@@ -1,7 +1,8 @@
 import os
 import json
 import copy
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 from importlib.resources import files as _importlib_files
 
@@ -55,18 +56,28 @@ def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any
 def _load_packaged_default() -> Dict[str, Any]:
     """Load the packaged default configuration shipped with the package.
 
-    Falls back to ``DEFAULT_CONFIG`` if the packaged resource is missing
-    or unreadable (e.g. running from a source tree without the resource).
+    Tries ``importlib.resources`` first (works for installed/editable
+    packages), then falls back to the file path relative to this module
+    (works when running from a source tree via ``PYTHONPATH``). If the
+    resource is missing or unreadable, ``DEFAULT_CONFIG`` is used.
     """
+    candidates = []
     try:
-        path = _importlib_files("pg_amcd") / "configs" / "default.json"
-        with path.open("r", encoding="utf-8") as f:
-            return json.load(f)
-    except (ModuleNotFoundError, FileNotFoundError, json.JSONDecodeError):
-        return copy.deepcopy(DEFAULT_CONFIG)
+        candidates.append(_importlib_files("pg_amcd") / "configs" / "default.json")
+    except (ModuleNotFoundError, FileNotFoundError):
+        pass
+    candidates.append(Path(__file__).resolve().parent / "configs" / "default.json")
+
+    for path in candidates:
+        try:
+            with path.open("r", encoding="utf-8") as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            continue
+    return copy.deepcopy(DEFAULT_CONFIG)
 
 
-def load_pipeline_config(config_path: str = None) -> Dict[str, Any]:
+def load_pipeline_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     """Load pipeline configuration.
 
     Resolution rule:

@@ -1,0 +1,12 @@
+{
+  "sampling_rate": 1000,
+  "segment_points": 1000,
+  "ceemdan": {
+    "trials": 2,
+    "search_trials": 1,
+    "epsilon": 0.02,
+    "noise_seed": 42,
+    "sifting_iterations": 2,
+    "search_cutoffs": [20]
+  }
+}

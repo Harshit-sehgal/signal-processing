@@ -31,7 +31,10 @@ run:
 evaluate:
 	PYTHONPATH=src $(PYTHON_ENV) scripts/evaluate.py
 
-reproduce: test evaluate
+validate:
+	PYTHONPATH=src $(PYTHON_ENV) scripts/validate_research.py
+
+reproduce: test evaluate validate
 	@echo "=================================================="
 	@echo "🎉 FULL REPRODUCTION RUN COMPLETED SUCCESSFULLY! 🎉"
 	@echo "=================================================="

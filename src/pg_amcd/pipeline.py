@@ -15,6 +15,7 @@ from pg_amcd.features import extract_window_features
 
 @dataclass
 class WindowResult:
+    time_segment: np.ndarray
     start_time: float
     end_time: float
     start_idx: int
@@ -106,7 +107,7 @@ def process_recording(
     
     # 1. Preprocessing (optimal cutoff is loaded or pre-calculated)
     cutoff = config.get("ceemdan", {}).get("selected_cutoff", 100.0)
-    high_cutoff = 4000.0
+    high_cutoff = min(4000.0, fs / 2.0 - 10.0)
     
     physical_preprocessed, scaled_preprocessed, scale_factor = preprocess_signal(
         signal, 
@@ -218,6 +219,7 @@ def process_recording(
         label = "chatter" if rms_val > 0.15 else "stable"
         
         window_results.append(WindowResult(
+            time_segment=t_seg,
             start_time=win['start_time'],
             end_time=win['end_time'],
             start_idx=win['start_idx'],
