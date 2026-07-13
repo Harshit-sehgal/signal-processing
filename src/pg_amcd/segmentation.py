@@ -9,6 +9,8 @@ def select_max_energy_segment_indices(
     containing the highest energy.
     """
     N = len(signal)
+    if segment_points <= 0:
+        raise ValueError(f"segment_points must be positive, got {segment_points}")
     if N <= segment_points:
         return 0, N
         
@@ -37,7 +39,15 @@ def generate_sliding_windows(
             'time_segment': Sliced time array
             'signal_segment': Sliced signal array
     """
+    if window_seconds <= 0:
+        raise ValueError(f"window_seconds must be positive, got {window_seconds}")
     segment_points = int(window_seconds * fs)
+    if segment_points < 1:
+        raise ValueError(
+            f"window_seconds={window_seconds} * fs={fs} yields fewer than 1 sample"
+        )
+    if overlap_ratio < 0.0 or overlap_ratio >= 1.0:
+        raise ValueError(f"overlap_ratio must be in [0, 1), got {overlap_ratio}")
     step_points = int(segment_points * (1.0 - overlap_ratio))
     if step_points <= 0:
         step_points = 1

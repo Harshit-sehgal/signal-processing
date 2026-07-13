@@ -39,3 +39,23 @@ def test_select_best_wavelet_returns_candidate():
     assert (best["wavelet"], best["level"]) in [("db4", 3), ("sym5", 3), ("coif1", 3)]
     assert len(results) == 3
     assert all(np.isfinite(r["snr_db"]) for r in results)
+
+
+def test_wavelet_denoise_invalid_level():
+    fs = 1000.0
+    t, sig, _ = generate_synthetic_signal(fs=fs, duration=0.5, seed=5, chatter_freq=125.0)
+    with pytest.raises(ValueError):
+        wavelet_denoise(
+            sig, wavelet_name="db4", level=0, fs=fs,
+            chatter_center=125.0, chatter_spread=50.0,
+        )
+
+
+def test_wavelet_denoise_too_short():
+    fs = 1000.0
+    sig = np.ones(2)
+    with pytest.raises(ValueError):
+        wavelet_denoise(
+            sig, wavelet_name="db4", level=1, fs=fs,
+            chatter_center=125.0, chatter_spread=50.0,
+        )

@@ -18,6 +18,13 @@ def butter_bandpass_filter_sos(
         raise ValueError(
             f"Invalid filter cutoffs: [{low_cutoff}, {high_cutoff}] Hz for Nyquist {nyquist} Hz"
         )
+    if order <= 0:
+        raise ValueError(f"Filter order must be a positive integer, got {order}")
+    if len(signal) < 2 * order + 1:
+        raise ValueError(
+            f"Signal length {len(signal)} is too short for a filter of order {order} "
+            f"(need at least {2 * order + 1} samples for sosfiltfilt)"
+        )
         
     sos = scipy.signal.butter(
         order,

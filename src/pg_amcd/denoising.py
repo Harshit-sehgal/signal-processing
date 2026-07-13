@@ -25,13 +25,20 @@ def wavelet_denoise(
     If band_aware is True, the threshold is scaled depending on whether the DWT
     subband overlaps with the expected chatter frequency band.
     """
-    # 1. Clamp decomposition level to prevent ValueError
-    try:
-        max_level = pywt.dwt_max_level(len(signal), pywt.Wavelet(wavelet_name).dec_len)
-        if level > max_level:
-            level = max_level
-    except Exception:
-        level = min(level, 4)
+    # 1. Validate wavelet and decomposition level
+    wavelet = pywt.Wavelet(wavelet_name)  # raises ValueError if name is invalid
+    if level < 1:
+        raise ValueError(f"Wavelet decomposition level must be >= 1, got {level}")
+    if len(signal) < 2:
+        raise ValueError(f"Signal too short for wavelet denoising: {len(signal)} samples")
+    max_level = pywt.dwt_max_level(len(signal), wavelet.dec_len)
+    if max_level < 1:
+        raise ValueError(
+            f"Signal length {len(signal)} is too short for wavelet '{wavelet_name}' "
+            f"(max decomposition level is 0)"
+        )
+    if level > max_level:
+        level = max_level
         
     # 2. Multilevel decomposition
     # coeffs list: [cA_N, cD_N, cD_N-1, ..., cD_1]

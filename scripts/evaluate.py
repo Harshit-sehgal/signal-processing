@@ -6,6 +6,7 @@ from sklearn.model_selection import GroupKFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
 # Add current directory and src/ to path so we can import pg_amcd
@@ -168,7 +169,10 @@ def main():
     classifiers = {
         "Logistic Regression": LogisticRegression(max_iter=1000),
         "Random Forest": RandomForestClassifier(random_state=42),
-        "Support Vector Machine": SVC(probability=True, random_state=42),
+        "Support Vector Machine": CalibratedClassifierCV(
+            estimator=SVC(random_state=42),
+            ensemble=False,
+        ),
         "Gradient Boosting": GradientBoostingClassifier(random_state=42)
     }
     

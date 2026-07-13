@@ -1,6 +1,7 @@
 """Segmentation tests (max-energy segment + sliding windows)."""
 
 import numpy as np
+import pytest
 
 from pg_amcd.segmentation import select_max_energy_segment_indices, generate_sliding_windows
 
@@ -34,10 +35,38 @@ def test_sliding_windows():
         assert "time_segment" in w
 
 
-def test_sliding_windows_invalid_overlap_does_not_hang():
+def test_sliding_windows_invalid_overlap_raises():
     fs = 1000.0
     n = 4000
     t = np.arange(n) / fs
     sig = np.sin(2 * np.pi * 50 * t)
-    wins = generate_sliding_windows(t, sig, fs, window_seconds=1.0, overlap_ratio=1.5)
-    assert isinstance(wins, list)
+    with pytest.raises(ValueError):
+        generate_sliding_windows(t, sig, fs, window_seconds=1.0, overlap_ratio=1.5)
+
+
+def test_select_max_energy_invalid_segment_points():
+    sig = np.ones(500)
+    with pytest.raises(ValueError):
+        select_max_energy_segment_indices(sig, segment_points=0)
+    with pytest.raises(ValueError):
+        select_max_energy_segment_indices(sig, segment_points=-10)
+
+
+def test_sliding_windows_invalid_window_seconds():
+    fs = 1000.0
+    n = 4000
+    t = np.arange(n) / fs
+    sig = np.sin(2 * np.pi * 50 * t)
+    with pytest.raises(ValueError):
+        generate_sliding_windows(t, sig, fs, window_seconds=0.0, overlap_ratio=0.5)
+    with pytest.raises(ValueError):
+        generate_sliding_windows(t, sig, fs, window_seconds=-1.0, overlap_ratio=0.5)
+
+
+def test_sliding_windows_negative_overlap():
+    fs = 1000.0
+    n = 4000
+    t = np.arange(n) / fs
+    sig = np.sin(2 * np.pi * 50 * t)
+    with pytest.raises(ValueError):
+        generate_sliding_windows(t, sig, fs, window_seconds=1.0, overlap_ratio=-0.2)
