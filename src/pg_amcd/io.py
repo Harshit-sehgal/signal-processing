@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import scipy.io
-from typing import Tuple, Dict, Any
+from typing import Tuple
 
 def validate_and_load_signal(
     file_path: str, 
@@ -70,7 +70,10 @@ def validate_and_load_signal(
     # exactly N samples at fs Hz is accepted as N/fs seconds (e.g. 10000
     # samples at 10 kHz is 1.0000 s, not 0.9999 s from floating-point time).
     duration = len(signal) / fs_estimated
-    if duration < min_duration_seconds:
+    # Tolerance absorbs floating-point noise in fs_estimated so that a signal
+    # with exactly N samples at the rated fs (N/fs seconds) is not
+    # rejected at the boundary.
+    if duration < min_duration_seconds - 1e-6:
         raise ValueError(
             f"Signal duration ({duration:.4f}s) is shorter than minimum "
             f"required ({min_duration_seconds}s)."

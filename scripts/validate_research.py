@@ -11,8 +11,6 @@ from sklearn.metrics import accuracy_score, f1_score
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
 
-from pg_amcd.config import load_pipeline_config
-from pg_amcd.evaluation import build_dataset_index
 
 def run_evaluation_on_feature_subset(X, y, groups, feature_indices):
     """Runs GroupKFold evaluation on a subset of features."""

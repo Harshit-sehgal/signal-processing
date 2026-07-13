@@ -1,9 +1,8 @@
-import os
 import numpy as np
 import scipy.stats
 import scipy.signal
 from dataclasses import dataclass
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 
 # Import local pg_amcd modules
 from pg_amcd.preprocessing import preprocess_signal
@@ -47,23 +46,27 @@ def apply_temporal_decision_logic(
     min_consecutive_windows: int = 2
 ):
     """Applies median probability filtering and a hysteresis state machine over adjacent windows.
-    
+
     Prevents prediction flickering and ensures stable cutting-state transitions.
+
+    NOTE: Not invoked by ``process_recording`` in the current commit. Chatter
+    detection is intentionally left unevaluated (see Segment 6) until a
+    validated detector replaces the placeholder heuristic.
     """
     if not window_results:
         return
-        
+
     probs = [res.chatter_probability for res in window_results]
-    
+
     # 1. Median filter to smooth window-to-window flicker
-    kernel_size = min(len(probs) | 1, 3) # ensure odd kernel size
+    kernel_size = min(len(probs) | 1, 3)  # ensure odd kernel size
     smoothed_probs = scipy.signal.medfilt(probs, kernel_size=kernel_size)
-    
+
     # 2. Hysteresis State Machine
     state = "stable"
     for i, res in enumerate(window_results):
         sp = smoothed_probs[i]
-        
+
         if state == "stable":
             # Require enter threshold to be exceeded for consecutive windows
             if sp >= enter_chatter_threshold:
@@ -82,7 +85,7 @@ def apply_temporal_decision_logic(
             # Require drop below exit threshold to transition back to stable
             if sp < exit_chatter_threshold:
                 state = "stable"
-                
+
         # Update predictions
         res.chatter_probability = float(sp)
         res.predicted_label = state
@@ -95,29 +98,29 @@ def process_recording(
     mode: str = "exploratory"  # "exploratory" or "sliding_window"
 ) -> PipelineResult:
     """The canonical entrypoint to process a single machining vibration recording.
-    
-    Preserves amplitude and runs input validation, preprocessing, segmentation, 
-    CEEMDAN, physics-aware gating, band-aware Wavelet Denoising, and temporal decision logic.
+
+    Preserves amplitude and runs input validation, preprocessing, segmentation,
+    CEEMDAN, physics-aware gating, and band-aware Wavelet Denoising.
     """
     warnings = []
     fs = config["sampling_rate"]
-    
+
     rpm = metadata.get("rpm", 570.0) if metadata else 570.0
     tooth_count = metadata.get("tooth_count", 1) if metadata else 1
-    
+
     # 1. Preprocessing (optimal cutoff is loaded or pre-calculated)
     cutoff = config.get("ceemdan", {}).get("selected_cutoff", 100.0)
     high_cutoff = min(4000.0, fs / 2.0 - 10.0)
-    
+
     physical_preprocessed, scaled_preprocessed, scale_factor = preprocess_signal(
-        signal, 
-        low_cutoff=cutoff, 
-        high_cutoff=high_cutoff, 
+        signal,
+        low_cutoff=cutoff,
+        high_cutoff=high_cutoff,
         fs=fs
     )
-    
+
     window_results = []
-    
+
     # 2. Segment Generation
     if mode == "exploratory":
         segment_points = config.get("segment_points", 10000)
@@ -132,30 +135,30 @@ def process_recording(
         }]
     else:
         windows = generate_sliding_windows(
-            time, 
-            scaled_preprocessed, 
-            fs, 
-            window_seconds=1.0, 
+            time,
+            scaled_preprocessed,
+            fs,
+            window_seconds=1.0,
             overlap_ratio=0.75
         )
-        
+
     # 3. Process Windows
     ceemdan_cfg = config["ceemdan"]
     trials = ceemdan_cfg["trials"]
     epsilon = ceemdan_cfg["epsilon"]
     seed = ceemdan_cfg["noise_seed"]
     sifting_iterations = ceemdan_cfg.get("sifting_iterations", 16)
-    
+
     chatter_center = config["maiw"]["chatter_band_center"]
     chatter_spread = config["maiw"]["chatter_band_spread"]
-    
+
     for win in windows:
         t_seg = win['time_segment']
         s_seg = win['signal_segment']
-        
+
         # A. CEEMDAN Decomposition
         imfs = run_ceemdan(s_seg, trials, epsilon, seed, sifting_iterations)
-        
+
         # B. Gating/Weighting (Dynamic toggle for standard vs. physics gating)
         use_physics = config.get("use_physics_gating", True)
         if use_physics:
@@ -166,23 +169,23 @@ def process_recording(
         else:
             W, _, _, _, _ = calculate_maiw_weights(imfs, s_seg, fs, config)
             reconstructed_scaled = reconstruct_weighted_signal(imfs, W)
-            
+
         # C. Wavelet Denoising (Band-Aware)
         denoised_scaled = wavelet_denoise(
-            reconstructed_scaled, 
-            wavelet_name=config["wavelet"]["wavelet_name"], 
+            reconstructed_scaled,
+            wavelet_name=config["wavelet"]["wavelet_name"],
             level=config["wavelet"]["level"],
             fs=fs,
             chatter_center=chatter_center,
             chatter_spread=chatter_spread,
             band_aware=config.get("wavelet", {}).get("band_aware", True)
         )
-        
+
         # D. Convert Denoised Output back to Physical Units
         denoised_physical = denoised_scaled * scale_factor
         maiw_reconstructed_physical = reconstructed_scaled * scale_factor
-        
-        # E. Calculate Features (Goal 11)
+
+        # E. Calculate Features
         features = extract_window_features(
             raw_window=signal[win['start_idx']:win['end_idx']],
             prep_physical_window=physical_preprocessed[win['start_idx']:win['end_idx']],
@@ -194,10 +197,10 @@ def process_recording(
             chatter_center=chatter_center,
             chatter_spread=chatter_spread
         )
-        
+
         # Calculate diagnostics
         mmi, _ = calculate_adjacent_imf_correlation(imfs)
-        
+
         cross_terms = 0.0
         num_layers = imfs.shape[0]
         for idx1 in range(num_layers):
@@ -205,19 +208,21 @@ def process_recording(
                 cross_terms += np.sum(imfs[idx1] * imfs[idx2])
         orig_energy = np.sum(s_seg ** 2)
         oi = float(2.0 * cross_terms / orig_energy) if orig_energy > 0 else 0.0
-        
+
         recon_err = np.sum(imfs, axis=0) - s_seg
         nrmse = float(np.sqrt(np.mean(recon_err ** 2)) / np.sqrt(np.mean(s_seg ** 2))) if np.any(s_seg) else 0.0
-        
+
         features["mmi"] = mmi
         features["oi"] = oi
         features["nrmse"] = nrmse
-        
-        # Simple threshold classification based on RMS
-        rms_val = features["time_rms"]
-        prob = float(min(1.0, rms_val / 0.5))
-        label = "chatter" if rms_val > 0.15 else "stable"
-        
+
+        # Chatter detection is intentionally NOT evaluated in this commit.
+        # The placeholder RMS heuristic and arbitrary confidence=0.9 were removed
+        # until a validated detector exists (see Segment 6 of the roadmap).
+        chatter_probability = float("nan")
+        predicted_label = "not_evaluated"
+        confidence = float("nan")
+
         window_results.append(WindowResult(
             time_segment=t_seg,
             start_time=win['start_time'],
@@ -225,23 +230,15 @@ def process_recording(
             start_idx=win['start_idx'],
             end_idx=win['end_idx'],
             features=features,
-            chatter_probability=prob,
-            predicted_label=label,
+            chatter_probability=chatter_probability,
+            predicted_label=predicted_label,
             selected_imfs=[i for i in range(len(W)) if W[i] > 0.05],
-            confidence=0.9,
+            confidence=confidence,
             imfs=imfs,
             maiw_reconstructed=maiw_reconstructed_physical,
             denoised_clean=denoised_physical
         ))
-        
-    # 4. Apply Hysteresis and Smoothing Temporal Logic (Goal 14)
-    apply_temporal_decision_logic(
-        window_results,
-        enter_chatter_threshold=config.get("enter_chatter_threshold", 0.60),
-        exit_chatter_threshold=config.get("exit_chatter_threshold", 0.35),
-        min_consecutive_windows=config.get("min_consecutive_windows", 2)
-    )
-    
+
     selected_params = {
         "cutoff_frequency": cutoff,
         "ceemdan_trials": trials,
@@ -251,7 +248,7 @@ def process_recording(
         "wavelet_level": config["wavelet"]["level"],
         "use_physics_gating": use_physics
     }
-    
+
     return PipelineResult(
         raw_signal=signal,
         physical_preprocessed_signal=physical_preprocessed,

@@ -140,8 +140,6 @@ def run_pipeline_on_dataset(args):
                 'tsDS': np.column_stack((win_res.time_segment, win_res.maiw_reconstructed))
             })
             
-            # Save Clean (Stage 3)
-            clean_path = os.path.join(target_folder, base_name.replace(".mat", "_Clean.mat")) # Wait, keep naming consistent with clean_folder
             # To match the monitor and pipeline, let's write to Vibration_Clean
             # In the new structure, we can just save all outputs under the output directory:
             # outputs/Vibration_IMFs/, outputs/Vibration_MAIW/, outputs/Vibration_Clean/

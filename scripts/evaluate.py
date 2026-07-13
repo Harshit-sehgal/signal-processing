@@ -1,9 +1,7 @@
 import os
 import sys
 import json
-import glob
 import numpy as np
-import scipy.io
 from sklearn.model_selection import GroupKFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier

@@ -1,9 +1,6 @@
-import pytest
 import numpy as np
-import scipy.signal
 
 from pg_amcd.preprocessing import preprocess_signal
-from pg_amcd.pipeline import process_recording
 from pg_amcd.weighting import calculate_physics_gated_weights, reconstruct_weighted_signal
 from pg_amcd.decomposition import run_ceemdan
 from pg_amcd.denoising import wavelet_denoise

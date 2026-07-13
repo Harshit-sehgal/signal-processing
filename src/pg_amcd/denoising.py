@@ -1,6 +1,5 @@
 import numpy as np
 import pywt
-from typing import Dict, Any
 
 def bayes_shrink_threshold(coeff: np.ndarray, noise_sigma: float) -> float:
     """Calculates the standard BayesShrink adaptive threshold for a subband."""

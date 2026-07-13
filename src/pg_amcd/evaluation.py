@@ -2,7 +2,7 @@ import os
 import re
 import glob
 import openpyxl
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 
 def build_dataset_index(
     input_dir: str, 

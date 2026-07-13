@@ -2,7 +2,7 @@ import numpy as np
 import scipy.stats
 import scipy.signal
 import scipy.fftpack
-from typing import Dict, Any
+from typing import Dict
 
 def extract_window_features(
     raw_window: np.ndarray,
