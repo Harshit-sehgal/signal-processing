@@ -22,6 +22,7 @@ def perform_optimized_decomposition(raw_path, preprocessed_path, npz_path, plot_
     config = load_pipeline_config()
     ceemdan_cfg = config["ceemdan"]
     fs = config["sampling_rate"]
+    high_cutoff_val = min(4000.0, fs / 2.0 - 10.0)
     
     try:
         # Load and validate signal
@@ -38,7 +39,7 @@ def perform_optimized_decomposition(raw_path, preprocessed_path, npz_path, plot_
     print("Looping cutoffs to find optimal preprocessing...")
     for cut in cutoffs:
         # Preprocess
-        _, scaled, _ = preprocess_signal(raw_vibration, cut, 4000.0, fs)
+        _, scaled, _ = preprocess_signal(raw_vibration, cut, high_cutoff_val, fs)
         
         # Segment indices for max energy
         start_idx, end_idx = select_max_energy_segment_indices(scaled, config["segment_points"])
@@ -61,7 +62,7 @@ def perform_optimized_decomposition(raw_path, preprocessed_path, npz_path, plot_
     print(f"Optimal low cutoff selected: {best_cutoff} Hz (score: {best_score:.4f})")
     
     # 2. Final preprocessing with optimal cutoff and save
-    physical_prep, scaled_prep, scale_factor = preprocess_signal(raw_vibration, best_cutoff, 4000.0, fs)
+    physical_prep, scaled_prep, scale_factor = preprocess_signal(raw_vibration, best_cutoff, high_cutoff_val, fs)
     reconstructed_tsDS = np.column_stack((time_arr, physical_prep))
     scipy.io.savemat(preprocessed_path, {'tsDS': reconstructed_tsDS})
     print(f"Saved optimized preprocessed data to {preprocessed_path}")

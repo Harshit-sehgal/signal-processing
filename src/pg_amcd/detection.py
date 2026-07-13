@@ -15,7 +15,7 @@ The pipeline currently leaves ``chatter_probability`` as ``nan``
 into a fake detector.
 """
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -221,3 +221,42 @@ def evaluate_detector(
     y_pred = np.asarray(y_pred)
     y_proba = np.asarray(y_proba, dtype=float)
     return _score_fold(y_true, y_pred, y_proba)
+
+
+def fit_probability_calibrator(
+    y_true: Sequence[int],
+    y_proba: Sequence[float],
+    method: str = "isotonic",
+) -> Callable[[np.ndarray], np.ndarray]:
+    """Fit a calibrator mapping raw detector scores onto calibrated probabilities.
+
+    Feed this the out-of-fold probabilities from grouped cross-validation
+    (never the in-sample probabilities) so the calibration is leakage-proof,
+    satisfying Goal 6.5's "calibrated chatter probabilities". Returns a callable
+    ``f(raw_probs) -> calibrated_probs``.
+    """
+    if not _HAVE_SKLEARN:
+        raise RuntimeError("scikit-learn is required for probability calibration")
+    if method not in ("isotonic", "sigmoid", "platt"):
+        raise ValueError(f"Unknown calibration method: {method!r}")
+    y_true = np.asarray(y_true)
+    y_proba = np.asarray(y_proba, dtype=float).ravel()
+    if y_true.shape[0] != y_proba.shape[0]:
+        raise ValueError(
+            f"y_true ({y_true.shape[0]}) and y_proba ({y_proba.shape[0]}) "
+            "length mismatch"
+        )
+    if method == "isotonic":
+        from sklearn.isotonic import IsotonicRegression
+
+        cal = IsotonicRegression(out_of_bounds="clip", y_min=0.0, y_max=1.0)
+        cal.fit(y_proba, y_true)
+        return cal.predict
+    # Platt / sigmoid scaling via logistic regression
+    from sklearn.linear_model import LogisticRegression
+
+    lr = LogisticRegression(C=1e6)
+    lr.fit(y_proba.reshape(-1, 1), y_true)
+    return lambda p: lr.predict_proba(
+        np.asarray(p, dtype=float).ravel().reshape(-1, 1)
+    )[:, 1]

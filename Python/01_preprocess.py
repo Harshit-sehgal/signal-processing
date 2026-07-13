@@ -1,60 +1,66 @@
 import os
+import sys
 import glob
 import numpy as np
 import scipy.io
-from scipy import signal
-from scipy import signal
 
-def preprocess_signal(file_path):
+# Add current directory and src/ to path so we can import pg_amcd
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
+
+from pg_amcd.config import load_pipeline_config
+from pg_amcd.io import validate_and_load_signal
+from pg_amcd.preprocessing import preprocess_signal
+
+def preprocess_signal_legacy(file_path):
     print(f"\nProcessing: {os.path.basename(file_path)}")
-    print("1. Loading Data...")
+    config = load_pipeline_config()
+    fs = config["sampling_rate"]
+    low_cutoff = config["preprocessing"]["low_cutoff"]
+    high_cutoff = config["preprocessing"]["high_cutoff"]
+    order = config["preprocessing"]["order"]
+    
+    # Dynamically cap high_cutoff if Nyquist is too low
+    high_cutoff_val = min(high_cutoff, fs / 2.0 - 10.0)
+    
     try:
-        data = scipy.io.loadmat(file_path)['tsDS']
+        time, raw_vibration, _ = validate_and_load_signal(file_path, fs)
     except Exception as e:
         print(f"Error loading {file_path}: {e}")
         return None, None
         
-    time = data[:, 0]
-    raw_vibration = data[:, 1]
+    # Reuse standard robust preprocessing library (SOS filtering + detrending)
+    physical_prep, _, _ = preprocess_signal(
+        raw_vibration,
+        low_cutoff=low_cutoff,
+        high_cutoff=high_cutoff_val,
+        fs=fs,
+        order=order
+    )
     
-    print("2. Denoising (Band-Pass Filter)... starts")
-    # The sensor samples at 10,000 Hz. We apply a 3rd-order Butterworth band-pass filter
-    # from 100 Hz to 4,000 Hz to remove low-frequency spindle forced vibrations and
-    # ultra-high frequency electrical 'hiss'.
-    nyquist = 0.5 * 10000 
-    low_cutoff = 100
-    high_cutoff = 4000         
-    b, a = signal.butter(3, [low_cutoff / nyquist, high_cutoff / nyquist], btype='band')
-    denoised = signal.filtfilt(b, a, raw_vibration)
-    print("2. Denoising... finished")
-    
-    print("3. Detrending (Centering)... starts")
-    # Removes any "slope" or DC offset (sensor drift) from the data so it sits perfectly around zero.
-    # Doing this AFTER denoising works beautifully, especially if the high-frequency noise was slightly unbalancing the average.
-    detrended = signal.detrend(denoised)
-    print("3. Detrending... finished")
-    
-    print("4. Normalization (Scaling)... starts")
-    max_val = np.max(np.abs(detrended))
-    normalized = detrended / max_val
-    print("4. Normalization... finished")
-    
-    
+    # Normalized scaling expected by legacy script
+    max_val = np.max(np.abs(physical_prep))
+    if max_val > 0:
+        normalized = physical_prep / max_val
+    else:
+        normalized = physical_prep
+        
     return time, normalized
 
 if __name__ == "__main__":
-
-    base_dir = "/home/harshit/Documents/Research/Vibration - ML"
+    config = load_pipeline_config()
+    suffix = config.get("output_suffix", "")
     
-    output_dir = "/home/harshit/Documents/Research/Vibration - ML_Preprocessed"
+    # Resolve paths dynamically relative to repository root
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base_dir = os.path.join(root_dir, "Vibration - ML")
+    output_dir = os.path.join(root_dir, f"Vibration - ML_Preprocessed{suffix}")
     os.makedirs(output_dir, exist_ok=True)
     
-    all_mat_files = glob.glob(os.path.join(base_dir, "**/*.mat"), recursive=True) #for loading all the files, glob utility searches for the similar file path and fetch it
-    
+    all_mat_files = glob.glob(os.path.join(base_dir, "**/*.mat"), recursive=True)
     print(f"Found {len(all_mat_files)} total .mat data files to process.")
     
     for file_path in all_mat_files:
-        
         folder_name = os.path.basename(os.path.dirname(file_path))
         file_name = os.path.basename(file_path)
         
@@ -68,12 +74,10 @@ if __name__ == "__main__":
             continue
             
         print(f"\n[{folder_name}] -> Generating {file_name}...")
-        
-        time, preprocessed_vibration = preprocess_signal(file_path)
+        time, preprocessed_vibration = preprocess_signal_legacy(file_path)
         
         if time is not None and preprocessed_vibration is not None:
             reconstructed_tsDS = np.column_stack((time, preprocessed_vibration))
-            
             scipy.io.savemat(target_mat_path, {'tsDS': reconstructed_tsDS})
             print(f"Success! Saved preprocessed data to {target_mat_path}")
             
