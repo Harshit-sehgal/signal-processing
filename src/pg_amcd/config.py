@@ -1,8 +1,12 @@
 import os
 import json
+import copy
 from typing import Any, Dict
 
-# Default configuration values in case config.json is missing
+from importlib.resources import files as _importlib_files
+
+# Default configuration values used as the packaged fallback and as the
+# base layer when an explicit configuration file is provided.
 DEFAULT_CONFIG = {
     "sampling_rate": 10000.0,
     "segment_points": 10000,
@@ -28,33 +32,60 @@ DEFAULT_CONFIG = {
     }
 }
 
+
+def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+    """Recursively merge ``override`` onto a copy of ``base``.
+
+    Nested dictionaries are merged key-by-key; all other values (including
+    lists) are replaced by the override value.
+    """
+    result = copy.deepcopy(base)
+    for key, value in override.items():
+        if (
+            key in result
+            and isinstance(result[key], dict)
+            and isinstance(value, dict)
+        ):
+            result[key] = _deep_merge(result[key], value)
+        else:
+            result[key] = copy.deepcopy(value)
+    return result
+
+
+def _load_packaged_default() -> Dict[str, Any]:
+    """Load the packaged default configuration shipped with the package.
+
+    Falls back to ``DEFAULT_CONFIG`` if the packaged resource is missing
+    or unreadable (e.g. running from a source tree without the resource).
+    """
+    try:
+        path = _importlib_files("pg_amcd") / "configs" / "default.json"
+        with path.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except (ModuleNotFoundError, FileNotFoundError, json.JSONDecodeError):
+        return copy.deepcopy(DEFAULT_CONFIG)
+
+
 def load_pipeline_config(config_path: str = None) -> Dict[str, Any]:
-    """Loads configuration parameters from JSON.
-    
-    If config_path is not specified, it searches for config.json in the
-    current directory and Python source root. If none is found, fallback to defaults.
+    """Load pipeline configuration.
+
+    Resolution rule:
+
+    * Explicit ``--config`` path wins. The file is deep-merged on top of
+      the packaged default so that partial configurations still receive
+      defaults for keys they omit (e.g. ``wavelet`` / ``maiw``).
+    * Without an explicit path, the packaged default is used.
+
+    Arbitrary working-directory searching is intentionally NOT performed.
     """
     if config_path is not None:
-        if os.path.exists(config_path):
-            with open(config_path, 'r') as f:
-                return json.load(f)
-        else:
+        if not os.path.exists(config_path):
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
-            
-    # Search paths
-    search_dirs = [
-        os.getcwd(),
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Python")
-    ]
-    
-    for d in search_dirs:
-        p = os.path.join(d, "config.json")
-        if os.path.exists(p):
-            try:
-                with open(p, 'r') as f:
-                    return json.load(f)
-            except Exception:
-                pass
-                
-    return DEFAULT_CONFIG.copy()
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                file_cfg = json.load(f)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Invalid configuration: {exc}") from exc
+        return _deep_merge(_load_packaged_default(), file_cfg)
+
+    return _load_packaged_default()

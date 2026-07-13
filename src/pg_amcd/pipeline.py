@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import scipy.stats
+import scipy.signal
 from dataclasses import dataclass
 from typing import List, Dict, Any, Tuple
 
@@ -38,6 +39,53 @@ class PipelineResult:
     selected_parameters: Dict[str, Any]
     warnings: List[str]
 
+def apply_temporal_decision_logic(
+    window_results: List[WindowResult],
+    enter_chatter_threshold: float = 0.60,
+    exit_chatter_threshold: float = 0.35,
+    min_consecutive_windows: int = 2
+):
+    """Applies median probability filtering and a hysteresis state machine over adjacent windows.
+    
+    Prevents prediction flickering and ensures stable cutting-state transitions.
+    """
+    if not window_results:
+        return
+        
+    probs = [res.chatter_probability for res in window_results]
+    
+    # 1. Median filter to smooth window-to-window flicker
+    kernel_size = min(len(probs) | 1, 3) # ensure odd kernel size
+    smoothed_probs = scipy.signal.medfilt(probs, kernel_size=kernel_size)
+    
+    # 2. Hysteresis State Machine
+    state = "stable"
+    for i, res in enumerate(window_results):
+        sp = smoothed_probs[i]
+        
+        if state == "stable":
+            # Require enter threshold to be exceeded for consecutive windows
+            if sp >= enter_chatter_threshold:
+                consecutive = True
+                for k in range(min_consecutive_windows):
+                    if i + k < len(smoothed_probs):
+                        if smoothed_probs[i + k] < enter_chatter_threshold:
+                            consecutive = False
+                            break
+                    else:
+                        consecutive = False
+                        break
+                if consecutive:
+                    state = "chatter"
+        elif state == "chatter":
+            # Require drop below exit threshold to transition back to stable
+            if sp < exit_chatter_threshold:
+                state = "stable"
+                
+        # Update predictions
+        res.chatter_probability = float(sp)
+        res.predicted_label = state
+
 def process_recording(
     time: np.ndarray,
     signal: np.ndarray,
@@ -48,7 +96,7 @@ def process_recording(
     """The canonical entrypoint to process a single machining vibration recording.
     
     Preserves amplitude and runs input validation, preprocessing, segmentation, 
-    CEEMDAN, physics-aware gating, and band-aware Wavelet Denoising.
+    CEEMDAN, physics-aware gating, band-aware Wavelet Denoising, and temporal decision logic.
     """
     warnings = []
     fs = config["sampling_rate"]
@@ -184,6 +232,14 @@ def process_recording(
             denoised_clean=denoised_physical
         ))
         
+    # 4. Apply Hysteresis and Smoothing Temporal Logic (Goal 14)
+    apply_temporal_decision_logic(
+        window_results,
+        enter_chatter_threshold=config.get("enter_chatter_threshold", 0.60),
+        exit_chatter_threshold=config.get("exit_chatter_threshold", 0.35),
+        min_consecutive_windows=config.get("min_consecutive_windows", 2)
+    )
+    
     selected_params = {
         "cutoff_frequency": cutoff,
         "ceemdan_trials": trials,

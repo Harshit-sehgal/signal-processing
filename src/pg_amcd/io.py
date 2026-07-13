@@ -65,8 +65,15 @@ def validate_and_load_signal(
             f"configured rate ({configured_fs:.2f} Hz) beyond {tolerance*100}% tolerance."
         )
         
-    duration = time[-1] - time[0]
+    # 7. Duration check.
+    # Use sample count over the estimated sampling rate so that a signal with
+    # exactly N samples at fs Hz is accepted as N/fs seconds (e.g. 10000
+    # samples at 10 kHz is 1.0000 s, not 0.9999 s from floating-point time).
+    duration = len(signal) / fs_estimated
     if duration < min_duration_seconds:
-        raise ValueError(f"Signal duration ({duration:.2f}s) is shorter than minimum required ({min_duration_seconds}s).")
+        raise ValueError(
+            f"Signal duration ({duration:.4f}s) is shorter than minimum "
+            f"required ({min_duration_seconds}s)."
+        )
         
     return time, signal, fs_estimated
