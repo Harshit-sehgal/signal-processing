@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pg_amcd"
+version = "2.0.0"
+description = "Physics-Guided Adaptive Multi-Stage Chatter Detection"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.25.0",
+    "scipy>=1.11.0",
+    "matplotlib>=3.7.0",
+    "PyEMD>=1.4.0",
+    "PyWavelets>=1.4.0",
+    "openpyxl>=3.1.0",
+    "pyyaml>=6.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+]
+
+[project.scripts]
+pg-amcd = "pg_amcd.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["pg_amcd*"]

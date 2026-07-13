@@ -1,80 +1,35 @@
 import os
+import sys
 import glob
 import numpy as np
 import scipy.io
 import scipy.signal
-from PyEMD import CEEMDAN
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from config_utils import load_pipeline_config
 
-def preprocess_raw_signal(raw_vibration, low_cutoff, fs=None):
-    config = load_pipeline_config()
-    if fs is None:
-        fs = config["sampling_rate"]
-        
-    nyquist = 0.5 * fs
-    high_cutoff = 4000.0
-    b, a = scipy.signal.butter(3, [low_cutoff / nyquist, high_cutoff / nyquist], btype='band')
-    denoised = scipy.signal.filtfilt(b, a, raw_vibration)
-    detrended = scipy.signal.detrend(denoised)
-    max_val = np.max(np.abs(detrended))
-    normalized = detrended / (max_val if max_val > 0 else 1.0)
-    return normalized
+# Add current directory to path so we can import packages
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def select_max_energy_segment(signal, time, segment_points=None):
-    config = load_pipeline_config()
-    if segment_points is None:
-        segment_points = config["segment_points"]
-        
-    if len(signal) > segment_points:
-        squared_signal = np.square(signal)
-        window = np.ones(segment_points)
-        rolling_energy = np.convolve(squared_signal, window, mode='valid')
-        start_idx = np.argmax(rolling_energy)
-        end_idx = start_idx + segment_points
-        return signal[start_idx:end_idx], time[start_idx:end_idx]
-    else:
-        return signal, time
-
-def evaluate_mode_mixing(s_seg, low_cutoff, trials=None, epsilon=None):
-    config = load_pipeline_config()
-    ceemdan_cfg = config["ceemdan"]
-    if trials is None:
-        trials = ceemdan_cfg["search_trials"]
-    if epsilon is None:
-        epsilon = ceemdan_cfg["epsilon"]
-        
-    fxe = ceemdan_cfg.get("sifting_iterations", 0)
-    ceemdan = CEEMDAN(trials=trials, epsilon=epsilon, FIXE=fxe, parallel=True)
-    ceemdan.noise_seed(ceemdan_cfg["noise_seed"])
-    imfs = ceemdan(s_seg)
-    num_imfs = imfs.shape[0]
-    
-    corrs = []
-    for i in range(num_imfs - 2): # exclude residual
-        corr = np.abs(np.corrcoef(imfs[i], imfs[i+1])[0, 1])
-        if not np.isnan(corr):
-            corrs.append(corr)
-            
-    avg_corr = np.mean(corrs) if corrs else 1.0
-    return avg_corr, imfs
+from pg_amcd.config import load_pipeline_config
+from pg_amcd.io import validate_and_load_signal
+from pg_amcd.preprocessing import preprocess_signal
+from pg_amcd.segmentation import select_max_energy_segment_indices
+from pg_amcd.decomposition import run_ceemdan, calculate_adjacent_imf_correlation
 
 def perform_optimized_decomposition(raw_path, preprocessed_path, npz_path, plot_path):
     print(f"\nDecomposing & Optimizing: {os.path.basename(raw_path)}")
     config = load_pipeline_config()
     ceemdan_cfg = config["ceemdan"]
+    fs = config["sampling_rate"]
     
     try:
-        raw_data = scipy.io.loadmat(raw_path)['tsDS']
+        # Load and validate signal
+        time_arr, raw_vibration, _ = validate_and_load_signal(raw_path, fs)
     except Exception as e:
-        print(f"Error loading {raw_path}: {e}")
+        print(f"Error validating {raw_path}: {e}")
         return
         
-    time_arr = raw_data[:, 0]
-    raw_vibration = raw_data[:, 1]
-    
     # 1. Parameter loop over low cutoffs to find best preprocessing
     cutoffs = ceemdan_cfg["search_cutoffs"]
     best_score = float('inf')
@@ -82,11 +37,21 @@ def perform_optimized_decomposition(raw_path, preprocessed_path, npz_path, plot_
     
     print("Looping cutoffs to find optimal preprocessing...")
     for cut in cutoffs:
-        normalized = preprocess_raw_signal(raw_vibration, cut)
-        s_seg, _ = select_max_energy_segment(normalized, time_arr)
+        # Preprocess
+        _, scaled, _ = preprocess_signal(raw_vibration, cut, 4000.0, fs)
         
-        # Fast evaluation
-        score, _ = evaluate_mode_mixing(s_seg, cut)
+        # Segment indices for max energy
+        start_idx, end_idx = select_max_energy_segment_indices(scaled, config["segment_points"])
+        s_seg = scaled[start_idx:end_idx]
+        
+        # Fast evaluation using search_trials
+        trials = ceemdan_cfg["search_trials"]
+        epsilon = ceemdan_cfg["epsilon"]
+        seed = ceemdan_cfg["noise_seed"]
+        sifting_iterations = ceemdan_cfg.get("sifting_iterations", 16)
+        
+        imfs = run_ceemdan(s_seg, trials, epsilon, seed, sifting_iterations)
+        score = calculate_adjacent_imf_correlation(imfs)
         print(f"  Cutoff {cut} Hz -> Avg Adj IMF Corr: {score:.4f}")
         
         if score < best_score:
@@ -96,25 +61,26 @@ def perform_optimized_decomposition(raw_path, preprocessed_path, npz_path, plot_
     print(f"Optimal low cutoff selected: {best_cutoff} Hz (score: {best_score:.4f})")
     
     # 2. Final preprocessing with optimal cutoff and save
-    opt_normalized = preprocess_raw_signal(raw_vibration, best_cutoff)
-    reconstructed_tsDS = np.column_stack((time_arr, opt_normalized))
+    physical_prep, scaled_prep, scale_factor = preprocess_signal(raw_vibration, best_cutoff, 4000.0, fs)
+    reconstructed_tsDS = np.column_stack((time_arr, physical_prep))
     scipy.io.savemat(preprocessed_path, {'tsDS': reconstructed_tsDS})
     print(f"Saved optimized preprocessed data to {preprocessed_path}")
     
     # 3. Final decomposition with trials from config
-    opt_s_seg, opt_t_seg = select_max_energy_segment(opt_normalized, time_arr)
+    start_idx, end_idx = select_max_energy_segment_indices(physical_prep, config["segment_points"])
+    opt_t_seg = time_arr[start_idx:end_idx]
+    opt_s_seg = scaled_prep[start_idx:end_idx]
+    
     trials = ceemdan_cfg["trials"]
     epsilon = ceemdan_cfg["epsilon"]
     seed = ceemdan_cfg["noise_seed"]
-    fxe = ceemdan_cfg.get("sifting_iterations", 0)
-    print(f"Running final CEEMDAN (trials={trials}, epsilon={epsilon}, FIXE={fxe})...")
+    sifting_iterations = ceemdan_cfg.get("sifting_iterations", 16)
     
-    final_ceemdan = CEEMDAN(trials=trials, epsilon=epsilon, FIXE=fxe, parallel=True)
-    final_ceemdan.noise_seed(seed)
-    imfs = final_ceemdan(opt_s_seg)
+    print(f"Running final CEEMDAN (trials={trials}, epsilon={epsilon}, sifting_iterations={sifting_iterations})...")
+    imfs = run_ceemdan(opt_s_seg, trials, epsilon, seed, sifting_iterations)
     
     # Save IMFs
-    np.savez_compressed(npz_path, time=opt_t_seg, original_signal=opt_s_seg, imfs=imfs)
+    np.savez_compressed(npz_path, time=opt_t_seg, original_signal=opt_s_seg, imfs=imfs, start_index=start_idx)
     print(f"Saved IMFs mathematically to {npz_path}")
     
     # Save Plot
@@ -141,13 +107,14 @@ def perform_optimized_decomposition(raw_path, preprocessed_path, npz_path, plot_
     print(f"Saved visual decomposition to {plot_path}")
 
 if __name__ == "__main__":
-    from config_utils import load_pipeline_config
     config = load_pipeline_config()
     suffix = config.get("output_suffix", "")
     
-    raw_dir = "/home/harshit/Documents/Research/Vibration - ML"
-    preprocessed_dir = "/home/harshit/Documents/Research/Vibration - ML_Preprocessed"
-    imf_output_dir = f"/home/harshit/Documents/Research/Vibration_IMFs{suffix}"
+    # Resolve paths relative to root directory
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    raw_dir = os.path.join(root_dir, "Vibration - ML")
+    preprocessed_dir = os.path.join(root_dir, "Vibration - ML_Preprocessed")
+    imf_output_dir = os.path.join(root_dir, f"Vibration_IMFs{suffix}")
     
     os.makedirs(preprocessed_dir, exist_ok=True)
     os.makedirs(imf_output_dir, exist_ok=True)

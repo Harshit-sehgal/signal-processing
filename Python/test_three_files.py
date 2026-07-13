@@ -17,8 +17,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from PyEMD import CEEMDAN
 
 # Import production pipeline functions directly
-from maiw_weighting import calculate_maiw_weights
-from wavelet_denoise import wavelet_denoise
+from pg_amcd.weighting import calculate_maiw_weights, reconstruct_weighted_signal
+from pg_amcd.denoising import wavelet_denoise
 
 # Helper function to load config
 def load_pipeline_config():
@@ -217,11 +217,9 @@ def main():
         plt.close()
         
         # 4. MAIW Reconstruction (Production logic: normalized metrics & no residual)
-        W, C, E, K, F = calculate_maiw_weights(imfs, opt_s_seg)
-        num_weighted = imfs.shape[0] - 1
-        reconstructed = np.zeros_like(opt_s_seg)
-        for i in range(num_weighted):
-            reconstructed += W[i] * imfs[i]
+        fs = config["sampling_rate"]
+        W, C, E, K, F = calculate_maiw_weights(imfs, opt_s_seg, fs, config)
+        reconstructed = reconstruct_weighted_signal(imfs, W)
             
         # Scale reconstructed signal
         max_val_reconstructed = np.max(np.abs(reconstructed))
@@ -239,7 +237,11 @@ def main():
         })
         
         # 5. Wavelet Denoising (Production logic: BayesShrink with d1 estimation)
-        clean_signal = wavelet_denoise(reconstructed)
+        clean_signal = wavelet_denoise(
+            reconstructed,
+            wavelet_name=config["wavelet"]["wavelet_name"],
+            level=config["wavelet"]["level"]
+        )
         
         # Scale clean signal
         max_val_clean = np.max(np.abs(clean_signal))

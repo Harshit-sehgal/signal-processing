@@ -1,0 +1,2 @@
+[console_scripts]
+pg-amcd = pg_amcd.cli:main
