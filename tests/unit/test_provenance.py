@@ -2,7 +2,6 @@
 import os
 import time
 
-import pytest
 
 from pg_amcd.provenance import compute_file_sha256, is_output_stale, compute_run_id
 

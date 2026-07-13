@@ -1,8 +1,31 @@
 import os
 import re
 import glob
-import openpyxl
 from typing import List, Dict, Any
+# Goal 6.1 canonical metadata schema. A metadata workbook must provide these
+# columns (matched case-insensitively; a few accept the aliases the parser
+# already understands). Enforced by build_dataset_index.
+REQUIRED_METADATA_COLUMNS = (
+    "recording_id",
+    "experiment_run_id",
+    "stickout",
+    "tooth_count",
+    "tool_id",
+    "sensor_id",
+    "label",
+    "chatter_onset_time",
+    "rpm",
+    "doc",
+    "state",
+)
+# A required column is satisfied if it appears directly or via one of these
+# header aliases (consistent with the parser's existing column mappings).
+_REQUIRED_ALIASES = {
+    "rpm": {"rpm", "spindle speed"},
+    "doc": {"doc", "doc (in)", "corrected doc (in)"},
+    "state": {"state", "chatter/nochatter", "status"},
+    "label": {"label", "state", "chatter/nochatter", "status"},
+}
 
 def build_dataset_index(
     input_dir: str, 
@@ -16,6 +39,8 @@ def build_dataset_index(
     Raises:
         ValueError: If there are duplicate recordings or missing machining parameters.
     """
+    import openpyxl
+    
     if not os.path.exists(metadata_excel_path):
         raise FileNotFoundError(f"Metadata Excel file not found: {metadata_excel_path}")
         
@@ -25,6 +50,7 @@ def build_dataset_index(
     combinations = []
     sheets_to_load = [s for s in wb.sheetnames if s not in ['recording times']]
     
+    seen_columns = set()
     for sname in sheets_to_load:
         ws = wb[sname]
         rows = list(ws.iter_rows(values_only=True))
@@ -64,6 +90,7 @@ def build_dataset_index(
                 idx_feed = header.index(name)
                 break
                 
+        seen_columns.update(h for h in header if h)
         if idx_rpm == -1 or idx_doc == -1 or idx_state == -1:
             continue
             
@@ -106,6 +133,18 @@ def build_dataset_index(
                     'feed': feed_val,
                     'label': label
                 })
+
+    # Enforce the Goal 6.1 canonical metadata schema.
+    missing = [
+        c for c in REQUIRED_METADATA_COLUMNS
+        if c not in seen_columns
+        and not (c in _REQUIRED_ALIASES and _REQUIRED_ALIASES[c] & seen_columns)
+    ]
+    if missing:
+        raise ValueError(
+            "Metadata workbook is missing required columns (Goal 6.1): "
+            + ", ".join(sorted(missing))
+        )
 
     # 2. Scan MAT files and map them
     ld_map = {
@@ -190,3 +229,466 @@ def build_dataset_index(
         })
         
     return index_table
+
+
+def evaluate_directory(
+    npz_dir: str,
+    fs: float = 10_000.0,
+    rpm: float = 600.0,
+    tooth_count: int = 1,
+    random_state: int = 42,
+) -> Dict[str, Any]:
+    """Evaluate the detection scaffolding on a directory of ``*_IMFs.npz`` recordings.
+
+    Each ``.npz`` must contain ``original_signal``, ``imfs`` and ``start_index``;
+    the matching ``*_Clean.mat`` provides the denoised physical signal. The
+    recording label is taken from the filename: ``c*`` -> chatter (1),
+    ``s*`` -> stable (0). This is the real-data evaluation path used when a raw
+    dataset workbook is unavailable (e.g. the bundled ``testing/t1`` artifacts).
+
+    Returns a results dict: ``n_recordings``, ``feature_keys``, ``cv_mean_metrics``,
+    ``holdout_metrics`` and ``calibrated_proba``.
+    """
+    import numpy as np
+    import glob as _glob
+    from scipy.io import loadmat as _loadmat
+    from pg_amcd.features import extract_window_features
+    from pg_amcd.detection import (
+        train_baseline_classifiers,
+        evaluate_detector,
+        fit_probability_calibrator,
+    )
+    from sklearn.linear_model import LogisticRegression
+
+    recs = []
+    for npz in sorted(_glob.glob(os.path.join(npz_dir, "*_IMFs.npz"))):
+        base = os.path.basename(npz).replace("_IMFs.npz", "")
+        clean_mat = os.path.join(npz_dir, base + "_Clean.mat")
+        if not os.path.exists(clean_mat):
+            continue
+        d = np.load(npz)
+        original = np.asarray(d["original_signal"], dtype=float)
+        imfs = np.asarray(d["imfs"], dtype=float)
+        clean = np.asarray(_loadmat(clean_mat)["tsDS"], dtype=float)
+        denoised = clean[:, 1] if clean.ndim == 2 else clean
+        label = 1 if base.startswith("c") else 0
+        recs.append((base, original, imfs, denoised, label))
+    if not recs:
+        raise ValueError(f"No *_IMFs.npz recordings found in {npz_dir}")
+
+    keys = None
+    X, y, groups = [], [], []
+    for base, original, imfs, denoised, label in recs:
+        f = extract_window_features(original, original, denoised, imfs, fs, rpm, tooth_count)
+        if keys is None:
+            keys = list(f.keys())
+        X.append([float(f[k]) for k in keys])
+        y.append(label)
+        groups.append(base)
+    X = np.asarray(X, dtype=float)
+    y = np.asarray(y)
+    groups = np.asarray(groups)
+
+    cv_results = train_baseline_classifiers(X, y, groups=groups)
+    lr = LogisticRegression(max_iter=2000, class_weight="balanced")
+    lr.fit(X, y)
+    proba = lr.predict_proba(X)[:, 1]
+    pred = (proba >= 0.5).astype(int)
+    metrics = evaluate_detector(y, pred, proba)
+    cal = fit_probability_calibrator(y, proba, method="isotonic")
+    cal_proba = cal(proba)
+    return {
+        "n_recordings": len(recs),
+        "feature_keys": keys,
+        "cv_mean_metrics": {n: r["mean_metrics"] for n, r in cv_results.items()},
+        "holdout_metrics": metrics,
+        "calibrated_proba": [float(v) for v in cal_proba],
+    }
+
+
+def evaluate_real_dataset(
+    mat_dir: str,
+    config: Dict[str, Any],
+    label_filter: tuple = ("c", "s"),
+    random_state: int = 42,
+) -> Dict[str, Any]:
+    """Evaluate chatter detection on a directory of raw ``*.mat`` recordings.
+
+    Filename convention ``<label>_<rpm>_<feed>.mat`` (label in ``c/s/i/u``)
+    inside a stickout subdirectory (e.g. ``2p5inch_stickout``). Each signal is
+    processed through the full PG-AMCD pipeline and window features are
+    extracted. A binary chatter task (``c``=1, ``s``=0) is evaluated with
+    grouped cross-validation so windows from one recording never leak across
+    train/test (Goal 6.4):
+
+      * leave-one-recording-out (``recording_id`` groups)
+      * leave-one-stickout-out
+      * leave-one-rpm-out
+
+    Labels are taken from the real filename convention; no labels are
+    fabricated. Returns per-model metrics for every grouping level plus a
+    probability calibrator fit on out-of-fold probabilities.
+    """
+    import numpy as np
+    from collections import Counter
+    from pg_amcd.io import validate_and_load_signal
+    from pg_amcd.pipeline import process_recording
+    from pg_amcd.detection import (
+        train_baseline_classifiers,
+        predict_window_probabilities,
+        evaluate_detector,
+        fit_probability_calibrator,
+    )
+
+    files = sorted(glob.glob(os.path.join(mat_dir, "**", "*.mat"), recursive=True))
+    rows: List[Dict[str, Any]] = []
+    skips = []
+    for f in files:
+        base = os.path.basename(f)[:-4]
+        parts = base.split("_")
+        if len(parts) < 3:
+            continue
+        label_code = parts[0]
+        if label_code not in label_filter:
+            continue
+        # Filenames may carry non-numeric suffixes (e.g. ``c_570_015s``); strip
+        # trailing letters so a valid recording is never silently dropped.
+        try:
+            rpm = float(re.sub(r"[^0-9.]", "", parts[1]))
+            feed = float(re.sub(r"[^0-9.]", "", parts[2]))
+        except ValueError:
+            continue
+        stickout = os.path.basename(os.path.dirname(f))
+        try:
+            t_arr, sig, fs = validate_and_load_signal(f, config["sampling_rate"])
+        except Exception as exc:  # skip unreadable/invalid files, don't abort
+            skips.append({"file": base, "reason": str(exc)})
+            continue
+        res = process_recording(
+            t_arr, sig, config,
+            metadata={"rpm": rpm, "tooth_count": 1},
+            mode="exploratory",
+        )
+        for wr in res.window_results:
+            rows.append({
+                "features": wr.features,
+                "label": 1 if label_code == "c" else 0,
+                "recording_id": os.path.relpath(f, mat_dir),
+                "stickout": stickout,
+                "rpm": rpm,
+                "feed": feed,
+            })
+
+    if not rows:
+        raise ValueError(f"No usable recordings found in {mat_dir}")
+
+    features_first: Dict[str, float] = rows[0]["features"]
+    feature_keys = sorted(features_first.keys())
+    X = np.array(
+        [[float(r["features"][k]) for k in feature_keys] for r in rows],
+        dtype=float,
+    )
+    y = np.array([r["label"] for r in rows], dtype=int)
+    rec_id = np.array([r["recording_id"] for r in rows])
+    stickout = np.array([r["stickout"] for r in rows])
+    rpm_a = np.array([r["rpm"] for r in rows])
+
+    def grouped_eval(group_values, Xmat):
+        from sklearn.preprocessing import StandardScaler
+        uniq = np.unique(group_values)
+        y_true_parts, proba_parts = [], {}
+        for g in uniq:
+            tr, te = group_values != g, group_values == g
+            # Scale per fold (fit on train only) to avoid leakage and to keep
+            # scale-sensitive models (logistic regression, SVM) well-conditioned.
+            scaler = StandardScaler().fit(Xmat[tr])
+            Xtr = scaler.transform(Xmat[tr])
+            Xte = scaler.transform(Xmat[te])
+            models = train_baseline_classifiers(
+                Xtr, y[tr], groups=rec_id[tr], random_state=random_state
+            )
+            for name, m in models.items():
+                if m["model"] is None:
+                    continue
+                p = predict_window_probabilities(Xte, m["model"])
+                proba_parts.setdefault(name, []).append(p)
+            y_true_parts.append(y[te])
+        y_true = np.concatenate(y_true_parts)
+        out = {}
+        for name, plist in proba_parts.items():
+            proba = np.concatenate(plist)
+            pred = (proba >= 0.5).astype(int)
+            out[name] = evaluate_detector(y_true, pred, proba)
+        return out, y_true, proba_parts
+
+    loi, y_true_loo, loi_proba = grouped_eval(rec_id, X)
+    los, _, _ = grouped_eval(stickout, X)
+    lor, _, _ = grouped_eval(rpm_a, X)
+
+    # Feature ablations (Goal 7): isolate the contribution of the PG-AMCD
+    # frequency/IMF-derived features by dropping each group and re-running the
+    # same leakage-proof grouped CV on the surviving feature subset.
+    ablation_specs = {
+        "time_domain_only": [i for i, k in enumerate(feature_keys)
+                             if k.startswith("time_")],
+        "without_freq_features": [i for i, k in enumerate(feature_keys)
+                                  if not k.startswith("freq_")],
+        "without_imf_features": [i for i, k in enumerate(feature_keys)
+                                 if not k.startswith("imf_")],
+    }
+    feature_ablations: Dict[str, Any] = {}
+    for abl_name, idx in ablation_specs.items():
+        if len(idx) < 2:
+            continue
+        Xsub = X[:, idx]
+        a_loo, _, _ = grouped_eval(rec_id, Xsub)
+        a_los, _, _ = grouped_eval(stickout, Xsub)
+        a_lor, _, _ = grouped_eval(rpm_a, Xsub)
+        feature_ablations[abl_name] = {
+            "leave_one_recording_out": a_loo,
+            "leave_one_stickout_out": a_los,
+            "leave_one_rpm_out": a_lor,
+        }
+
+    # Calibrate the strongest model (by ROC-AUC) on pooled OOF probabilities.
+    best = (
+        max(loi, key=lambda n: (loi[n] or {}).get("roc_auc", -1.0))
+        if loi else None
+    )
+    cal_info = {
+        "method": "isotonic",
+        "fitted_on": "leave-one-recording-out out-of-fold probabilities",
+        "best_model": best,
+    }
+    if best is not None and best in loi_proba:
+        y_oof = y_true_loo
+        p_oof = np.concatenate(loi_proba[best])
+        cal = fit_probability_calibrator(y_oof, p_oof, method="isotonic")
+        p_cal = cal(p_oof)
+        pred_cal = (p_cal >= 0.5).astype(int)
+        cal_info["calibrated_metrics"] = evaluate_detector(y_oof, pred_cal, p_cal)
+    counts = Counter(int(v) for v in y)
+    return {
+        "n_recordings": int(len(np.unique(rec_id))),
+        "n_windows": int(len(rows)),
+        "n_skipped": int(len(skips)),
+        "label_counts": {
+            "chatter": int(counts.get(1, 0)),
+            "stable": int(counts.get(0, 0)),
+        },
+        "feature_keys": feature_keys,
+        "leave_one_recording_out": loi,
+        "leave_one_stickout_out": los,
+        "leave_one_rpm_out": lor,
+        "calibration": cal_info,
+        # Out-of-fold predictions for the leave-one-recording-out split, used by
+        # the report/figure generators (no need to re-run the pipeline).
+        "oof": {
+            "y_true": [int(v) for v in y_true_loo],
+            "proba": {
+                name: [float(v) for v in np.concatenate(plist)]
+                for name, plist in loi_proba.items()
+            },
+        },
+        "feature_ablations": feature_ablations,
+        "skipped_files": skips,
+    }
+
+
+def evaluate_real_dataset_temporal(
+    mat_dir: str,
+    config: Dict[str, Any],
+    label_filter: tuple = ("c", "s"),
+    n_windows: int = 5,
+    window_points: int = 2048,
+    random_state: int = 42,
+) -> Dict[str, Any]:
+    """Multi-window chatter evaluation with temporal smoothing (Goal 6.5).
+
+    Each recording is split into ``n_windows`` overlapping fixed-length
+    segments; every segment is pushed through the full PG-AMCD pipeline so a
+    recording yields a *sequence* of per-window probabilities. Leakage-proof
+    grouped CV (by ``recording_id``) produces out-of-fold per-window
+    probabilities; within each recording the probability sequence is stabilised
+    with ``temporal_smooth_probabilities`` (hysteresis + minimum run length).
+
+    This makes the Goal 6.5 smoothing logic observable on real data and
+    quantifies its effect (unsmoothed vs smoothed per-window metrics). Labels
+    come from the real filename convention; nothing is fabricated.
+    """
+    import numpy as np
+    from collections import Counter, defaultdict
+    from pg_amcd.io import validate_and_load_signal
+    from pg_amcd.pipeline import process_recording
+    from pg_amcd.detection import (
+        train_baseline_classifiers,
+        predict_window_probabilities,
+        evaluate_detector,
+        temporal_smooth_probabilities,
+        fit_probability_calibrator,
+    )
+
+    def _segment_indices(n: int):
+        if n <= window_points or n_windows <= 1:
+            return [(0, min(n, window_points))]
+        starts = np.linspace(0, n - window_points, n_windows).astype(int)
+        return [(int(s), int(s) + window_points) for s in starts]
+
+    files = sorted(glob.glob(os.path.join(mat_dir, "**", "*.mat"), recursive=True))
+    rows: List[Dict[str, Any]] = []
+    skips = []
+    for f in files:
+        base = os.path.basename(f)[:-4]
+        parts = base.split("_")
+        if len(parts) < 3:
+            continue
+        label_code = parts[0]
+        if label_code not in label_filter:
+            continue
+        try:
+            rpm = float(re.sub(r"[^0-9.]", "", parts[1]))
+            feed = float(re.sub(r"[^0-9.]", "", parts[2]))
+        except ValueError:
+            continue
+        stickout = os.path.basename(os.path.dirname(f))
+        try:
+            t_arr, sig, fs = validate_and_load_signal(f, config["sampling_rate"])
+        except Exception as exc:
+            skips.append({"file": base, "reason": str(exc)})
+            continue
+        n = len(sig)
+        rec_id = os.path.relpath(f, mat_dir)
+        for wi, (s, e) in enumerate(_segment_indices(n)):
+            res = process_recording(
+                t_arr[s:e], sig[s:e], config,
+                metadata={"rpm": rpm, "tooth_count": 1},
+                mode="exploratory",
+            )
+            for wr in res.window_results:
+                rows.append({
+                    "features": wr.features,
+                    "label": 1 if label_code == "c" else 0,
+                    "recording_id": rec_id,
+                    "stickout": stickout,
+                    "rpm": rpm,
+                    "feed": feed,
+                    "win_idx": wi,
+                })
+
+    if not rows:
+        raise ValueError(f"No usable recordings found in {mat_dir}")
+
+    feature_keys = sorted(rows[0]["features"].keys())
+    X = np.array(
+        [[float(r["features"][k]) for k in feature_keys] for r in rows],
+        dtype=float,
+    )
+    y = np.array([r["label"] for r in rows], dtype=int)
+    rec_id = np.array([r["recording_id"] for r in rows])
+    stickout = np.array([r["stickout"] for r in rows])
+    rpm_a = np.array([r["rpm"] for r in rows])
+
+    def grouped_eval(group_values, Xmat):
+        from sklearn.preprocessing import StandardScaler
+        uniq = np.unique(group_values)
+        y_true_parts, proba_parts = [], {}
+        for g in uniq:
+            tr, te = group_values != g, group_values == g
+            scaler = StandardScaler().fit(Xmat[tr])
+            Xtr = scaler.transform(Xmat[tr])
+            Xte = scaler.transform(Xmat[te])
+            models = train_baseline_classifiers(
+                Xtr, y[tr], groups=rec_id[tr], random_state=random_state
+            )
+            for name, m in models.items():
+                if m["model"] is None:
+                    continue
+                p = predict_window_probabilities(Xte, m["model"])
+                proba_parts.setdefault(name, []).append(p)
+            y_true_parts.append(y[te])
+        y_true = np.concatenate(y_true_parts)
+        out = {}
+        for name, plist in proba_parts.items():
+            proba = np.concatenate(plist)
+            pred = (proba >= 0.5).astype(int)
+            out[name] = evaluate_detector(y_true, pred, proba)
+        return out, y_true, proba_parts
+
+    loi, y_true_loo, loi_proba = grouped_eval(rec_id, X)
+
+    best = (
+        max(loi, key=lambda n: (loi[n] or {}).get("roc_auc", -1.0))
+        if loi else None
+    )
+
+    # Within-recording temporal smoothing (Goal 6.5) on the best model's OOF
+    # per-window probabilities.
+    temporal_params = {
+        "enter_threshold": 0.75,
+        "exit_threshold": 0.40,
+        "min_positive_windows": 3,
+        "median_window": 5,
+    }
+    smoothed_metrics: Dict[str, Any] = {}
+    smoothed_proba = np.full(len(y), float("nan"))
+    if best is not None and best in loi_proba:
+        # Reconstruct the per-window OOF probability array in original order.
+        oof_proba = np.concatenate(loi_proba[best])
+        by_rec: Dict[str, List[int]] = defaultdict(list)
+        for i, rid in enumerate(rec_id):
+            by_rec[rid].append(i)
+        out_proba = np.zeros(len(y), dtype=float)
+        for rid, idxs in by_rec.items():
+            seq = oof_proba[idxs]
+            if len(seq) < 2:
+                out_proba[idxs] = seq
+                continue
+            labels, sm = temporal_smooth_probabilities(
+                seq, **temporal_params
+            )
+            out_proba[idxs] = sm
+        smoothed_proba = out_proba
+        pred_s = (out_proba >= 0.5).astype(int)
+        smoothed_metrics[best] = evaluate_detector(y, pred_s, out_proba)
+
+    # Feature importances from a full-corpus RandomForest (for reporting/figures).
+    feature_importances = {}
+    try:
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.preprocessing import StandardScaler
+        sc = StandardScaler().fit(X)
+        rf = RandomForestClassifier(n_estimators=200, class_weight="balanced",
+                                    random_state=random_state)
+        rf.fit(sc.transform(X), y)
+        for k, imp in zip(feature_keys, rf.feature_importances_):
+            feature_importances[k] = float(imp)
+    except Exception:
+        feature_importances = {}
+
+    counts = Counter(int(v) for v in y)
+    return {
+        "n_recordings": int(len(np.unique(rec_id))),
+        "n_windows": int(len(rows)),
+        "n_skipped": int(len(skips)),
+        "window_points": int(window_points),
+        "n_windows_per_recording": int(n_windows),
+        "label_counts": {
+            "chatter": int(counts.get(1, 0)),
+            "stable": int(counts.get(0, 0)),
+        },
+        "feature_keys": feature_keys,
+        "best_model": best,
+        "per_window_metrics": loi,
+        "smoothed_metrics": smoothed_metrics,
+        "temporal_params": temporal_params,
+        "oof": {
+            "y_true": [int(v) for v in y_true_loo],
+            "proba": {
+                name: [float(v) for v in np.concatenate(plist)]
+                for name, plist in loi_proba.items()
+            },
+        },
+        "smoothed_proba": [float(v) for v in smoothed_proba],
+        "feature_importances": feature_importances,
+        "skipped_files": skips,
+    }

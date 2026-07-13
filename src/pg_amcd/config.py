@@ -27,9 +27,26 @@ DEFAULT_CONFIG = {
         "chatter_band_center": 1250.0,
         "chatter_band_spread": 500.0
     },
+    "physics_gating": {
+        "chatter_energy_weight": 4.0,
+        "correlation_weight": 2.0,
+        "kurtosis_weight": 1.0,
+        "harmonic_penalty": 5.0,
+        "offset": 1.5,
+        "harmonic_tolerance_hz": 15.0,
+        "harmonic_count": 5,
+        "kurtosis_scale": 10.0
+    },
     "wavelet": {
         "wavelet_name": "db8",
-        "level": 4
+        "level": 4,
+        "band_aware": True,
+        "chatter_threshold_scale": 0.5,
+        "noise_threshold_scale": 1.4
+    },
+    "pipeline": {
+        "fallback_rpm": 570.0,
+        "fallback_tooth_count": 1
     }
 }
 
@@ -56,10 +73,11 @@ def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any
 def _load_packaged_default() -> Dict[str, Any]:
     """Load the packaged default configuration shipped with the package.
 
-    Tries ``importlib.resources`` first (works for installed/editable
-    packages), then falls back to the file path relative to this module
-    (works when running from a source tree via ``PYTHONPATH``). If the
-    resource is missing or unreadable, ``DEFAULT_CONFIG`` is used.
+    The packaged ``configs/default.json`` is the single source of truth for
+    defaults. It is loaded from ``importlib.resources`` when the package is
+    installed, or from the source tree when running via ``PYTHONPATH``. The
+    in-code ``DEFAULT_CONFIG`` is only used as a last-resort fallback if the
+    JSON resource is missing or unreadable.
     """
     candidates = []
     try:

@@ -135,6 +135,7 @@ def calculate_physics_gated_weights(
     offset = pg_cfg.get("offset", 1.5)
     tolerance = pg_cfg.get("harmonic_tolerance_hz", 15.0)
     h_count = pg_cfg.get("harmonic_count", 5)
+    kurtosis_scale = pg_cfg.get("kurtosis_scale", 10.0)
 
     # Machine physics parameters
     f_spindle = rpm / 60.0
@@ -151,7 +152,7 @@ def calculate_physics_gated_weights(
         # B. Kurtosis (K)
         # Standardize K to [0, 1] relative to nominal Gaussian kurtosis (3.0)
         k_val = float(scipy.stats.kurtosis(imf, fisher=False))
-        K[i] = min(1.0, max(0.0, (k_val - 3.0) / 10.0))
+        K[i] = min(1.0, max(0.0, (k_val - 3.0) / kurtosis_scale))
         
         # C. Spectral analysis via FFT
         N = len(imf)
@@ -179,8 +180,6 @@ def calculate_physics_gated_weights(
             
         score = a1 * E_chatter[i] + a2 * C[i] + a3 * K[i] - a4 * E_harmonics[i] - offset
         gates[i] = 1.0 / (1.0 + np.exp(-score))
-        
-    return gates, C, E_chatter, K, E_harmonics
         
     return gates, C, E_chatter, K, E_harmonics
 

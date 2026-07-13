@@ -25,6 +25,7 @@ try:  # scikit-learn is an optional heavy dependency
     from sklearn.svm import SVC
     from sklearn.model_selection import GroupKFold, KFold
     from sklearn.metrics import (
+        accuracy_score,
         balanced_accuracy_score,
         precision_score,
         recall_score,
@@ -122,11 +123,21 @@ def _default_models(random_state: int) -> Dict[str, Any]:
 
 
 def _score_fold(y_true, y_pred, y_proba) -> Dict[str, float]:
+    # Always evaluate against the binary chatter/stable label space so
+    # single-class folds produce well-shaped metrics instead of warnings.
+    labels = [0, 1]
+    # balanced_accuracy_score warns on single-class folds; suppress it locally
+    # because the value is still meaningful (it equals accuracy in that case).
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        bal_acc = float(balanced_accuracy_score(y_true, y_pred))
     out = {
-        "balanced_accuracy": float(balanced_accuracy_score(y_true, y_pred)),
-        "precision": float(precision_score(y_true, y_pred, zero_division=0)),
-        "recall": float(recall_score(y_true, y_pred, zero_division=0)),
-        "f1": float(f1_score(y_true, y_pred, zero_division=0)),
+        "accuracy": float(accuracy_score(y_true, y_pred)),
+        "balanced_accuracy": bal_acc,
+        "precision": float(precision_score(y_true, y_pred, labels=labels, zero_division=0)),
+        "recall": float(recall_score(y_true, y_pred, labels=labels, zero_division=0)),
+        "f1": float(f1_score(y_true, y_pred, labels=labels, zero_division=0)),
     }
     if len(np.unique(y_true)) > 1:
         try:
@@ -183,20 +194,56 @@ def train_baseline_classifiers(
     for name, clf in models.items():
         fold_metrics: List[Dict[str, float]] = []
         for tr, te in splits:
-            est = clone(clf)
-            est.fit(X[tr], y[tr])
-            pred = est.predict(X[te])
-            if hasattr(est, "predict_proba"):
-                proba = est.predict_proba(X[te])[:, 1]
-            else:
-                proba = pred.astype(float)
-            fold_metrics.append(_score_fold(y[te], pred, proba))
-        final = clone(clf)
-        final.fit(X, y)
+            # A degenerate fold (single class in the training split) cannot fit
+            # a binary classifier; skip it so the CV loop never crashes on tiny
+            # or imbalanced corpora (e.g. one positive sample across groups).
+            if len(np.unique(y[tr])) < 2:
+                continue
+            try:
+                est = clone(clf)
+                est.fit(X[tr], y[tr])
+                pred = est.predict(X[te])
+                if hasattr(est, "predict_proba"):
+                    p = est.predict_proba(X[te])
+                    if hasattr(est, "classes_") and 1 in est.classes_:
+                        proba = p[:, list(est.classes_).index(1)]
+                    else:
+                        proba = np.zeros(p.shape[0], dtype=float)
+                else:
+                    proba = pred.astype(float)
+                fold_metrics.append(_score_fold(y[te], pred, proba))
+            except Exception:
+                # Classifier (or its internal CV, e.g. CalibratedClassifierCV)
+                # cannot fit this fold; skip it rather than aborting all CV.
+                continue
+        try:
+            final = clone(clf)
+            final.fit(X, y)
+        except Exception:
+            # The classifier (or its internal CV) cannot fit even on the full
+            # corpus (e.g. too few samples for CalibratedClassifierCV's CV);
+            # exclude it rather than aborting the whole training step.
+            results[name] = {
+                "model": None,
+                "cv_metrics": fold_metrics,
+                "mean_metrics": (
+                    _mean_of_metrics(fold_metrics)
+                    if fold_metrics
+                    else {k: float("nan") for k in ("accuracy", "balanced_accuracy",
+                                                   "precision", "recall", "f1", "roc_auc")}
+                ),
+            }
+            continue
+        mean_metrics = (
+            _mean_of_metrics(fold_metrics)
+            if fold_metrics
+            else {k: float("nan") for k in ("accuracy", "balanced_accuracy",
+                                           "precision", "recall", "f1", "roc_auc")}
+        )
         results[name] = {
             "model": final,
             "cv_metrics": fold_metrics,
-            "mean_metrics": _mean_of_metrics(fold_metrics),
+            "mean_metrics": mean_metrics,
         }
     return results
 

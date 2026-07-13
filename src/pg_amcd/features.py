@@ -2,6 +2,7 @@ import numpy as np
 import scipy.stats
 import scipy.signal
 import scipy.fftpack
+import pywt
 from typing import Dict
 
 def extract_window_features(
@@ -132,7 +133,6 @@ def extract_window_features(
     # ----------------------------------------------------
     # 4. Time-Frequency (Wavelet Energy) Features
     # ----------------------------------------------------
-    import pywt
     coeffs = pywt.wavedec(denoised_physical_window, "db8", level=4)
     wavelet_energies = [np.sum(c ** 2) for c in coeffs]
     total_wavelet_energy = np.sum(wavelet_energies)

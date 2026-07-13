@@ -157,7 +157,7 @@ def print_comparison(stickout, file_name):
             layer_name = f"IMF {i+1}" if (i < max(base_diag['num_imfs']-1, fine_diag['num_imfs']-1)) else "Residual"
             md_content += f"| **{layer_name}** | {eb} | {ef} | {fb} | {ff} |\n"
             
-        md_path = f"/home/harshit/.gemini/antigravity-cli/brain/653b7dd5-5975-4225-ae8d-35c787e7fcf9/decomposition_diagnostics.md"
+        md_path = "/home/harshit/.gemini/antigravity-cli/brain/653b7dd5-5975-4225-ae8d-35c787e7fcf9/decomposition_diagnostics.md"
         with open(md_path, "w") as fd:
             fd.write(md_content)
         print(f"\nSaved diagnostic report to: {md_path}")

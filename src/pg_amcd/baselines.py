@@ -176,7 +176,6 @@ def benchmark_denoising(
             snr_db=snr_db,
         )
         chatter = comps["chatter"]
-        clean = comps["clean"]
 
         imfs = run_ceemdan(
             signal,
@@ -189,7 +188,7 @@ def benchmark_denoising(
         denoised = _run_non_pipeline_methods(signal, fs, low, high, config, ceemdan_cfg, imfs)
 
         # Full proposed pipeline (canonical entrypoint). It denoises a
-        # max-energy segment, so compare against the clean reference over the
+        # max-energy segment, so compare against the chatter component over the
         # same segment to keep lengths and conditions matched.
         res = process_recording(t, signal, config, mode="exploratory")
         wr = res.window_results[0]

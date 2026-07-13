@@ -25,7 +25,7 @@ def run_evaluation_on_feature_subset(X, y, groups, feature_indices):
         preds = clf.predict(X_test)
         
         accs.append(accuracy_score(y_test, preds))
-        f1s.append(f1_score(y_test, preds, zero_division=0))
+        f1s.append(f1_score(y_test, preds, labels=[0, 1], zero_division=0))
         
     return np.mean(accs), np.mean(f1s), f1s
 

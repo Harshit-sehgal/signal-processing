@@ -3,15 +3,17 @@
 PYTHON_ENV = Python/venv/bin/python
 PIP_ENV = Python/venv/bin/pip
 
-.PHONY: help install test run evaluate reproduce lint clean
+.PHONY: help install test run baseline evaluate report statistics reproduce lint clean validate
 
 help:
 	@echo "PG-AMCD Reproducibility targets:"
 	@echo "  install    - Install package in editable mode and dev dependencies"
 	@echo "  test       - Run all unit and regression tests"
 	@echo "  run        - Execute the CLI on the validation test directory"
-	@echo "  evaluate   - Run ML training and evaluation script"
-	@echo "  reproduce  - Run the entire verification and evaluation pipeline"
+	@echo "  baseline   - Run synthetic denoising baseline comparison (Segment 5)"
+	@echo "  evaluate   - Run evaluation pipeline on labelled data"
+	@echo "  report     - Generate Markdown evaluation report"
+	@echo "  statistics  - Bootstrap CI + McNemar significance (Segment 7)"
 	@echo "  lint       - Run formatting and code quality checks (Ruff)"
 	@echo "  clean      - Clean up temporary files and caches"
 
@@ -29,15 +31,22 @@ run:
 		--continue-on-error
 
 evaluate:
-	PYTHONPATH=src $(PYTHON_ENV) scripts/evaluate_dataset.py
+	PYTHONPATH=src $(PYTHON_ENV) scripts/evaluate_dataset.py \
+		--mat-dir Vibration_Clean --output outputs/evaluation_results.json
 
 validate:
 	PYTHONPATH=src $(PYTHON_ENV) scripts/validate_research.py
 
+baseline:
+	PYTHONPATH=src $(PYTHON_ENV) scripts/compare_baselines.py
+
 report:
 	PYTHONPATH=src $(PYTHON_ENV) scripts/generate_report.py
 
-reproduce: test evaluate validate report
+statistics:
+	PYTHONPATH=src $(PYTHON_ENV) scripts/run_statistics.py
+
+reproduce: test baseline evaluate report statistics
 	@echo "=================================================="
 	@echo "🎉 FULL REPRODUCTION RUN COMPLETED SUCCESSFULLY! 🎉"
 	@echo "=================================================="

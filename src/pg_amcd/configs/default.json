@@ -17,8 +17,25 @@
     "chatter_band_center": 1250.0,
     "chatter_band_spread": 500.0
   },
+  "physics_gating": {
+    "chatter_energy_weight": 4.0,
+    "correlation_weight": 2.0,
+    "kurtosis_weight": 1.0,
+    "harmonic_penalty": 5.0,
+    "offset": 1.5,
+    "harmonic_tolerance_hz": 15.0,
+    "harmonic_count": 5,
+    "kurtosis_scale": 10.0
+  },
   "wavelet": {
     "wavelet_name": "db8",
-    "level": 4
+    "level": 4,
+    "band_aware": true,
+    "chatter_threshold_scale": 0.5,
+    "noise_threshold_scale": 1.4
+  },
+  "pipeline": {
+    "fallback_rpm": 570.0,
+    "fallback_tooth_count": 1
   }
 }

@@ -247,13 +247,15 @@ def test_cli_validate_with_metadata(tmp_path):
     config_path = tmp_path / "test_config.json"
     with open(config_path, "w", encoding="utf-8") as f:
         json.dump(TEST_CONFIG, f)
+        
+    # A. Incorrect metadata -> should fail (returncode == 1)
     meta_path = tmp_path / "meta.csv"
     with open(meta_path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["file_path", "label"])
+        w = csv.DictWriter(f, fieldnames=["file_path", "label", "rpm", "tooth_count"])
         w.writeheader()
-        w.writerow({"file_path": "sample.mat", "label": "chatter"})
-        w.writerow({"file_path": "sample.mat", "label": "stable"})  # duplicate entry
-        w.writerow({"file_path": "other.mat", "label": ""})        # missing label
+        w.writerow({"file_path": "sample.mat", "label": "chatter", "rpm": "1200", "tooth_count": "4"})
+        w.writerow({"file_path": "sample.mat", "label": "stable", "rpm": "1200", "tooth_count": "4"})  # duplicate entry
+        w.writerow({"file_path": "other.mat", "label": "", "rpm": "1200", "tooth_count": "4"})        # missing label
     report_path = tmp_path / "report.json"
     env = os.environ.copy()
     existing = env.get("PYTHONPATH", "")
@@ -264,7 +266,7 @@ def test_cli_validate_with_metadata(tmp_path):
          "--metadata", str(meta_path), "--output", str(report_path)],
         cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
     )
-    assert proc.returncode == 0, proc.stderr
+    assert proc.returncode == 1
     report = json.loads(report_path.read_text())
     assert report["n_files"] == 2
     meta = report["metadata"]
@@ -272,6 +274,28 @@ def test_cli_validate_with_metadata(tmp_path):
     assert meta["duplicate_metadata_entries"] == 1
     assert meta["missing_chatter_label"] == 1
     assert "Metadata validation" in proc.stdout
+
+    # B. Correct metadata -> should succeed (returncode == 0)
+    meta_ok_path = tmp_path / "meta_ok.csv"
+    with open(meta_ok_path, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["file_path", "label", "rpm", "tooth_count"])
+        w.writeheader()
+        w.writerow({"file_path": "sample.mat", "label": "chatter", "rpm": "1200", "tooth_count": "4"})
+        w.writerow({"file_path": "orphan.mat", "label": "stable", "rpm": "1200", "tooth_count": "4"})
+        
+    proc_ok = subprocess.run(
+        [sys.executable, "-m", "pg_amcd.cli", "validate",
+         "--input-dir", str(input_dir), "--config", str(config_path),
+         "--metadata", str(meta_ok_path), "--output", str(report_path)],
+        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
+    )
+    assert proc_ok.returncode == 0, proc_ok.stderr
+    report_ok = json.loads(report_path.read_text())
+    assert report_ok["n_files"] == 2
+    meta_ok = report_ok["metadata"]
+    assert meta_ok["missing_metadata"] == 0
+    assert meta_ok["duplicate_metadata_entries"] == 0
+    assert meta_ok["missing_chatter_label"] == 0
 
 
 def test_cli_run_metadata_wiring(tmp_path):

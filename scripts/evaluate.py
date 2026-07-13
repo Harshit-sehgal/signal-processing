@@ -199,9 +199,9 @@ def main():
                 auc = 1.0
                 
             fold_acc.append(accuracy_score(y_test, preds))
-            fold_prec.append(precision_score(y_test, preds, zero_division=0))
-            fold_rec.append(recall_score(y_test, preds, zero_division=0))
-            fold_f1.append(f1_score(y_test, preds, zero_division=0))
+            fold_prec.append(precision_score(y_test, preds, labels=[0, 1], zero_division=0))
+            fold_rec.append(recall_score(y_test, preds, labels=[0, 1], zero_division=0))
+            fold_f1.append(f1_score(y_test, preds, labels=[0, 1], zero_division=0))
             fold_auc.append(auc)
             
         results[clf_name] = {

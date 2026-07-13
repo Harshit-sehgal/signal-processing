@@ -43,14 +43,33 @@ def test_full_pipeline_outperforms_naive_baselines():
         ceemdan_cfg=CEEMDAN_CHEAP,
     )
     full = agg["full_proposed"]
+    others = [m for m in METHODS if m != "full_proposed"]
+    other_rmse = [agg[m]["rmse"] for m in others]
+    other_snr = [agg[m]["snr_db"] for m in others]
+    other_att = [agg[m]["noise_band_attenuation"] for m in others]
+    best_rmse = min(other_rmse)
+    best_snr = max(other_snr)
+    best_att = max(other_att)
     raw = agg["raw"]
     butter = agg["butterworth_only"]
-
-    # The proposed pipeline must beat doing nothing (raw) ...
+    wavelet = agg["wavelet_only"]
+    ceemdan_only = agg["ceemdan_only"]
+    ceemdan_simple = agg["ceemdan_simple_selection"]
+    current_maiw = agg["current_maiw"]
+    stft = agg["stft_baseline"]
+    # The proposed pipeline must beat doing nothing (raw) and a simple
+    # bandpass-only baseline. Those keep forced/drift/noise, so the proposed
+    # chatter-isolating pipeline strictly dominates them.
     assert full["rmse"] < raw["rmse"], (full["rmse"], raw["rmse"])
     assert full["snr_db"] > raw["snr_db"], (full["snr_db"], raw["snr_db"])
     assert full["noise_band_attenuation"] > raw["noise_band_attenuation"]
-
-    # ... and a simple bandpass-only baseline.
     assert full["rmse"] < butter["rmse"], (full["rmse"], butter["rmse"])
     assert full["snr_db"] > butter["snr_db"]
+    # The remaining baselines (wavelet/CEEMDAN variants, current MAIW, STFT)
+    # are competitive denoisers; the proposed pipeline must be best within a
+    # small tolerance for seed variance.
+    for m in (wavelet, ceemdan_only, ceemdan_simple, current_maiw, stft):
+        assert full["rmse"] <= m["rmse"] + 0.01, (m, full["rmse"], m["rmse"])
+    assert full["rmse"] <= best_rmse + 0.01, (full["rmse"], best_rmse)
+    assert full["snr_db"] >= best_snr - 0.5, (full["snr_db"], best_snr)
+    assert full["noise_band_attenuation"] >= best_att - 0.2

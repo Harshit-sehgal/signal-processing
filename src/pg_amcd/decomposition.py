@@ -90,7 +90,9 @@ def calculate_spectral_overlap(imfs: np.ndarray, fs: float) -> float:
 def calculate_orthogonality_index(imfs: np.ndarray, original_signal: np.ndarray) -> float:
     """Calculates the global Orthogonality Index (OI) of the decomposition.
     
-    OI = 2 * sum_{i < j} sum_t (c_i * c_j) / sum_t (X^2)
+    OI = 2 * sum_{i < j} sum_t (c_i * c_j) / sum_k ||c_k||^2
+    
+    Uses total IMF energy as denominator (consistent with validation.py).
     """
     num_layers = imfs.shape[0]
     cross_terms = 0.0
@@ -98,8 +100,8 @@ def calculate_orthogonality_index(imfs: np.ndarray, original_signal: np.ndarray)
         for j in range(i + 1, num_layers):
             cross_terms += np.sum(imfs[i] * imfs[j])
             
-    orig_energy = np.sum(original_signal ** 2)
-    return float(2.0 * cross_terms / orig_energy) if orig_energy > 0 else 0.0
+    total_imf_energy = np.sum(imfs ** 2)
+    return float(2.0 * cross_terms / total_imf_energy) if total_imf_energy > 0 else 0.0
 
 def calculate_composite_cutoff_score(
     imfs: np.ndarray, 

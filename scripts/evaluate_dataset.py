@@ -25,7 +25,11 @@ sys.path.insert(0, os.path.join(ROOT, "src"))
 import numpy as np
 
 from pg_amcd.config import load_pipeline_config
-from pg_amcd.evaluation import build_dataset_index
+from pg_amcd.evaluation import (
+    build_dataset_index,
+    evaluate_directory,
+    evaluate_real_dataset,
+)
 from pg_amcd.io import validate_and_load_signal
 from pg_amcd.pipeline import process_recording
 from pg_amcd.features import extract_window_features
@@ -86,11 +90,61 @@ def main(argv=None):
     )
     parser.add_argument("--metadata", default=None, help="Metadata spreadsheet.")
     parser.add_argument(
+        "--npz-dir",
+        default=None,
+        help="Directory of *_IMFs.npz recordings (real-data mode, filename labels).",
+    )
+    parser.add_argument(
+        "--mat-dir",
+        default=None,
+        help="Directory of raw *.mat recordings (real-data mode, filename labels).",
+    )
+    parser.add_argument(
         "--output",
         default=os.path.join(ROOT, "outputs", "evaluation_results.json"),
     )
     parser.add_argument("--config", default=None)
     args = parser.parse_args(argv)
+
+    # Real-data npz directory mode: uses bundled testing/t1-style artifacts with
+    # filename-derived chatter/stable labels; no metadata workbook required.
+    if args.npz_dir and os.path.isdir(args.npz_dir):
+        print(f"Evaluating real-data npz directory: {args.npz_dir}")
+        result = evaluate_directory(args.npz_dir, fs=10_000.0)
+        print(
+            f"  recordings={result['n_recordings']} "
+            f"holdout_balanced_acc={result['holdout_metrics']['balanced_accuracy']:.4f}"
+        )
+        os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
+        with open(args.output, "w", encoding="utf-8") as fh:
+            json.dump(result, fh, indent=2)
+        print(f"Wrote evaluation results to {args.output}")
+        return 0
+    # Real-data raw .mat directory mode: processes every recording through the
+    # full PG-AMCD pipeline and evaluates chatter detection with grouped
+    # cross-validation (leave-one-recording / stickout / rpm). Labels come from
+    # the real <label>_<rpm>_<feed>.mat filename convention; no labels fabricated.
+    if args.mat_dir and os.path.isdir(args.mat_dir):
+        print(f"Evaluating real-data MAT directory: {args.mat_dir}")
+        config_path = args.config or os.path.join(ROOT, "configs", "research_fast.json")
+        config = load_pipeline_config(config_path)
+        result = evaluate_real_dataset(args.mat_dir, config)
+        print(
+            f"  recordings={result['n_recordings']} windows={result['n_windows']} "
+            f"chatter={result['label_counts']['chatter']} stable={result['label_counts']['stable']}"
+        )
+        best = result["calibration"].get("best_model")
+        if best and best in result["leave_one_recording_out"]:
+            m = result["leave_one_recording_out"][best]
+            print(
+                f"  best={best} LOO balanced_acc={m['balanced_accuracy']:.4f} "
+                f"roc_auc={m['roc_auc']:.4f}"
+            )
+        os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
+        with open(args.output, "w", encoding="utf-8") as fh:
+            json.dump(result, fh, indent=2)
+        print(f"Wrote evaluation results to {args.output}")
+        return 0
 
     if not os.path.isdir(args.input_dir):
         print(

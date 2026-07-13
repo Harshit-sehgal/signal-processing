@@ -1,6 +1,5 @@
 import numpy as np
 import pywt
-from pg_amcd.synthetic import evaluate_denoising_performance
 
 def bayes_shrink_threshold(coeff: np.ndarray, noise_sigma: float) -> float:
     """Calculates the standard BayesShrink adaptive threshold for a subband."""
@@ -13,12 +12,14 @@ def bayes_shrink_threshold(coeff: np.ndarray, noise_sigma: float) -> float:
 
 def wavelet_denoise(
     signal: np.ndarray, 
-    wavelet_name: str = "db8", 
+    wavelet_name: str = "db8",
     level: int = 4,
     fs: float = 10000.0,
     chatter_center: float = 1250.0,
     chatter_spread: float = 500.0,
-    band_aware: bool = True
+    band_aware: bool = True,
+    chatter_threshold_scale: float = 0.5,
+    noise_threshold_scale: float = 1.4,
 ) -> np.ndarray:
     """Applies Bayesian Adaptive Wavelet Denoising.
     
@@ -76,11 +77,11 @@ def wavelet_denoise(
             overlap = (high_limit >= chatter_min) and (low_limit <= chatter_max)
             
             if overlap:
-                # Halve threshold to preserve chatter components (Goal 8)
-                threshold *= 0.5
+                # Reduce threshold to preserve chatter components (Goal 8)
+                threshold *= chatter_threshold_scale
             else:
                 # Scale up threshold in noise-dominated bands
-                threshold *= 1.4
+                threshold *= noise_threshold_scale
                 
         denoised_coeff = pywt.threshold(coeff, threshold, mode='soft')
         denoised_coeffs.append(denoised_coeff)
@@ -107,6 +108,7 @@ def evaluate_wavelet_config(
     chatter_spread: float,
 ) -> dict:
     """Quantitative denoising quality for one wavelet configuration (Goal 5.6)."""
+    from pg_amcd.synthetic import evaluate_denoising_performance
     denoised = wavelet_denoise(
         signal,
         wavelet_name=wavelet_name,
