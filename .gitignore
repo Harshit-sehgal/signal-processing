@@ -1,0 +1,26 @@
+# Virtual Environment and Python Cache
+Python/.venv/
+Python/venv/
+Python/bin/
+Python/lib/
+Python/share/
+Python/include/
+**/__pycache__/
+*.pyc
+
+# Raw and Preprocessed Datasets
+Vibration - ML/
+Vibration - ML_Preprocessed/
+Vibration - ML_Preprocessed_backup/
+
+# Output and Backup directories
+Vibration_IMFs/
+Vibration_IMFs_backup/
+Vibration_MAIW/
+Vibration_Clean/
+old_files/
+
+# Temporary and local log directories
+.gemini/
+.hermes/
+*.log

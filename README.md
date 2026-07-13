@@ -1,0 +1,112 @@
+# Vibration-Based Chatter Detection using PG-AMCD Framework
+
+This repository implements the **Physics-Guided Adaptive Multi-Stage Chatter Detection (PG-AMCD)** framework. The pipeline is designed to preprocess raw vibration signals, decompose them into Intrinsic Mode Functions (IMFs) with minimal mode mixing, apply multi-criteria adaptive weighting, and perform Bayesian wavelet denoising to extract clean chatter signals.
+
+---
+
+## 📁 Project Directory Structure
+
+```plaintext
+/home/harshit/Documents/Research/
+├── Vibration - ML/                       # Raw Vibration Data (.mat files)
+│   ├── 2inch_stickout/                   # Datasets grouped by tool stickout length
+│   ├── 2.5inch_stickout/
+│   ├── 3.5inch_stickout/
+│   ├── 4.5inch_stickout/
+│   └── rpm_doc_combinations.xlsx        # Excel mapping of RPM, DOC, and Chatter State
+│
+├── Vibration - ML_Preprocessed/          # Preprocessed Vibration Data
+│
+├── Vibration_IMFs/                       # CEEMDAN Decomposed IMFs (.npz and plots)
+│
+├── Vibration_MAIW/                       # Stage 2: Reconstructed Weighted IMFs (.mat)
+│
+├── Vibration_Clean/                      # Stage 3: Final Denoised Signals (.mat)
+│
+└── Python/                               # Processing Source Code
+    ├── .venv/                            # Python Virtual Environment
+    ├── config.json                       # Central Pipeline Parameters Configuration
+    ├── config_utils.py                   # Configuration utility helper module
+    ├── 01_preprocess.py                  # Baseline Preprocessing Script
+    ├── 02_iceemdan.py                    # Adaptive Preprocessing & CEEMDAN Decomposition
+    ├── 03_maiw_weighting.py              # Stage 2: Multi-Criteria IMF Weighting
+    ├── 04_wavelet_denoise.py             # Stage 3: Bayesian Wavelet Denoising
+    ├── run_pipeline.py                   # Master sequential pipeline runner
+    ├── visualize_pipeline.py             # Waveform comparison visualizer
+    └── rpm_doc_combinations.xlsx         # Reference link/copy of combinations sheet
+```
+
+---
+
+## ⚙️ Setup & Installation
+
+1. **Activate the Virtual Environment**:
+   ```bash
+   source Python/.venv/bin/activate
+   ```
+
+2. **Install Dependencies**:
+   The required libraries are:
+   ```bash
+   pip install numpy scipy matplotlib openpyxl EMD-signal PyWavelets
+   ```
+
+---
+
+## 🚀 Processing Pipeline (Stages 1 to 3)
+
+The processing pipeline is executed sequentially across the four main Python scripts:
+
+### Stage 1: Adaptive Preprocessing & CEEMDAN
+*   **Script**: `Python/02_iceemdan.py`
+*   **Functionality**:
+    1. Loops over different bandpass filter cutoff frequencies (`[50, 100, 150, 200] Hz`) for each raw file.
+    2. Runs a fast-eval CEEMDAN (`trials=50`) to measure the average Pearson correlation between adjacent IMFs (mode-mixing index).
+    3. Selects the optimal cutoff that minimizes mode mixing, applies a 3rd-order Butterworth bandpass filter `[cutoff, 4000] Hz`, detrends, and normalizes the signal.
+    4. Extracts the 1-second segment with the highest energy.
+    5. Performs a high-fidelity CEEMDAN decomposition (`trials=300`, `epsilon=0.05`, `noise_seed=42`) with full process parallelism.
+    6. Saves the IMFs to `Vibration_IMFs/` and a visual decomposition plot.
+
+### Stage 2: Multi-Criteria Adaptive IMF Weighting (MAIW)
+*   **Script**: `Python/03_maiw_weighting.py`
+*   **Functionality**:
+    1. Loads the decomposed IMFs.
+    2. Calculates four distinct criteria for each IMF:
+       * **Correlation ($C_k$)**: Pearson correlation with the preprocessed signal.
+       * **Energy ($E_k$)**: Energy contribution relative to all IMFs.
+       * **Kurtosis ($K_k$)**: Normalised kurtosis (`fisher=False`) to capture tool impact spikes.
+       * **Frequency Proximity ($F_k$)**: Proximity of the dominant frequency to the natural chatter band ($500 \text{--} 2000$ Hz) using a Gaussian proximity score.
+    3. Reconstructs the signal using the combined weight: $W_k = 0.25 C_k + 0.25 E_k + 0.25 K_k + 0.25 F_k$.
+    4. Saves the reconstructed signal to `Vibration_MAIW/`.
+
+### Stage 3: Bayesian Adaptive Wavelet Denoising
+*   **Script**: `Python/04_wavelet_denoise.py`
+*   **Functionality**:
+    1. Performs 4-level wavelet decomposition on the MAIW-reconstructed signal using the `db8` Daubechies wavelet.
+    2. Estimates the noise standard deviation $\sigma_n$ using the Median Absolute Deviation (MAD) of the finest subband coefficients.
+    3. Calculates adaptive thresholds for each detail subband using BayesShrink:
+       $$T_j = \frac{\sigma_n^2}{\sigma_x}$$
+    4. Applies soft-thresholding and reconstructs the final high-quality clean signal $x_{\text{clean}}(t)$.
+    5. Saves the final output to `Vibration_Clean/`.
+
+---
+
+## 📈 Running the Pipeline
+
+To run the entire pipeline from end-to-end:
+
+```bash
+# Step 1: Run Adaptive Preprocessing & CEEMDAN
+python Python/02_iceemdan.py
+
+# Step 2: Run Multi-Criteria IMF Weighting
+python Python/03_maiw_weighting.py
+
+# Step 3: Run Wavelet Denoising
+python Python/04_wavelet_denoise.py
+```
+
+---
+
+## 📝 License & Contact
+This project is developed for research in machining vibration analysis and tool health monitoring. For inquiries or updates, refer to the accompanying `project_details.md` document.
