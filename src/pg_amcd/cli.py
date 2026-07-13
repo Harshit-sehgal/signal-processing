@@ -87,6 +87,25 @@ def run_pipeline_on_dataset(args):
     if not mat_files:
         print(f"No MAT files found in: {args.input_dir}")
         sys.exit(0)
+
+    # Check if physics gating is enabled
+    use_physics = config.get("use_physics_gating", True)
+    if use_physics and not args.metadata:
+        print("Error: Physics gating is enabled (use_physics_gating=true), but no metadata file was provided via --metadata.")
+        sys.exit(1)
+
+    meta_index = {}
+    if args.metadata:
+        if not os.path.exists(args.metadata):
+            print(f"Error: Metadata file does not exist: {args.metadata}")
+            sys.exit(1)
+        meta_rows = _load_metadata_index(args.metadata)
+        def _meta_key(r):
+            return os.path.basename(str(r.get("file_path") or r.get("recording_id") or ""))
+        for _row in meta_rows:
+            _k = _meta_key(_row)
+            if _k not in meta_index:
+                meta_index[_k] = _row
         
     print("=" * 65)
     print(f"🚀 Running PG-AMCD CLI Pipeline on {len(mat_files)} files 🚀")
@@ -125,6 +144,15 @@ def run_pipeline_on_dataset(args):
     
     success_count = 0
     failure_count = 0
+
+    def get_case_insensitive(d, keys, default=None):
+        if not d:
+            return default
+        for k in keys:
+            for dk in d:
+                if dk.lower() == k.lower():
+                    return d[dk]
+        return default
     
     for raw_path in mat_files:
         folder_name = os.path.basename(os.path.dirname(raw_path))
@@ -145,6 +173,42 @@ def run_pipeline_on_dataset(args):
                 print(f"⏭ Skipping {rel_path} (outputs up to date)")
                 continue
 
+            # Load and check metadata match for physics mode
+            row = meta_index.get(base_name)
+            if use_physics and not row:
+                raise ValueError(f"Recording {base_name} has no matching metadata row, required for physics gating.")
+
+            metadata_dict = None
+            if row:
+                if use_physics:
+                    rpm_raw = get_case_insensitive(row, ["rpm", "RPM"])
+                    if rpm_raw is None or str(rpm_raw).strip() == "":
+                        raise ValueError(f"Recording {base_name} metadata row is missing required 'rpm' field for physics gating.")
+                    tc_raw = get_case_insensitive(row, ["tooth_count", "toothcount", "ToothCount"])
+                    if tc_raw is None or str(tc_raw).strip() == "":
+                        raise ValueError(f"Recording {base_name} metadata row is missing required 'tooth_count' field for physics gating.")
+
+                try:
+                    rpm_raw = get_case_insensitive(row, ["rpm", "RPM"])
+                    rpm = float(rpm_raw) if rpm_raw is not None else 570.0
+                except ValueError:
+                    rpm = 570.0
+                    
+                try:
+                    tc_raw = get_case_insensitive(row, ["tooth_count", "toothcount", "ToothCount"])
+                    tooth_count = int(tc_raw) if tc_raw is not None else 1
+                except ValueError:
+                    tooth_count = 1
+                    
+                metadata_dict = {
+                    "rpm": rpm,
+                    "tooth_count": tooth_count,
+                    "stickout": get_case_insensitive(row, ["stickout", "Stickout"]),
+                    "depth_of_cut": get_case_insensitive(row, ["depth_of_cut", "depthofcut", "depth_of_cut_mm", "DepthOfCut"]),
+                    "recording_id": get_case_insensitive(row, ["recording_id", "recordingid", "RecordingID"]),
+                    "label": get_case_insensitive(row, ["label", "Label"]),
+                }
+
             # A. Validate and load signal (Strict Goal 3 Input Checks)
             t_arr, sig_arr, fs_est = validate_and_load_signal(
                 raw_path,
@@ -157,7 +221,7 @@ def run_pipeline_on_dataset(args):
             file_sha256 = compute_file_sha256(raw_path)
             
             # B. Run the canonical pipeline
-            res: PipelineResult = process_recording(t_arr, sig_arr, config, mode="exploratory")
+            res: PipelineResult = process_recording(t_arr, sig_arr, config, metadata=metadata_dict, mode="exploratory")
             
             # Prepare file output directories
             target_folder = os.path.join(run_output_dir, folder_name)

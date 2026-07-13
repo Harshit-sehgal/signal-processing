@@ -71,6 +71,12 @@ def evaluate_denoising_performance(
         clean = clean[:m]
         den = den[:m]
 
+    # Align amplitudes to remove scaling bias from RMSE and SNR
+    den_energy = float(np.sum(den ** 2))
+    if den_energy > 0:
+        alpha = float(np.sum(clean * den) / den_energy)
+        den = den * alpha
+
     rmse = float(np.sqrt(np.mean((clean - den) ** 2)))
 
     residual_power = float(np.var(clean - den))
@@ -86,13 +92,13 @@ def evaluate_denoising_performance(
     spectral_distortion = float(np.sum(np.abs(sc - sd)))
 
     mask = (freqs[pos] >= chatter_center - chatter_spread) & (freqs[pos] <= chatter_center + chatter_spread)
-    cb_clean = float(np.sum(spec_clean[mask]))
-    cb_den = float(np.sum(spec_den[mask]))
+    cb_clean = float(np.sum(sc[mask]))
+    cb_den = float(np.sum(sd[mask]))
     chatter_band_retention = float(cb_den / cb_clean) if cb_clean > 0 else 0.0
 
     out_mask = ~mask
-    nb_clean = float(np.sum(spec_clean[out_mask]))
-    nb_den = float(np.sum(spec_den[out_mask]))
+    nb_clean = float(np.sum(sc[out_mask]))
+    nb_den = float(np.sum(sd[out_mask]))
     noise_band_attenuation = float(1.0 - nb_den / nb_clean) if nb_clean > 0 else 0.0
 
     # Best-effort onset detection from the denoised energy envelope.

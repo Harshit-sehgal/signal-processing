@@ -104,6 +104,15 @@ def calculate_physics_gated_weights(
         gates: Independent sigmoidal weights for each IMF (shape: (num_weighted,))
         C, E_chatter, K, E_harmonics: Diagnostic arrays for reporting.
     """
+    if rpm <= 0:
+        raise ValueError("RPM must be positive.")
+    if tooth_count < 1:
+        raise ValueError("tooth_count must be at least 1.")
+    if imfs.ndim != 2:
+        raise ValueError("IMFs must be two-dimensional.")
+    if imfs.shape[1] != len(original_signal):
+        raise ValueError("IMF length does not match source signal.")
+
     num_layers = imfs.shape[0]
     num_weighted = num_layers - 1 # exclude residual
     
@@ -113,14 +122,24 @@ def calculate_physics_gated_weights(
     K = np.zeros(num_weighted)
     E_harmonics = np.zeros(num_weighted)
     
-    maiw_cfg = config["maiw"]
+    maiw_cfg = config.get("maiw", {})
     chatter_center = maiw_cfg.get("chatter_band_center", 1250.0)
     chatter_spread = maiw_cfg.get("chatter_band_spread", 500.0)
     
+    # Physics gating configuration
+    pg_cfg = config.get("physics_gating", {})
+    a1 = pg_cfg.get("chatter_energy_weight", 4.0)
+    a2 = pg_cfg.get("correlation_weight", 2.0)
+    a3 = pg_cfg.get("kurtosis_weight", 1.0)
+    a4 = pg_cfg.get("harmonic_penalty", 5.0)
+    offset = pg_cfg.get("offset", 1.5)
+    tolerance = pg_cfg.get("harmonic_tolerance_hz", 15.0)
+    h_count = pg_cfg.get("harmonic_count", 5)
+
     # Machine physics parameters
     f_spindle = rpm / 60.0
     f_tooth = f_spindle * tooth_count
-    harmonic_freqs = [k * f_tooth for k in range(1, 6)] # check up to 5th tooth harmonic
+    harmonic_freqs = [k * f_tooth for k in range(1, h_count + 1)]
     
     for i in range(num_weighted):
         imf = imfs[i]
@@ -151,22 +170,17 @@ def calculate_physics_gated_weights(
             # E. Harmonic forced vibration energy (E_harmonics)
             harmonic_mask = np.zeros_like(pos_freqs, dtype=bool)
             for h_freq in harmonic_freqs:
-                # 15 Hz sideband tolerance window
-                harmonic_mask |= (np.abs(pos_freqs - h_freq) <= 15.0)
+                # Tolerance window
+                harmonic_mask |= (np.abs(pos_freqs - h_freq) <= tolerance)
             E_harmonics[i] = np.sum(psd[harmonic_mask]) / total_psd
         else:
             E_chatter[i] = 0.0
             E_harmonics[i] = 0.0
             
-        # Sigmoid function parameters
-        a1 = 4.0   # Chatter energy coefficient
-        a2 = 2.0   # Correlation coefficient
-        a3 = 1.0   # Kurtosis coefficient
-        a4 = 5.0   # Harmonics penalty coefficient (high penalty for forced harmonics)
-        offset = 1.5
-        
         score = a1 * E_chatter[i] + a2 * C[i] + a3 * K[i] - a4 * E_harmonics[i] - offset
         gates[i] = 1.0 / (1.0 + np.exp(-score))
+        
+    return gates, C, E_chatter, K, E_harmonics
         
     return gates, C, E_chatter, K, E_harmonics
 

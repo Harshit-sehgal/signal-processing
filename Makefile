@@ -29,12 +29,15 @@ run:
 		--continue-on-error
 
 evaluate:
-	PYTHONPATH=src $(PYTHON_ENV) scripts/evaluate.py
+	PYTHONPATH=src $(PYTHON_ENV) scripts/evaluate_dataset.py
 
 validate:
 	PYTHONPATH=src $(PYTHON_ENV) scripts/validate_research.py
 
-reproduce: test evaluate validate
+report:
+	PYTHONPATH=src $(PYTHON_ENV) scripts/generate_report.py
+
+reproduce: test evaluate validate report
 	@echo "=================================================="
 	@echo "🎉 FULL REPRODUCTION RUN COMPLETED SUCCESSFULLY! 🎉"
 	@echo "=================================================="

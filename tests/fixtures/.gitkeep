@@ -1,0 +1,3 @@
+# Test fixtures are generated dynamically by tests/integration/test_cli.py
+# (synthetic tsDS MAT file + lightweight config), so this directory is empty
+# in version control.

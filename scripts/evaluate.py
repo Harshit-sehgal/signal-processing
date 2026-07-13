@@ -9,9 +9,6 @@ from sklearn.svm import SVC
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
-# Add current directory and src/ to path so we can import pg_amcd
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
 
 from pg_amcd.config import load_pipeline_config
 from pg_amcd.evaluation import build_dataset_index

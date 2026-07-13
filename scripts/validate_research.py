@@ -7,9 +7,6 @@ from sklearn.model_selection import GroupKFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 
-# Add path so we can import pg_amcd
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
 
 
 def run_evaluation_on_feature_subset(X, y, groups, feature_indices):

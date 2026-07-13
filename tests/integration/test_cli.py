@@ -23,6 +23,7 @@ SRC_DIR = os.path.join(REPO_ROOT, "src")
 TEST_CONFIG = {
     "sampling_rate": 1000,
     "segment_points": 1000,
+    "use_physics_gating": False,
     "ceemdan": {
         "trials": 2,
         "search_trials": 1,
@@ -271,3 +272,97 @@ def test_cli_validate_with_metadata(tmp_path):
     assert meta["duplicate_metadata_entries"] == 1
     assert meta["missing_chatter_label"] == 1
     assert "Metadata validation" in proc.stdout
+
+
+def test_cli_run_metadata_wiring(tmp_path):
+    import csv
+    import json
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    _make_synthetic_mat(str(input_dir / "sample.mat"), fs=1000.0, n_samples=2000)
+    output_dir = tmp_path / "output"
+    
+    # 1. Physics gating enabled + metadata missing -> should fail
+    config_path = tmp_path / "config_physics.json"
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump({
+            "sampling_rate": 1000.0,
+            "use_physics_gating": True,
+            "segment_points": 1000,
+            "ceemdan": {
+                "search_cutoffs": [100.0],
+                "search_trials": 2,
+                "trials": 2,
+                "epsilon": 0.2,
+                "noise_seed": 42
+            },
+            "maiw": {
+                "chatter_band_center": 300.0,
+                "chatter_band_spread": 100.0
+            },
+            "wavelet": {
+                "wavelet_name": "db2",
+                "level": 2
+            }
+        }, f)
+        
+    env = os.environ.copy()
+    existing = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = SRC_DIR + (os.pathsep + existing if existing else "")
+    
+    proc = subprocess.run(
+        [sys.executable, "-m", "pg_amcd.cli", "run",
+         "--input-dir", str(input_dir), "--output-dir", str(output_dir),
+         "--config", str(config_path)],
+        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=60,
+    )
+    assert proc.returncode != 0
+    assert "Error: Physics gating is enabled" in proc.stdout or "Error: Physics gating is enabled" in proc.stderr
+
+    # 2. Physics gating enabled + metadata present -> should succeed
+    meta_path = tmp_path / "meta.csv"
+    with open(meta_path, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["file_path", "rpm", "tooth_count", "label"])
+        w.writeheader()
+        w.writerow({"file_path": "sample.mat", "rpm": "1200", "tooth_count": "4", "label": "chatter"})
+        
+    proc = subprocess.run(
+        [sys.executable, "-m", "pg_amcd.cli", "run",
+         "--input-dir", str(input_dir), "--output-dir", str(output_dir),
+         "--config", str(config_path), "--metadata", str(meta_path)],
+        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
+    )
+    assert proc.returncode == 0, proc.stderr
+    
+    # 3. Physics gating disabled + metadata missing -> should succeed
+    config_no_physics_path = tmp_path / "config_no_physics.json"
+    with open(config_no_physics_path, "w", encoding="utf-8") as f:
+        json.dump({
+            "sampling_rate": 1000.0,
+            "use_physics_gating": False,
+            "segment_points": 1000,
+            "ceemdan": {
+                "search_cutoffs": [100.0],
+                "search_trials": 2,
+                "trials": 2,
+                "epsilon": 0.2,
+                "noise_seed": 42
+            },
+            "maiw": {
+                "chatter_band_center": 300.0,
+                "chatter_band_spread": 100.0
+            },
+            "wavelet": {
+                "wavelet_name": "db2",
+                "level": 2
+            }
+        }, f)
+        
+    proc = subprocess.run(
+        [sys.executable, "-m", "pg_amcd.cli", "run",
+         "--input-dir", str(input_dir), "--output-dir", str(output_dir / "no_physics"),
+         "--config", str(config_no_physics_path)],
+        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
+    )
+    assert proc.returncode == 0, proc.stderr
+
