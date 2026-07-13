@@ -10,17 +10,24 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+# Add Python directory to path to allow standard module imports
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 # Import EMD
 from PyEMD import CEEMDAN
 
-# 1. Helper function to load config
+# Import production pipeline functions directly
+from maiw_weighting import calculate_maiw_weights
+from wavelet_denoise import wavelet_denoise
+
+# Helper function to load config
 def load_pipeline_config():
     import json
-    config_path = "/home/harshit/Documents/Research/Python/config.json"
+    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
     with open(config_path, 'r') as f:
         return json.load(f)
 
-# 2. Preprocess function
+# Preprocess function
 def preprocess_raw_signal(raw_vibration, low_cutoff=100.0, fs=10000.0):
     nyquist = 0.5 * fs
     high_cutoff = 4000.0
@@ -30,7 +37,7 @@ def preprocess_raw_signal(raw_vibration, low_cutoff=100.0, fs=10000.0):
     max_val = np.max(np.abs(detrended))
     return detrended / (max_val if max_val > 0 else 1.0)
 
-# 3. Select max energy segment
+# Select max energy segment
 def select_max_energy_segment(signal, time, segment_points=10000):
     if len(signal) > segment_points:
         squared_signal = np.square(signal)
@@ -42,7 +49,7 @@ def select_max_energy_segment(signal, time, segment_points=10000):
     else:
         return signal, time, 0
 
-# 4. Fast MMI evaluation
+# Fast MMI evaluation
 def evaluate_mode_mixing(s_seg, ceemdan_cfg):
     trials = ceemdan_cfg["search_trials"]
     epsilon = ceemdan_cfg["epsilon"]
@@ -61,7 +68,7 @@ def evaluate_mode_mixing(s_seg, ceemdan_cfg):
     avg_corr = np.mean(corrs) if corrs else 1.0
     return avg_corr
 
-# 5. EMD Diagnostics
+# EMD Diagnostics
 def compute_diagnostics(original, imfs):
     num_imfs = imfs.shape[0]
     N = original.size
@@ -114,135 +121,15 @@ def compute_diagnostics(original, imfs):
         'energy_percentages': energy_percentages
     }
 
-# 6. MAIW Reconstitution
-def run_maiw(imfs, time, config):
-    maiw_cfg = config["maiw"]
-    num_imfs = imfs.shape[0]
-    N = time.size
-    
-    # Exclude residue (last IMF) from weighting
-    num_weighted = num_imfs - 1
-    
-    # Metrics
-    C = np.zeros(num_weighted)
-    E = np.zeros(num_weighted)
-    K = np.zeros(num_weighted)
-    F = np.zeros(num_weighted)
-    
-    fs = 10000.0
-    chatter_center = maiw_cfg["chatter_band_center"]
-    chatter_spread = maiw_cfg["chatter_band_spread"]
-    
-    # Overall signal energy
-    sum_imfs = np.sum(imfs[:num_weighted], axis=0)
-    sig_std = np.std(sum_imfs)
-    
-    for i in range(num_weighted):
-        imf = imfs[i]
-        
-        # A. Correlation coefficient
-        corr = np.abs(np.corrcoef(imf, sum_imfs)[0, 1])
-        C[i] = corr if not np.isnan(corr) else 0.0
-        
-        # B. Energy percentage
-        E[i] = np.sum(imf ** 2) / np.sum(sum_imfs ** 2)
-        
-        # C. Kurtosis
-        # kurtosis = E[(x - mu)^4] / sigma^4 - 3 (or fisher=False)
-        mu = np.mean(imf)
-        std = np.std(imf)
-        if std > 0:
-            K[i] = np.mean((imf - mu) ** 4) / (std ** 4)
-        else:
-            K[i] = 3.0 # normal kurtosis
-            
-        # D. Frequency Proximity
-        # Peak frequency of IMF
-        fft_vals = np.abs(scipy.fftpack.fft(imf))
-        freqs = scipy.fftpack.fftfreq(N, 1/fs)
-        pos_freqs = freqs[freqs >= 0]
-        pos_fft = fft_vals[freqs >= 0]
-        peak_f = pos_freqs[np.argmax(pos_fft)]
-        
-        # Gaussian proximity score
-        F[i] = np.exp(-((peak_f - chatter_center) ** 2) / (2 * (chatter_spread ** 2)))
-        
-    # Standardize indicators
-    def norm_ind(I):
-        s = np.sum(I)
-        return I / s if s > 0 else np.ones_like(I) / len(I)
-        
-    nC = norm_ind(C)
-    nE = norm_ind(E)
-    nK = norm_ind(K)
-    nF = norm_ind(F)
-    
-    # Weights
-    W = maiw_cfg["alpha"]*nC + maiw_cfg["beta"]*nE + maiw_cfg["gamma"]*nK + maiw_cfg["delta"]*nF
-    
-    # Reconstructed signal
-    reconstructed = np.zeros(N)
-    for i in range(num_weighted):
-        reconstructed += W[i] * imfs[i]
-        
-    # Add residue
-    reconstructed += imfs[-1]
-    
-    return reconstructed, W, C, E, K, F
-
-# 7. Wavelet Denoising
-def run_wavelet_denoise(signal, time, config):
-    import pywt
-    wav_cfg = config["wavelet"]
-    wavelet_name = wav_cfg["wavelet_name"]
-    requested_level = wav_cfg["level"]
-    
-    # Calculate max possible level
-    max_level = pywt.dwt_max_level(data_len=len(signal), filter_len=pywt.Wavelet(wavelet_name).dec_len)
-    level = min(requested_level, max_level)
-    
-    # Decompose
-    coeffs = pywt.wavedec(signal, wavelet_name, level=level)
-    
-    # BayesShrink thresholding on detail coefficients
-    for i in range(1, len(coeffs)):
-        details = coeffs[i]
-        # Estimating noise sigma from Median Absolute Deviation of highest level details
-        if i == 1:
-            sigma_w = np.median(np.abs(details)) / 0.6745
-        
-        # Signal variance estimate
-        var_y = np.mean(details ** 2)
-        var_x = max(0, var_y - (sigma_w ** 2))
-        
-        # BayesShrink threshold
-        if var_x > 0:
-            threshold = (sigma_w ** 2) / np.sqrt(var_x)
-        else:
-            threshold = np.max(np.abs(details)) # threshold everything
-            
-        coeffs[i] = pywt.threshold(details, threshold, mode='soft')
-        
-    # Reconstruct
-    clean_signal = pywt.waverec(coeffs, wavelet_name)
-    # Clip/truncate to exact original length
-    clean_signal = clean_signal[:len(signal)]
-    
-    # Normalize clean signal
-    max_val = np.max(np.abs(clean_signal))
-    if max_val > 0:
-        clean_signal = clean_signal / max_val
-        
-    return clean_signal
-
-# 8. Main execution
+# Main execution
 def main():
     config = load_pipeline_config()
     ceemdan_cfg = config["ceemdan"]
     
-    # Directory paths
-    raw_dir = "/home/harshit/Documents/Research/Vibration - ML"
-    testing_dir = "/home/harshit/Documents/Research/testing/t1"
+    # Resolve paths relative to repository root
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    raw_dir = os.path.join(root_dir, "Vibration - ML")
+    testing_dir = os.path.join(root_dir, "testing/t1")
     os.makedirs(testing_dir, exist_ok=True)
     
     # Find all mat files
@@ -306,7 +193,7 @@ def main():
         
         # Save IMFs
         npz_path = os.path.join(testing_dir, f"{base_name}_IMFs.npz")
-        np.savez_compressed(npz_path, time=opt_t_seg, original_signal=opt_s_seg, imfs=imfs)
+        np.savez_compressed(npz_path, time=opt_t_seg, original_signal=opt_s_seg, imfs=imfs, start_index=start_idx)
         
         # Save EMD plot
         num_imfs = imfs.shape[0]
@@ -329,8 +216,18 @@ def main():
         plt.savefig(plot_path, dpi=150)
         plt.close()
         
-        # 4. MAIW Reconstruction
-        reconstructed, W, C, E, K, F = run_maiw(imfs, opt_t_seg, config)
+        # 4. MAIW Reconstruction (Production logic: normalized metrics & no residual)
+        W, C, E, K, F = calculate_maiw_weights(imfs, opt_s_seg)
+        num_weighted = imfs.shape[0] - 1
+        reconstructed = np.zeros_like(opt_s_seg)
+        for i in range(num_weighted):
+            reconstructed += W[i] * imfs[i]
+            
+        # Scale reconstructed signal
+        max_val_reconstructed = np.max(np.abs(reconstructed))
+        if max_val_reconstructed > 0:
+            reconstructed = reconstructed / max_val_reconstructed
+            
         maiw_path = os.path.join(testing_dir, f"{base_name}_MAIW.mat")
         scipy.io.savemat(maiw_path, {
             'tsDS': np.column_stack((opt_t_seg, reconstructed)),
@@ -341,8 +238,14 @@ def main():
             'frequency_proximity': F
         })
         
-        # 5. Wavelet Denoising
-        clean_signal = run_wavelet_denoise(reconstructed, opt_t_seg, config)
+        # 5. Wavelet Denoising (Production logic: BayesShrink with d1 estimation)
+        clean_signal = wavelet_denoise(reconstructed)
+        
+        # Scale clean signal
+        max_val_clean = np.max(np.abs(clean_signal))
+        if max_val_clean > 0:
+            clean_signal = clean_signal / max_val_clean
+            
         clean_path = os.path.join(testing_dir, f"{base_name}_Clean.mat")
         scipy.io.savemat(clean_path, {
             'tsDS': np.column_stack((opt_t_seg, clean_signal))

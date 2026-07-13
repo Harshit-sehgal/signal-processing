@@ -22,13 +22,13 @@ if __name__ == "__main__":
     print("==================================================")
     
     # Stage 1: Adaptive Preprocessing & CEEMDAN Decomposition
-    run_script("02_iceemdan.py")
+    run_script("iceemdan.py")
     
     # Stage 2: Multi-Criteria Adaptive IMF Weighting (MAIW)
-    run_script("03_maiw_weighting.py")
+    run_script("maiw_weighting.py")
     
     # Stage 3: Bayesian Adaptive Wavelet Denoising
-    run_script("04_wavelet_denoise.py")
+    run_script("wavelet_denoise.py")
     
     print("\n==================================================")
     print("🎉 ALL PIPELINE STAGES COMPLETED SUCCESSFULLY!")

@@ -61,7 +61,17 @@ def calculate_maiw_weights(imfs, original_signal, fs=None):
         # Chatter band center and spread from config
         F[i] = np.exp(-((dom_freq - center) ** 2) / (2.0 * (spread ** 2)))
         
-    W = alpha * C + beta * E + gamma * K + delta * F
+    def normalize_indicator(values):
+        values = np.nan_to_num(values, nan=0.0, posinf=0.0, neginf=0.0)
+        total = np.sum(values)
+        return values / total if total > 0 else np.ones_like(values) / len(values)
+
+    nC = normalize_indicator(C)
+    nE = normalize_indicator(E)
+    nK = normalize_indicator(K)
+    nF = normalize_indicator(F)
+
+    W = alpha * nC + beta * nE + gamma * nK + delta * nF
     
     # Normalize weights so they sum to 1.0
     sum_W = np.sum(W)

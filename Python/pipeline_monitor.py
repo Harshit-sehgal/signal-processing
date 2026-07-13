@@ -2,26 +2,23 @@ import os
 import sys
 import time
 import glob
-import importlib
 import subprocess
 
 # Add current directory to path so we can import packages
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Import the modules starting with numbers
+# Clean imports from renamed modules
 try:
-    maiw_module = importlib.import_module("03_maiw_weighting")
-    denoise_module = importlib.import_module("04_wavelet_denoise")
-    process_file_maiw = maiw_module.process_file_maiw
-    process_file_denoise = denoise_module.process_file_denoise
+    from maiw_weighting import process_file_maiw
+    from wavelet_denoise import process_file_denoise
 except Exception as e:
     print(f"Error importing modules: {e}")
     sys.exit(1)
 
 def check_active_processes():
     try:
-        # Check if 02_iceemdan.py is running
-        res = subprocess.run(["pgrep", "-f", "02_iceemdan.py"], capture_output=True, text=True)
+        # Check if iceemdan.py is running
+        res = subprocess.run(["pgrep", "-f", "iceemdan.py"], capture_output=True, text=True)
         pids = res.stdout.strip().split()
         return len(pids) > 0
     except Exception:
@@ -32,9 +29,11 @@ def main():
     config = load_pipeline_config()
     suffix = config.get("output_suffix", "")
     
-    imf_dir = f"/home/harshit/Documents/Research/Vibration_IMFs{suffix}"
-    maiw_dir = f"/home/harshit/Documents/Research/Vibration_MAIW{suffix}"
-    clean_dir = f"/home/harshit/Documents/Research/Vibration_Clean{suffix}"
+    # Resolve paths dynamically relative to repository root
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    imf_dir = os.path.join(root_dir, f"Vibration_IMFs{suffix}")
+    maiw_dir = os.path.join(root_dir, f"Vibration_MAIW{suffix}")
+    clean_dir = os.path.join(root_dir, f"Vibration_Clean{suffix}")
     
     os.makedirs(maiw_dir, exist_ok=True)
     os.makedirs(clean_dir, exist_ok=True)
@@ -99,10 +98,10 @@ def main():
             
         # If CEEMDAN is still running, wait before next check
         if check_active_processes():
-            print("⏳ 02_iceemdan.py is still running. Sleeping for 15 seconds...", end="\r")
+            print("⏳ iceemdan.py is still running. Sleeping for 15 seconds...", end="\r")
             time.sleep(15)
         else:
-            print("\n🏁 02_iceemdan.py has finished execution or is not running.")
+            print("\n🏁 iceemdan.py has finished execution or is not running.")
             print("Running final sweep...")
             break
             
