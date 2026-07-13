@@ -15,7 +15,7 @@ from pg_amcd.config import load_pipeline_config
 from pg_amcd.io import validate_and_load_signal
 from pg_amcd.preprocessing import preprocess_signal
 from pg_amcd.segmentation import select_max_energy_segment_indices
-from pg_amcd.decomposition import run_ceemdan, calculate_adjacent_imf_correlation
+from pg_amcd.decomposition import run_ceemdan, calculate_composite_cutoff_score
 
 def perform_optimized_decomposition(raw_path, preprocessed_path, npz_path, plot_path):
     print(f"\nDecomposing & Optimizing: {os.path.basename(raw_path)}")
@@ -51,8 +51,8 @@ def perform_optimized_decomposition(raw_path, preprocessed_path, npz_path, plot_
         sifting_iterations = ceemdan_cfg.get("sifting_iterations", 16)
         
         imfs = run_ceemdan(s_seg, trials, epsilon, seed, sifting_iterations)
-        score = calculate_adjacent_imf_correlation(imfs)
-        print(f"  Cutoff {cut} Hz -> Avg Adj IMF Corr: {score:.4f}")
+        score = calculate_composite_cutoff_score(imfs, s_seg, fs)
+        print(f"  Cutoff {cut} Hz -> Composite Score: {score:.4f}")
         
         if score < best_score:
             best_score = score

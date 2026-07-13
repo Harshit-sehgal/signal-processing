@@ -4,6 +4,8 @@ src/pg_amcd/cli.py
 src/pg_amcd/config.py
 src/pg_amcd/decomposition.py
 src/pg_amcd/denoising.py
+src/pg_amcd/evaluation.py
+src/pg_amcd/features.py
 src/pg_amcd/io.py
 src/pg_amcd/pipeline.py
 src/pg_amcd/preprocessing.py

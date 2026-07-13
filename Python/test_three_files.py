@@ -13,12 +13,10 @@ import matplotlib.pyplot as plt
 # Add Python directory to path to allow standard module imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Import EMD
-from PyEMD import CEEMDAN
-
 # Import production pipeline functions directly
 from pg_amcd.weighting import calculate_maiw_weights, reconstruct_weighted_signal
 from pg_amcd.denoising import wavelet_denoise
+from pg_amcd.decomposition import run_ceemdan, calculate_composite_cutoff_score
 
 # Helper function to load config
 def load_pipeline_config():
@@ -49,24 +47,7 @@ def select_max_energy_segment(signal, time, segment_points=10000):
     else:
         return signal, time, 0
 
-# Fast MMI evaluation
-def evaluate_mode_mixing(s_seg, ceemdan_cfg):
-    trials = ceemdan_cfg["search_trials"]
-    epsilon = ceemdan_cfg["epsilon"]
-    fxe = ceemdan_cfg.get("sifting_iterations", 0)
-    
-    ceemdan = CEEMDAN(trials=trials, epsilon=epsilon, FIXE=fxe, parallel=True)
-    ceemdan.noise_seed(ceemdan_cfg["noise_seed"])
-    imfs = ceemdan(s_seg)
-    num_imfs = imfs.shape[0]
-    
-    corrs = []
-    for i in range(num_imfs - 2):
-        corr = np.abs(np.corrcoef(imfs[i], imfs[i+1])[0, 1])
-        if not np.isnan(corr):
-            corrs.append(corr)
-    avg_corr = np.mean(corrs) if corrs else 1.0
-    return avg_corr
+# evaluate_mode_mixing function deleted in favor of package import calculate_composite_cutoff_score
 
 # EMD Diagnostics
 def compute_diagnostics(original, imfs):
@@ -169,7 +150,15 @@ def main():
         for cut in cutoffs:
             normalized = preprocess_raw_signal(raw_vibration, cut)
             s_seg, _, _ = select_max_energy_segment(normalized, time_arr)
-            score = evaluate_mode_mixing(s_seg, ceemdan_cfg)
+            
+            # Fast EMD search
+            trials = ceemdan_cfg["search_trials"]
+            epsilon = ceemdan_cfg["epsilon"]
+            seed = ceemdan_cfg["noise_seed"]
+            fxe = ceemdan_cfg.get("sifting_iterations", 16)
+            
+            imfs_search = run_ceemdan(s_seg, trials, epsilon, seed, fxe)
+            score = calculate_composite_cutoff_score(imfs_search, s_seg, config["sampling_rate"])
             if score < best_score:
                 best_score = score
                 best_cutoff = cut
@@ -184,12 +173,10 @@ def main():
         trials = ceemdan_cfg["trials"]
         epsilon = ceemdan_cfg["epsilon"]
         seed = ceemdan_cfg["noise_seed"]
-        fxe = ceemdan_cfg.get("sifting_iterations", 0)
+        fxe = ceemdan_cfg.get("sifting_iterations", 16)
         
-        print(f"  Running final CEEMDAN (trials={trials}, epsilon={epsilon}, FIXE={fxe})...")
-        final_ceemdan = CEEMDAN(trials=trials, epsilon=epsilon, FIXE=fxe, parallel=True)
-        final_ceemdan.noise_seed(seed)
-        imfs = final_ceemdan(opt_s_seg)
+        print(f"  Running final CEEMDAN (trials={trials}, epsilon={epsilon}, sifting_iterations={fxe})...")
+        imfs = run_ceemdan(opt_s_seg, trials, epsilon, seed, fxe)
         
         # Save IMFs
         npz_path = os.path.join(testing_dir, f"{base_name}_IMFs.npz")

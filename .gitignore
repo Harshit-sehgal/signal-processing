@@ -19,6 +19,8 @@ Vibration_IMFs_backup/
 Vibration_MAIW/
 Vibration_Clean/
 old_files/
+outputs/
+.pytest_cache/
 
 # Temporary and local log directories
 .gemini/

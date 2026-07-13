@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import scipy.stats
 from dataclasses import dataclass
 from typing import List, Dict, Any, Tuple
 
@@ -7,8 +8,9 @@ from typing import List, Dict, Any, Tuple
 from pg_amcd.preprocessing import preprocess_signal
 from pg_amcd.segmentation import select_max_energy_segment_indices, generate_sliding_windows
 from pg_amcd.decomposition import run_ceemdan, calculate_adjacent_imf_correlation
-from pg_amcd.weighting import calculate_maiw_weights, reconstruct_weighted_signal
+from pg_amcd.weighting import calculate_maiw_weights, calculate_physics_gated_weights, reconstruct_weighted_signal
 from pg_amcd.denoising import wavelet_denoise
+from pg_amcd.features import extract_window_features
 
 @dataclass
 class WindowResult:
@@ -46,13 +48,15 @@ def process_recording(
     """The canonical entrypoint to process a single machining vibration recording.
     
     Preserves amplitude and runs input validation, preprocessing, segmentation, 
-    CEEMDAN, MAIW weighting, and Bayesian Wavelet Denoising.
+    CEEMDAN, physics-aware gating, and band-aware Wavelet Denoising.
     """
     warnings = []
     fs = config["sampling_rate"]
     
+    rpm = metadata.get("rpm", 570.0) if metadata else 570.0
+    tooth_count = metadata.get("tooth_count", 1) if metadata else 1
+    
     # 1. Preprocessing (optimal cutoff is loaded or pre-calculated)
-    # By default, use the cutoff from config or default to 100 Hz
     cutoff = config.get("ceemdan", {}).get("selected_cutoff", 100.0)
     high_cutoff = 4000.0
     
@@ -93,6 +97,9 @@ def process_recording(
     seed = ceemdan_cfg["noise_seed"]
     sifting_iterations = ceemdan_cfg.get("sifting_iterations", 16)
     
+    chatter_center = config["maiw"]["chatter_band_center"]
+    chatter_spread = config["maiw"]["chatter_band_spread"]
+    
     for win in windows:
         t_seg = win['time_segment']
         s_seg = win['signal_segment']
@@ -100,15 +107,26 @@ def process_recording(
         # A. CEEMDAN Decomposition
         imfs = run_ceemdan(s_seg, trials, epsilon, seed, sifting_iterations)
         
-        # B. MAIW Weighting
-        W, C, E, K, F = calculate_maiw_weights(imfs, s_seg, fs, config)
-        reconstructed_scaled = reconstruct_weighted_signal(imfs, W)
-        
-        # C. Wavelet Denoising
+        # B. Gating/Weighting (Dynamic toggle for standard vs. physics gating)
+        use_physics = config.get("use_physics_gating", True)
+        if use_physics:
+            W, _, _, _, _ = calculate_physics_gated_weights(
+                imfs, s_seg, fs, rpm, tooth_count, config
+            )
+            reconstructed_scaled = reconstruct_weighted_signal(imfs, W)
+        else:
+            W, _, _, _, _ = calculate_maiw_weights(imfs, s_seg, fs, config)
+            reconstructed_scaled = reconstruct_weighted_signal(imfs, W)
+            
+        # C. Wavelet Denoising (Band-Aware)
         denoised_scaled = wavelet_denoise(
             reconstructed_scaled, 
             wavelet_name=config["wavelet"]["wavelet_name"], 
-            level=config["wavelet"]["level"]
+            level=config["wavelet"]["level"],
+            fs=fs,
+            chatter_center=chatter_center,
+            chatter_spread=chatter_spread,
+            band_aware=config.get("wavelet", {}).get("band_aware", True)
         )
         
         # D. Convert Denoised Output back to Physical Units
@@ -116,39 +134,38 @@ def process_recording(
         maiw_reconstructed_physical = reconstructed_scaled * scale_factor
         
         # E. Calculate Features (Goal 11)
-        # Root Mean Square of Denoised Signal in Physical Units
-        rms_val = np.sqrt(np.mean(np.square(denoised_physical)))
+        features = extract_window_features(
+            raw_window=signal[win['start_idx']:win['end_idx']],
+            prep_physical_window=physical_preprocessed[win['start_idx']:win['end_idx']],
+            denoised_physical_window=denoised_physical,
+            imfs=imfs,
+            fs=fs,
+            rpm=rpm,
+            tooth_count=tooth_count,
+            chatter_center=chatter_center,
+            chatter_spread=chatter_spread
+        )
         
-        # Kurtosis
-        kurt_val = float(scipy.stats.kurtosis(denoised_physical, fisher=False))
+        # Calculate diagnostics
+        mmi, _ = calculate_adjacent_imf_correlation(imfs)
         
-        # Diagnostics
-        mmi = calculate_adjacent_imf_correlation(imfs)
-        
-        # Orthogonality Index (OI)
         cross_terms = 0.0
         num_layers = imfs.shape[0]
-        for i in range(num_layers):
-            for j in range(i + 1, num_layers):
-                cross_terms += np.sum(imfs[i] * imfs[j])
+        for idx1 in range(num_layers):
+            for idx2 in range(idx1 + 1, num_layers):
+                cross_terms += np.sum(imfs[idx1] * imfs[idx2])
         orig_energy = np.sum(s_seg ** 2)
         oi = float(2.0 * cross_terms / orig_energy) if orig_energy > 0 else 0.0
         
-        # Reconstruction NRMSE
         recon_err = np.sum(imfs, axis=0) - s_seg
         nrmse = float(np.sqrt(np.mean(recon_err ** 2)) / np.sqrt(np.mean(s_seg ** 2))) if np.any(s_seg) else 0.0
         
-        features = {
-            "physical_rms": float(rms_val),
-            "physical_kurtosis": kurt_val,
-            "mmi": mmi,
-            "oi": oi,
-            "nrmse": nrmse
-        }
+        features["mmi"] = mmi
+        features["oi"] = oi
+        features["nrmse"] = nrmse
         
-        # Placeholder chatter probability (Heuristic for initial version)
-        # Higher RMS in physical units generally correlates with chatter presence
-        # Threshold: if RMS > 0.1, assign higher probability
+        # Simple threshold classification based on RMS
+        rms_val = features["time_rms"]
         prob = float(min(1.0, rms_val / 0.5))
         label = "chatter" if rms_val > 0.15 else "stable"
         
@@ -173,7 +190,8 @@ def process_recording(
         "ceemdan_epsilon": epsilon,
         "sifting_iterations": sifting_iterations,
         "wavelet_name": config["wavelet"]["wavelet_name"],
-        "wavelet_level": config["wavelet"]["level"]
+        "wavelet_level": config["wavelet"]["level"],
+        "use_physics_gating": use_physics
     }
     
     return PipelineResult(
