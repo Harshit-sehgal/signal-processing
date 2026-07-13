@@ -23,7 +23,7 @@ def _synthetic_imfs(n_samples=2000, fs=10_000.0, n_modes=4):
     t = np.arange(n_samples) / fs
     imfs = []
     for k in range(1, n_modes + 1):
-        freq = 50.0 * k
+        freq = 50.0 * (n_modes - k + 1)
         imfs.append(np.sin(2 * np.pi * freq * t))
     return np.stack(imfs)
 

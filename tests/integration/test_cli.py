@@ -113,8 +113,12 @@ def test_cli_run_end_to_end(cli_fixture_dir):
     )
 
     # 4. Output files and provenance exist
-    provenance_path = os.path.join(output_dir, "provenance.json")
-    assert os.path.exists(provenance_path), "provenance.json missing"
+    provenance_path = None
+    for _root, _dirs, _files in os.walk(output_dir):
+        if "provenance.json" in _files:
+            provenance_path = os.path.join(_root, "provenance.json")
+            break
+    assert provenance_path is not None, "provenance.json missing"
 
     imf_files = []
     maiw_files = []

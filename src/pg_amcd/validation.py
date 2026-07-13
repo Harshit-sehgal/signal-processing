@@ -99,7 +99,7 @@ def frequency_ordering_index(imfs: np.ndarray, fs: float) -> float:
     if np.std(mean_freqs) == 0 or np.std(idx) == 0:
         return 1.0 if np.all(np.diff(mean_freqs) <= 0) else 0.0
     corr = float(np.corrcoef(idx, mean_freqs)[0, 1])
-    return (corr + 1.0) / 2.0
+    return (1.0 - corr) / 2.0
 
 
 def validate_decomposition(original: np.ndarray, imfs: np.ndarray, fs: float) -> Dict[str, float]:

@@ -95,6 +95,17 @@ def run_pipeline_on_dataset(args):
     print("=" * 65)
     
     os.makedirs(args.output_dir, exist_ok=True)
+    # Goal 4.4: deterministic run id from stable inputs (config + git + file
+    # contents), known before any CEEMDAN work. Outputs are written under
+    # <output_dir>/<run_id>/ and never reused unless the id matches.
+    _config_sha = _sha256_of_config(config, args.config)
+    _git_commit = get_git_commit_sha()
+    _input_checksums = [compute_file_sha256(f) for f in mat_files]
+    run_id = compute_run_id(_config_sha, _git_commit, _input_checksums)
+    run_output_dir = os.path.join(args.output_dir, run_id)
+    os.makedirs(run_output_dir, exist_ok=True)
+    print(f"Run ID: {run_id}")
+    print(f"Run output dir: {run_output_dir}")
     
     # Collect run metadata
     run_start = time.time()
@@ -126,7 +137,7 @@ def run_pipeline_on_dataset(args):
             file_start = time.time()
             # 0. Stale-output detection: skip if all outputs exist and are
             #    newer than the input (Sprint 3 reproducibility requirement).
-            target_folder = os.path.join(args.output_dir, folder_name)
+            target_folder = os.path.join(run_output_dir, folder_name)
             npz_path = os.path.join(target_folder, base_name.replace(".mat", "_IMFs.npz"))
             maiw_path = os.path.join(target_folder, base_name)
             clean_path = os.path.join(target_folder, base_name.replace(".mat", "_Clean.mat"))
@@ -149,7 +160,7 @@ def run_pipeline_on_dataset(args):
             res: PipelineResult = process_recording(t_arr, sig_arr, config, mode="exploratory")
             
             # Prepare file output directories
-            target_folder = os.path.join(args.output_dir, folder_name)
+            target_folder = os.path.join(run_output_dir, folder_name)
             os.makedirs(target_folder, exist_ok=True)
             
             # Save stage results
@@ -233,19 +244,16 @@ def run_pipeline_on_dataset(args):
                 print("\n❌ Pipeline aborted due to failure. (Use --continue-on-error to skip failures)")
                 sys.exit(1)
                 
-    input_checksums = [f.get("sha256", "") for f in run_metadata["files_processed"]]
-    run_metadata["run_id"] = compute_run_id(
-        run_metadata["config_sha256"],
-        run_metadata["git_commit"],
-        input_checksums,
-    )
+    # run_id was computed from all input file checksums before processing, so
+    # the provenance record matches the on-disk run directory exactly.
+    run_metadata["run_id"] = run_id
     run_metadata["end_iso"] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
     run_metadata["total_runtime"] = time.time() - run_start
     run_metadata["success_count"] = success_count
     run_metadata["failure_count"] = failure_count
     
     # Save provenance metadata
-    prov_path = os.path.join(args.output_dir, "provenance.json")
+    prov_path = os.path.join(run_output_dir, "provenance.json")
     with open(prov_path, "w") as f:
         json.dump(run_metadata, f, indent=2)
         
