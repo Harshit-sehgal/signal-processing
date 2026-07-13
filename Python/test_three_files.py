@@ -13,10 +13,11 @@ import matplotlib.pyplot as plt
 # Add Python directory to path to allow standard module imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Import production pipeline functions directly
+# Import production pipeline functions directly (single source of truth)
 from pg_amcd.weighting import calculate_maiw_weights, reconstruct_weighted_signal
 from pg_amcd.denoising import wavelet_denoise
 from pg_amcd.decomposition import run_ceemdan, calculate_composite_cutoff_score
+from pg_amcd.preprocessing import preprocess_signal
 
 # Helper function to load config
 def load_pipeline_config():
@@ -24,16 +25,6 @@ def load_pipeline_config():
     config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
     with open(config_path, 'r') as f:
         return json.load(f)
-
-# Preprocess function
-def preprocess_raw_signal(raw_vibration, low_cutoff=100.0, fs=10000.0):
-    nyquist = 0.5 * fs
-    high_cutoff = 4000.0
-    b, a = scipy.signal.butter(3, [low_cutoff / nyquist, high_cutoff / nyquist], btype='band')
-    denoised = scipy.signal.filtfilt(b, a, raw_vibration)
-    detrended = scipy.signal.detrend(denoised)
-    max_val = np.max(np.abs(detrended))
-    return detrended / (max_val if max_val > 0 else 1.0)
 
 # Select max energy segment
 def select_max_energy_segment(signal, time, segment_points=10000):
@@ -53,25 +44,25 @@ def select_max_energy_segment(signal, time, segment_points=10000):
 def compute_diagnostics(original, imfs):
     num_imfs = imfs.shape[0]
     N = original.size
-    
+
     # 1. Reconstruction Error
     reconstructed = np.sum(imfs, axis=0)
     rmse = np.sqrt(np.mean((original - reconstructed) ** 2))
     nrmse = rmse / np.sqrt(np.mean(original ** 2)) if np.any(original) else 0.0
-    
+
     # 2. Adjacent correlation
     adj_corrs = []
     for i in range(num_imfs - 2):
         corr = np.abs(np.corrcoef(imfs[i], imfs[i+1])[0, 1])
         adj_corrs.append(corr if not np.isnan(corr) else 0.0)
     mean_adj_corr = np.mean(adj_corrs) if adj_corrs else 0.0
-    
+
     # 3. Frequency Spectrum
     fs = 10000.0
     frequencies = scipy.fftpack.fftfreq(N, 1/fs)
     idx = np.where(frequencies >= 0)
     frequencies = frequencies[idx]
-    
+
     imf_mean_freqs = []
     for i in range(num_imfs - 1):
         fft_vals = np.abs(scipy.fftpack.fft(imfs[i]))[idx]
@@ -79,12 +70,12 @@ def compute_diagnostics(original, imfs):
         psd_sum = np.sum(psd)
         mean_f = np.sum(frequencies * psd) / psd_sum if psd_sum > 0 else 0.0
         imf_mean_freqs.append(mean_f)
-        
+
     # 4. Energy
     energies = np.sum(imfs ** 2, axis=1)
     total_energy = np.sum(energies)
     energy_percentages = (energies / total_energy) * 100.0 if total_energy > 0 else np.zeros(num_imfs)
-    
+
     # 5. Orthogonality Index (OI)
     cross_terms = 0.0
     for i in range(num_imfs):
@@ -92,7 +83,7 @@ def compute_diagnostics(original, imfs):
             cross_terms += np.sum(imfs[i] * imfs[j])
     orig_energy = np.sum(original ** 2)
     oi = 2.0 * cross_terms / orig_energy if orig_energy > 0 else 0.0
-    
+
     return {
         'num_imfs': num_imfs,
         'nrmse': nrmse,
@@ -106,82 +97,83 @@ def compute_diagnostics(original, imfs):
 def main():
     config = load_pipeline_config()
     ceemdan_cfg = config["ceemdan"]
-    
+
     # Resolve paths relative to repository root
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     raw_dir = os.path.join(root_dir, "Vibration - ML")
     testing_dir = os.path.join(root_dir, "testing/t1")
     os.makedirs(testing_dir, exist_ok=True)
-    
+
     # Find all mat files
     all_raw_files = glob.glob(os.path.join(raw_dir, "**/*.mat"), recursive=True)
     # Exclude doc file
     all_raw_files = [f for f in all_raw_files if not f.endswith("combinations.xlsx") and "~lock" not in f]
-    
+
     # Seed random for reproducibility
     random.seed(999)
     selected_files = random.sample(all_raw_files, 3)
-    
+
     print("=" * 65)
     print("🧪 HIGH-FIDELITY FINE-TUNING VALIDATION RUN (3 RANDOM FILES) 🧪")
     print("=" * 65)
-    print(f"Selected files:")
+    print("Selected files:")
     for f in selected_files:
         print(f"  - {os.path.relpath(f, raw_dir)}")
     print("-" * 65)
-    
+
     diagnostics_summary = []
-    
+
     for raw_path in selected_files:
         folder_name = os.path.basename(os.path.dirname(raw_path))
         base_name = os.path.basename(raw_path).replace(".mat", "")
         print(f"\nProcessing: {folder_name}/{base_name}.mat")
-        
+
         # Load raw data
         raw_data = scipy.io.loadmat(raw_path)['tsDS']
         time_arr = raw_data[:, 0]
         raw_vibration = raw_data[:, 1]
-        
+
         # 1. Parameter loop over cutoffs to find best preprocessing
         cutoffs = ceemdan_cfg["search_cutoffs"]
         best_score = float('inf')
         best_cutoff = 100
-        
+
+        fs = config["sampling_rate"]
         for cut in cutoffs:
-            normalized = preprocess_raw_signal(raw_vibration, cut)
+            normalized = preprocess_signal(raw_vibration, cut, 4000.0, fs)[0]
             s_seg, _, _ = select_max_energy_segment(normalized, time_arr)
-            
+
             # Fast EMD search
             trials = ceemdan_cfg["search_trials"]
             epsilon = ceemdan_cfg["epsilon"]
             seed = ceemdan_cfg["noise_seed"]
             fxe = ceemdan_cfg.get("sifting_iterations", 16)
-            
+
             imfs_search = run_ceemdan(s_seg, trials, epsilon, seed, fxe)
             score = calculate_composite_cutoff_score(imfs_search, s_seg, config["sampling_rate"])
             if score < best_score:
                 best_score = score
                 best_cutoff = cut
-                
+
         print(f"  Optimal cutoff chosen: {best_cutoff} Hz (score: {best_score:.4f})")
-        
+
         # 2. Final preprocessing
-        opt_normalized = preprocess_raw_signal(raw_vibration, best_cutoff)
+        opt_normalized = preprocess_signal(raw_vibration, best_cutoff, 4000.0, fs)[0]
         opt_s_seg, opt_t_seg, start_idx = select_max_energy_segment(opt_normalized, time_arr)
-        
+
         # 3. Final high-fidelity decomposition
         trials = ceemdan_cfg["trials"]
         epsilon = ceemdan_cfg["epsilon"]
         seed = ceemdan_cfg["noise_seed"]
         fxe = ceemdan_cfg.get("sifting_iterations", 16)
-        
+
         print(f"  Running final CEEMDAN (trials={trials}, epsilon={epsilon}, sifting_iterations={fxe})...")
         imfs = run_ceemdan(opt_s_seg, trials, epsilon, seed, fxe)
-        
+
         # Save IMFs
         npz_path = os.path.join(testing_dir, f"{base_name}_IMFs.npz")
         np.savez_compressed(npz_path, time=opt_t_seg, original_signal=opt_s_seg, imfs=imfs, start_index=start_idx)
-        
+
         # Save EMD plot
         num_imfs = imfs.shape[0]
         plt.figure(figsize=(14, 2 * (num_imfs + 1)))
@@ -202,17 +194,12 @@ def main():
         plot_path = os.path.join(testing_dir, f"{base_name}_IMFs_plot.png")
         plt.savefig(plot_path, dpi=150)
         plt.close()
-        
+
         # 4. MAIW Reconstruction (Production logic: normalized metrics & no residual)
         fs = config["sampling_rate"]
         W, C, E, K, F = calculate_maiw_weights(imfs, opt_s_seg, fs, config)
         reconstructed = reconstruct_weighted_signal(imfs, W)
-            
-        # Scale reconstructed signal
-        max_val_reconstructed = np.max(np.abs(reconstructed))
-        if max_val_reconstructed > 0:
-            reconstructed = reconstructed / max_val_reconstructed
-            
+
         maiw_path = os.path.join(testing_dir, f"{base_name}_MAIW.mat")
         scipy.io.savemat(maiw_path, {
             'tsDS': np.column_stack((opt_t_seg, reconstructed)),
@@ -222,24 +209,19 @@ def main():
             'kurtosis': K,
             'frequency_proximity': F
         })
-        
+
         # 5. Wavelet Denoising (Production logic: BayesShrink with d1 estimation)
         clean_signal = wavelet_denoise(
             reconstructed,
             wavelet_name=config["wavelet"]["wavelet_name"],
             level=config["wavelet"]["level"]
         )
-        
-        # Scale clean signal
-        max_val_clean = np.max(np.abs(clean_signal))
-        if max_val_clean > 0:
-            clean_signal = clean_signal / max_val_clean
-            
+
         clean_path = os.path.join(testing_dir, f"{base_name}_Clean.mat")
         scipy.io.savemat(clean_path, {
             'tsDS': np.column_stack((opt_t_seg, clean_signal))
         })
-        
+
         # 6. Pipeline comparison plot
         plt.figure(figsize=(14, 10))
         # Plot 0: Raw
@@ -265,12 +247,12 @@ def main():
         plt.title("Stage 3: Bayesian Adaptive Wavelet Denoised (Final Clean Output)", fontsize=12, fontweight='bold')
         plt.xlabel("Time (seconds)")
         plt.grid(True, linestyle='--', alpha=0.5)
-        
+
         plt.tight_layout()
         comparison_plot_path = os.path.join(testing_dir, f"{base_name}_pipeline_comparison.png")
         plt.savefig(comparison_plot_path, dpi=150)
         plt.close()
-        
+
         # 7. Diagnostics calculation
         diag = compute_diagnostics(opt_s_seg, imfs)
         diagnostics_summary.append({
@@ -297,7 +279,7 @@ This report presents EMD diagnostics for three randomly selected data files proc
         f_path = f"{item['folder']}/{item['file']}.mat"
         diag = item['diag']
         md_content += f"| **{f_path}** | {item['cutoff']} Hz | {diag['num_imfs']} | {diag['nrmse']:.2e} | {diag['oi']:.4f} | {diag['mean_adj_corr']:.4f} |\n"
-        
+
     md_content += """
 ---
 
@@ -306,7 +288,7 @@ Below are the spectral centroid frequencies (in Hz) for the physical IMFs of eac
 
 | Layer | """ + " | ".join([f"{item['file']}.mat" for item in diagnostics_summary]) + " |\n"
     md_content += "|---| " + " | ".join(["---" for _ in diagnostics_summary]) + " |\n"
-    
+
     max_imfs_all = max([item['diag']['num_imfs'] for item in diagnostics_summary])
     for i in range(max_imfs_all - 1):
         row = f"| **IMF {i+1}** | "

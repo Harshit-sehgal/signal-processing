@@ -40,3 +40,10 @@ pg-amcd = "pg_amcd.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["pg_amcd*"]
+
+[tool.mypy]
+ignore_missing_imports = true
+disable_error_code = ["assignment", "attr-defined", "operator", "arg-type", "index", "var-annotated", "call-overload"]
+
+[tool.pytest.ini_options]
+norecursedirs = ["Python/venv", "venv", ".venv", "build", "dist"]

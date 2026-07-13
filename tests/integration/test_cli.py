@@ -171,3 +171,99 @@ def test_cli_help():
         timeout=120,
     )
     assert proc.returncode == 0
+
+
+def _run_validate(input_dir, config_path, output=None):
+    env = os.environ.copy()
+    existing = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = SRC_DIR + (os.pathsep + existing if existing else "")
+    cmd = [
+        sys.executable,
+        "-m",
+        "pg_amcd.cli",
+        "validate",
+        "--input-dir",
+        input_dir,
+        "--config",
+        config_path,
+    ]
+    if output is not None:
+        cmd += ["--output", output]
+    proc = subprocess.run(cmd, cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=600)
+    return proc
+
+
+def test_cli_validate_end_to_end(tmp_path):
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    _make_synthetic_mat(str(input_dir / "sample.mat"), fs=1000.0, n_samples=2000)
+    config_path = tmp_path / "test_config.json"
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump(TEST_CONFIG, f)
+    report_path = tmp_path / "report.json"
+    proc = _run_validate(str(input_dir), str(config_path), str(report_path))
+    assert proc.returncode == 0, proc.stderr
+    report = json.loads(report_path.read_text())
+    assert report["n_files"] == 1
+    assert report["n_valid"] == 1
+    assert report["n_invalid"] == 0
+    assert report["files"][0]["valid"] is True
+    assert report["files"][0]["fs_estimated"] == pytest.approx(1000.0, rel=0.05)
+
+
+def test_cli_validate_rejects_invalid(tmp_path):
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    # Time spacing implies 2000 Hz, deviating >5% from the configured 1000 Hz.
+    _make_synthetic_mat(str(input_dir / "bad.mat"), fs=2000.0, n_samples=2000)
+    config_path = tmp_path / "test_config.json"
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump(TEST_CONFIG, f)
+    proc = _run_validate(str(input_dir), str(config_path))
+    assert proc.returncode == 1, proc.stdout
+    assert "0/1" in proc.stdout
+
+
+def test_cli_validate_help():
+    env = os.environ.copy()
+    proc = subprocess.run(
+        [sys.executable, "-m", "pg_amcd.cli", "validate", "--help"],
+        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=60,
+    )
+    assert proc.returncode == 0
+
+
+def test_cli_validate_with_metadata(tmp_path):
+    import csv
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    _make_synthetic_mat(str(input_dir / "sample.mat"), fs=1000.0, n_samples=2000)
+    _make_synthetic_mat(str(input_dir / "orphan.mat"), fs=1000.0, n_samples=2000)
+    config_path = tmp_path / "test_config.json"
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump(TEST_CONFIG, f)
+    meta_path = tmp_path / "meta.csv"
+    with open(meta_path, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["file_path", "label"])
+        w.writeheader()
+        w.writerow({"file_path": "sample.mat", "label": "chatter"})
+        w.writerow({"file_path": "sample.mat", "label": "stable"})  # duplicate entry
+        w.writerow({"file_path": "other.mat", "label": ""})        # missing label
+    report_path = tmp_path / "report.json"
+    env = os.environ.copy()
+    existing = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = SRC_DIR + (os.pathsep + existing if existing else "")
+    proc = subprocess.run(
+        [sys.executable, "-m", "pg_amcd.cli", "validate",
+         "--input-dir", str(input_dir), "--config", str(config_path),
+         "--metadata", str(meta_path), "--output", str(report_path)],
+        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
+    )
+    assert proc.returncode == 0, proc.stderr
+    report = json.loads(report_path.read_text())
+    assert report["n_files"] == 2
+    meta = report["metadata"]
+    assert meta["missing_metadata"] == 1
+    assert meta["duplicate_metadata_entries"] == 1
+    assert meta["missing_chatter_label"] == 1
+    assert "Metadata validation" in proc.stdout

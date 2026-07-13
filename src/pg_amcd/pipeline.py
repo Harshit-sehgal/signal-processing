@@ -1,43 +1,18 @@
 import numpy as np
 import scipy.stats
 import scipy.signal
-from dataclasses import dataclass
 from typing import List, Dict, Any
+
+from pg_amcd.models import WindowResult, PipelineResult, CutoffOptimizationResult
 
 # Import local pg_amcd modules
 from pg_amcd.preprocessing import preprocess_signal
 from pg_amcd.segmentation import select_max_energy_segment_indices, generate_sliding_windows
 from pg_amcd.decomposition import run_ceemdan, calculate_adjacent_imf_correlation
-from pg_amcd.weighting import calculate_maiw_weights, calculate_physics_gated_weights, reconstruct_weighted_signal
+from pg_amcd.weighting import calculate_maiw_weights, calculate_physics_gated_weights, reconstruct_weighted_signal, reconstruct_gated_signal
 from pg_amcd.denoising import wavelet_denoise
 from pg_amcd.features import extract_window_features
-
-@dataclass
-class WindowResult:
-    time_segment: np.ndarray
-    start_time: float
-    end_time: float
-    start_idx: int
-    end_idx: int
-    features: Dict[str, float]
-    chatter_probability: float
-    predicted_label: str
-    selected_imfs: List[int]
-    confidence: float
-    imfs: np.ndarray  # (num_layers, N)
-    maiw_reconstructed: np.ndarray  # (N,)
-    denoised_clean: np.ndarray  # (N,)
-
-@dataclass
-class PipelineResult:
-    raw_signal: np.ndarray
-    physical_preprocessed_signal: np.ndarray
-    scaled_preprocessed_signal: np.ndarray
-    window_results: List[WindowResult]
-    sampling_rate: float
-    scale_factors: Dict[str, float]
-    selected_parameters: Dict[str, Any]
-    warnings: List[str]
+from pg_amcd.optimization import optimize_cutoff
 
 def apply_temporal_decision_logic(
     window_results: List[WindowResult],
@@ -108,10 +83,32 @@ def process_recording(
     rpm = metadata.get("rpm", 570.0) if metadata else 570.0
     tooth_count = metadata.get("tooth_count", 1) if metadata else 1
 
-    # 1. Preprocessing (optimal cutoff is loaded or pre-calculated)
-    cutoff = config.get("ceemdan", {}).get("selected_cutoff", 100.0)
+    ceemdan_cfg = config["ceemdan"]
     high_cutoff = min(4000.0, fs / 2.0 - 10.0)
+    candidate_cutoffs = ceemdan_cfg.get(
+        "search_cutoffs", [ceemdan_cfg.get("selected_cutoff", 100.0)]
+    )
 
+    # 1. Locate ONE max-energy segment with a preliminary cutoff so that every
+    #    candidate cutoff optimises the *same* raw segment (Goal 5.1).
+    prelim_cutoff = float(candidate_cutoffs[0])
+    phys_prelim, _, _ = preprocess_signal(signal, low_cutoff=prelim_cutoff, high_cutoff=high_cutoff, fs=fs)
+    segment_points = config.get("segment_points", 10000)
+    start_idx, end_idx = select_max_energy_segment_indices(phys_prelim, segment_points)
+    raw_segment = signal[start_idx:end_idx]
+
+    # 2. Adaptive cutoff optimisation over the identical raw segment.
+    opt = optimize_cutoff(
+        raw_segment,
+        candidate_cutoffs,
+        config,
+        fs,
+        n_seeds=max(1, ceemdan_cfg.get("search_seeds", 2)),
+    )
+    cutoff = opt.selected_cutoff
+    cutoff_search = opt.per_cutoff_metrics
+
+    # 3. Actual preprocessing with the selected cutoff.
     physical_preprocessed, scaled_preprocessed, scale_factor = preprocess_signal(
         signal,
         low_cutoff=cutoff,
@@ -121,10 +118,8 @@ def process_recording(
 
     window_results = []
 
-    # 2. Segment Generation
+    # 4. Segment Generation
     if mode == "exploratory":
-        segment_points = config.get("segment_points", 10000)
-        start_idx, end_idx = select_max_energy_segment_indices(physical_preprocessed, segment_points)
         windows = [{
             'start_idx': start_idx,
             'end_idx': end_idx,
@@ -165,10 +160,10 @@ def process_recording(
             W, _, _, _, _ = calculate_physics_gated_weights(
                 imfs, s_seg, fs, rpm, tooth_count, config
             )
-            reconstructed_scaled = reconstruct_weighted_signal(imfs, W)
+            reconstructed_scaled = reconstruct_gated_signal(imfs, W)
         else:
             W, _, _, _, _ = calculate_maiw_weights(imfs, s_seg, fs, config)
-            reconstructed_scaled = reconstruct_weighted_signal(imfs, W)
+            reconstructed_scaled = reconstruct_gated_signal(imfs, W)
 
         # C. Wavelet Denoising (Band-Aware)
         denoised_scaled = wavelet_denoise(
@@ -241,6 +236,7 @@ def process_recording(
 
     selected_params = {
         "cutoff_frequency": cutoff,
+        "cutoff_search": cutoff_search,
         "ceemdan_trials": trials,
         "ceemdan_epsilon": epsilon,
         "sifting_iterations": sifting_iterations,

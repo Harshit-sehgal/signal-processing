@@ -1,5 +1,6 @@
 import numpy as np
 import pywt
+from pg_amcd.synthetic import evaluate_denoising_performance
 
 def bayes_shrink_threshold(coeff: np.ndarray, noise_sigma: float) -> float:
     """Calculates the standard BayesShrink adaptive threshold for a subband."""
@@ -87,3 +88,48 @@ def wavelet_denoise(
         denoised_signal = np.pad(denoised_signal, (0, len(signal) - len(denoised_signal)), mode='edge')
         
     return denoised_signal
+
+
+def evaluate_wavelet_config(
+    signal: np.ndarray,
+    clean_reference: np.ndarray,
+    wavelet_name: str,
+    level: int,
+    fs: float,
+    chatter_center: float,
+    chatter_spread: float,
+) -> dict:
+    """Quantitative denoising quality for one wavelet configuration (Goal 5.6)."""
+    denoised = wavelet_denoise(
+        signal,
+        wavelet_name=wavelet_name,
+        level=level,
+        fs=fs,
+        chatter_center=chatter_center,
+        chatter_spread=chatter_spread,
+        band_aware=True,
+    )
+    return evaluate_denoising_performance(clean_reference, denoised, fs, chatter_center, chatter_spread)
+
+
+def select_best_wavelet(
+    signal: np.ndarray,
+    clean_reference: np.ndarray,
+    candidates: list,
+    fs: float,
+    chatter_center: float,
+    chatter_spread: float,
+):
+    """Evaluate candidate ``(wavelet_name, level)`` configs and return the best.
+
+    Selection uses the highest SNR-improvement (dB) versus the clean reference.
+    Returns ``(best_config_dict, all_results)``.
+    """
+    results = []
+    for wavelet_name, level in candidates:
+        metrics = evaluate_wavelet_config(
+            signal, clean_reference, wavelet_name, level, fs, chatter_center, chatter_spread
+        )
+        results.append({"wavelet": wavelet_name, "level": level, **metrics})
+    best = max(results, key=lambda d: d["snr_db"])
+    return best, results

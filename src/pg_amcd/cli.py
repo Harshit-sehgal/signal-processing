@@ -6,6 +6,7 @@ import time
 import json
 import hashlib
 import subprocess
+import csv
 import numpy as np
 import scipy.io
 import matplotlib
@@ -15,15 +16,11 @@ import matplotlib.pyplot as plt
 # Import local pg_amcd modules
 from pg_amcd.config import load_pipeline_config
 from pg_amcd.io import validate_and_load_signal
-from pg_amcd.pipeline import process_recording, PipelineResult
+from pg_amcd.pipeline import process_recording
+from pg_amcd.models import PipelineResult
+from pg_amcd.validation import validate_decomposition
 
-def get_md5_checksum(file_path: str) -> str:
-    """Calculates the MD5 checksum of a file."""
-    hash_md5 = hashlib.md5()
-    with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
+from pg_amcd.provenance import compute_file_sha256, is_output_stale, compute_run_id
 
 def get_git_commit_sha() -> str:
     """Retrieves the current git commit SHA of the repository."""
@@ -32,6 +29,26 @@ def get_git_commit_sha() -> str:
         return res.stdout.strip()
     except Exception:
         return "Unknown"
+
+
+def _git_is_dirty() -> bool:
+    """Return True if the working tree has uncommitted changes."""
+    try:
+        res = subprocess.run(
+            ["git", "status", "--porcelain"],
+            capture_output=True, text=True, check=True,
+        )
+        return bool(res.stdout.strip())
+    except Exception:
+        return False
+
+
+def _sha256_of_config(config: dict, config_path: str) -> str:
+    """SHA-256 of the resolved configuration (Goal 4.3)."""
+    h = hashlib.sha256(json.dumps(config, sort_keys=True).encode("utf-8"))
+    if config_path and os.path.exists(config_path):
+        h.update(compute_file_sha256(config_path).encode("utf-8"))
+    return h.hexdigest()
 
 def get_environment_info() -> dict:
     """Collects python, packages, and OS information."""
@@ -80,11 +97,17 @@ def run_pipeline_on_dataset(args):
     os.makedirs(args.output_dir, exist_ok=True)
     
     # Collect run metadata
+    run_start = time.time()
     run_metadata = {
-        "start_timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "start_iso": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+        "command_line": " ".join(sys.argv),
         "git_commit": get_git_commit_sha(),
+        "git_dirty": _git_is_dirty(),
+        "config_sha256": _sha256_of_config(config, args.config),
+        "random_seeds": config.get("ceemdan", {}),
         "env_info": get_environment_info(),
         "resolved_config": config,
+        "per_file_runtime": {},
         "files_processed": [],
         "failures": []
     }
@@ -100,16 +123,27 @@ def run_pipeline_on_dataset(args):
         print(f"\nProcessing: {rel_path}")
         
         try:
+            file_start = time.time()
+            # 0. Stale-output detection: skip if all outputs exist and are
+            #    newer than the input (Sprint 3 reproducibility requirement).
+            target_folder = os.path.join(args.output_dir, folder_name)
+            npz_path = os.path.join(target_folder, base_name.replace(".mat", "_IMFs.npz"))
+            maiw_path = os.path.join(target_folder, base_name)
+            clean_path = os.path.join(target_folder, base_name.replace(".mat", "_Clean.mat"))
+            if not is_output_stale(raw_path, [npz_path, maiw_path, clean_path]):
+                print(f"⏭ Skipping {rel_path} (outputs up to date)")
+                continue
+
             # A. Validate and load signal (Strict Goal 3 Input Checks)
             t_arr, sig_arr, fs_est = validate_and_load_signal(
-                raw_path, 
-                configured_fs=fs, 
-                tolerance=0.05, 
+                raw_path,
+                configured_fs=fs,
+                tolerance=0.05,
                 min_duration_seconds=1.0
             )
-            
-            # Compute file checksum
-            file_md5 = get_md5_checksum(raw_path)
+
+            # Compute file checksum (SHA-256 provenance)
+            file_sha256 = compute_file_sha256(raw_path)
             
             # B. Run the canonical pipeline
             res: PipelineResult = process_recording(t_arr, sig_arr, config, mode="exploratory")
@@ -165,12 +199,25 @@ def run_pipeline_on_dataset(args):
             plt.savefig(os.path.join(target_folder, base_name.replace(".mat", "_IMFs_plot.png")), dpi=120)
             plt.close()
             
+            run_metadata["per_file_runtime"][rel_path] = time.time() - file_start
+            output_checksums = {
+                "imfs_npz": compute_file_sha256(npz_path),
+                "maiw_mat": compute_file_sha256(maiw_path),
+                "clean_mat": compute_file_sha256(clean_mat_path),
+            }
             success_count += 1
+            validation_metrics = validate_decomposition(
+                res.scaled_preprocessed_signal[win_res.start_idx:win_res.end_idx],
+                win_res.imfs,
+                fs,
+            )
             run_metadata["files_processed"].append({
                 "path": rel_path,
-                "md5": file_md5,
+                "sha256": file_sha256,
                 "cutoff": res.selected_parameters["cutoff_frequency"],
-                "diagnostics": win_res.features
+                "diagnostics": win_res.features,
+                "validation": validation_metrics,
+                "output_checksums": output_checksums,
             })
             print(f"✅ Success: NRMSE={win_res.features['nrmse']:.2e}, MMI={win_res.features['mmi']:.4f}, OI={win_res.features['oi']:.4f}")
             
@@ -186,7 +233,14 @@ def run_pipeline_on_dataset(args):
                 print("\n❌ Pipeline aborted due to failure. (Use --continue-on-error to skip failures)")
                 sys.exit(1)
                 
-    run_metadata["end_timestamp"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    input_checksums = [f.get("sha256", "") for f in run_metadata["files_processed"]]
+    run_metadata["run_id"] = compute_run_id(
+        run_metadata["config_sha256"],
+        run_metadata["git_commit"],
+        input_checksums,
+    )
+    run_metadata["end_iso"] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
+    run_metadata["total_runtime"] = time.time() - run_start
     run_metadata["success_count"] = success_count
     run_metadata["failure_count"] = failure_count
     
@@ -203,6 +257,133 @@ def run_pipeline_on_dataset(args):
     if failure_count > 0:
         sys.exit(1)
 
+
+
+
+def _load_metadata_index(path):
+    """Load a dataset metadata spreadsheet (CSV or XLSX) into a list of row dicts."""
+    ext = os.path.splitext(path)[1].lower()
+    if ext == ".csv":
+        with open(path, newline="", encoding="utf-8") as fh:
+            return list(csv.DictReader(fh))
+    if ext in (".xlsx", ".xls"):
+        try:
+            import pandas as pd
+        except ImportError as exc:
+            raise RuntimeError(
+                "Reading Excel metadata requires pandas+openpyxl; supply a CSV instead."
+            ) from exc
+        df = pd.read_excel(path)
+        return df.where(pd.notnull(df), None).to_dict(orient="records")
+    raise ValueError(f"Unsupported metadata format: {ext}")
+def run_validation_on_dataset(args):
+    """Validate a dataset's raw signals against the configured input contract.
+
+    Implements the ``pg-amcd validate`` command (Goal 3: strict input
+    validation surfaced as a first-class, non-destructive operation).
+    """
+    config = load_pipeline_config(args.config)
+    fs = config["sampling_rate"]
+    vcfg = config.get("validation", {})
+    tolerance = vcfg.get("tolerance", 0.05)
+    min_duration = vcfg.get("min_duration_seconds", 1.0)
+    meta_index = {}
+    duplicate_meta = 0
+    missing_meta = 0
+    missing_label = 0
+    sampling_mismatch = 0
+    if getattr(args, "metadata", None):
+        if not os.path.exists(args.metadata):
+            print(f"Error: Metadata file does not exist: {args.metadata}")
+            sys.exit(1)
+        meta_rows = _load_metadata_index(args.metadata)
+        def _meta_key(r):
+            return os.path.basename(str(r.get("file_path") or r.get("recording_id") or ""))
+        for _row in meta_rows:
+            _k = _meta_key(_row)
+            if _k in meta_index:
+                duplicate_meta += 1
+            else:
+                meta_index[_k] = _row
+        missing_label = sum(1 for _r in meta_rows if not str(_r.get("label", "") or "").strip())
+
+    if not os.path.exists(args.input_dir):
+        print(f"Error: Input directory does not exist: {args.input_dir}")
+        sys.exit(1)
+
+    mat_files = glob.glob(os.path.join(args.input_dir, "**/*.mat"), recursive=True)
+    mat_files = [f for f in mat_files if not f.endswith("combinations.xlsx") and "~lock" not in f]
+
+    if not mat_files:
+        print(f"No MAT files found in: {args.input_dir}")
+        sys.exit(0)
+
+    report = {
+        "sampling_rate": fs,
+        "tolerance": tolerance,
+        "min_duration_seconds": min_duration,
+        "files": [],
+    }
+    n_valid = 0
+    print("=" * 65)
+    print(f"🔎 Validating {len(mat_files)} files (fs={fs} Hz, tol={tolerance*100:.0f}%, min_dur={min_duration}s)")
+    print("=" * 65)
+    for raw_path in mat_files:
+        rel_path = os.path.relpath(raw_path, args.input_dir)
+        entry = {"path": rel_path, "valid": False}
+        base = os.path.basename(raw_path)
+        if meta_index and base not in meta_index:
+            missing_meta += 1
+        try:
+            t_arr, sig_arr, fs_est = validate_and_load_signal(
+                raw_path, configured_fs=fs, tolerance=tolerance, min_duration_seconds=min_duration
+            )
+            entry["valid"] = True
+            entry["fs_estimated"] = float(fs_est)
+            entry["n_samples"] = int(len(sig_arr))
+            entry["duration_seconds"] = float(len(sig_arr) / fs_est)
+            n_valid += 1
+            print(f"✅ {rel_path}  fs={fs_est:.1f}Hz  N={len(sig_arr)}  dur={entry['duration_seconds']:.3f}s")
+        except Exception as e:
+            emsg = str(e).lower()
+            if "sampling rate" in emsg or "deviates" in emsg:
+                sampling_mismatch += 1
+            entry["error"] = str(e)
+            print(f"❌ {rel_path}  {e}")
+        report["files"].append(entry)
+
+    report["n_files"] = len(mat_files)
+    report["n_valid"] = n_valid
+    report["n_invalid"] = len(mat_files) - n_valid
+    if meta_index:
+        report["metadata"] = {
+            "n_rows": len(meta_index) + duplicate_meta,
+            "missing_metadata": missing_meta,
+            "duplicate_metadata_entries": duplicate_meta,
+            "missing_chatter_label": missing_label,
+            "sampling_rate_mismatches": sampling_mismatch,
+        }
+        print("\n--- Metadata validation ---")
+        print(f"Files discovered:           {len(mat_files)}")
+        print(f"Valid:                      {n_valid}")
+        print(f"Invalid:                    {report['n_invalid']}")
+        print(f"Missing metadata:           {missing_meta}")
+        print(f"Duplicate metadata entries: {duplicate_meta}")
+        print(f"Missing chatter label:      {missing_label}")
+        print(f"Sampling-rate mismatches:   {sampling_mismatch}")
+
+    if args.output:
+        out_dir = os.path.dirname(os.path.abspath(args.output))
+        os.makedirs(out_dir, exist_ok=True)
+        with open(args.output, "w") as f:
+            json.dump(report, f, indent=2)
+        print(f"\nValidation report written to: {args.output}")
+
+    print("\n" + "=" * 65)
+    print(f"🏁 VALIDATION: {n_valid}/{len(mat_files)} files passed")
+    print("=" * 65)
+    if report["n_invalid"] > 0:
+        sys.exit(1)
 def main():
     parser = argparse.ArgumentParser(description="PG-AMCD Signal Processing CLI Command Line Interface")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -214,11 +395,22 @@ def main():
     run_parser.add_argument("--output-dir", required=True, help="Path to output processed results")
     run_parser.add_argument("--config", required=False, help="Path to config.json file")
     run_parser.add_argument("--continue-on-error", action="store_true", help="Continue processing on file failure")
+
+    # 'validate' subcommand
+    validate_parser = subparsers.add_parser(
+        "validate", help="Validate raw signals against the input contract without processing"
+    )
+    validate_parser.add_argument("--input-dir", required=True, help="Path to Vibration - ML raw data directory")
+    validate_parser.add_argument("--config", required=False, help="Path to config.json file")
+    validate_parser.add_argument("--output", required=False, help="Path to write the JSON validation report")
+    validate_parser.add_argument("--metadata", required=False, help="Path to metadata CSV/XLSX for dataset validation reporting")
     
     args = parser.parse_args()
     
     if args.command == "run":
         run_pipeline_on_dataset(args)
+    elif args.command == "validate":
+        run_validation_on_dataset(args)
 
 if __name__ == "__main__":
     main()

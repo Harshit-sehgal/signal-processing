@@ -19,6 +19,12 @@ def calculate_maiw_weights(
     """Calculates Multi-Criteria Adaptive IMF weights based on Correlation, 
     Energy, Kurtosis, and Frequency Proximity.
     """
+    if imfs.ndim != 2:
+        raise ValueError("IMFs must be a two-dimensional array.")
+    if imfs.shape[1] != len(original_signal):
+        raise ValueError("IMF and source-signal lengths differ.")
+    if imfs.shape[0] < 2:
+        raise ValueError("Decomposition must contain at least one IMF and residual.")
     num_layers = imfs.shape[0]
     num_weighted = num_layers - 1 # exclude residual
     
@@ -34,6 +40,9 @@ def calculate_maiw_weights(
     delta = maiw_cfg.get("delta", 0.25)
     center = maiw_cfg.get("chatter_band_center", 1250.0)
     spread = maiw_cfg.get("chatter_band_spread", 500.0)
+    coeff_sum = alpha + beta + gamma + delta
+    if coeff_sum <= 0:
+        raise ValueError("MAIW coefficients (alpha+beta+gamma+delta) must be positive.")
     
     total_energy = np.sum([np.sum(np.square(imfs[i])) for i in range(num_weighted)])
     if total_energy == 0:
@@ -163,8 +172,23 @@ def calculate_physics_gated_weights(
 
 def reconstruct_weighted_signal(imfs: np.ndarray, weights: np.ndarray) -> np.ndarray:
     """Reconstructs the vibration signal by summing physical IMFs weighted by weights."""
+    if imfs.ndim != 2:
+        raise ValueError("IMFs must be a two-dimensional array.")
+    if len(weights) != imfs.shape[0] - 1:
+        raise ValueError("Weight count does not match physical IMF count.")
     num_weighted = len(weights)
     reconstructed = np.zeros(imfs.shape[1])
     for i in range(num_weighted):
         reconstructed += weights[i] * imfs[i]
     return reconstructed
+
+
+def reconstruct_gated_signal(imfs: np.ndarray, gates: np.ndarray) -> np.ndarray:
+    """Reconstructs the vibration signal using independent IMF gates (Goal 5.5).
+
+    Each physical IMF receives an independent relevance gate (e.g. a sigmoid
+    score); the reconstructed signal is the gate-weighted sum. Mathematically
+    identical to :func:`reconstruct_weighted_signal`, but named to make the
+    gating semantics explicit.
+    """
+    return reconstruct_weighted_signal(imfs, gates)

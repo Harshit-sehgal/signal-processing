@@ -34,8 +34,13 @@ def extract_window_features(
     max_abs = np.max(np.abs(denoised_physical_window))
     crest_factor = max_abs / rms if rms > 0 else 0.0
     
-    kurtosis = float(scipy.stats.kurtosis(denoised_physical_window, fisher=False))
-    skewness = float(scipy.stats.skew(denoised_physical_window))
+    std = np.std(denoised_physical_window)
+    if std > 0:
+        kurtosis = float(scipy.stats.kurtosis(denoised_physical_window, fisher=False))
+        skewness = float(scipy.stats.skew(denoised_physical_window))
+    else:
+        kurtosis = 0.0
+        skewness = 0.0
     
     features["time_rms"] = rms
     features["time_variance"] = var
@@ -116,8 +121,11 @@ def extract_window_features(
         
     # Correlation between first IMF and preprocessed signal
     if num_imfs > 0:
-        corr_val = np.abs(np.corrcoef(imfs[0], prep_physical_window)[0, 1])
-        features["imf1_correlation"] = float(corr_val) if not np.isnan(corr_val) else 0.0
+        if np.std(imfs[0]) > 0 and np.std(prep_physical_window) > 0:
+            corr_val = np.abs(np.corrcoef(imfs[0], prep_physical_window)[0, 1])
+            features["imf1_correlation"] = float(corr_val) if not np.isnan(corr_val) else 0.0
+        else:
+            features["imf1_correlation"] = 0.0
     else:
         features["imf1_correlation"] = 0.0
         
@@ -135,4 +143,69 @@ def extract_window_features(
     else:
         features["wavelet_high_freq_ratio"] = 0.0
         
+    # ----------------------------------------------------
+    # 5. Extended required features (Goal 6.2)
+    # ----------------------------------------------------
+    mean_abs = np.mean(np.abs(denoised_physical_window))
+    features["time_impulse_factor"] = max_abs / mean_abs if mean_abs > 0 else 0.0
+    features["time_shape_factor"] = rms / mean_abs if mean_abs > 0 else 0.0
+
+    # Spectral kurtosis
+    if total_psd > 0:
+        features["freq_spectral_kurtosis"] = float(
+            scipy.stats.kurtosis(psd_norm, fisher=False)
+        )
+        # Spindle-harmonic energy (rpm/60 multiples) and sideband ratio
+        spindle_freqs = [k * f_spindle for k in range(1, 6)]
+        sp_mask = np.zeros_like(freqs, dtype=bool)
+        for sf in spindle_freqs:
+            sp_mask |= np.abs(freqs - sf) <= 15.0
+        features["freq_spindle_harmonic_ratio"] = float(
+            np.sum(psd[sp_mask]) / total_psd
+        )
+        harmonic_mask = np.zeros_like(freqs, dtype=bool)
+        for h_freq in harmonic_freqs:
+            harmonic_mask |= np.abs(freqs - h_freq) <= 15.0
+        harm_energy = float(np.sum(psd[harmonic_mask])) if np.any(harmonic_mask) else 0.0
+        sb_mask = np.zeros_like(freqs, dtype=bool)
+        for h_freq in harmonic_freqs:
+            sb_mask |= np.abs(freqs - (h_freq + f_spindle)) <= 10.0
+            sb_mask |= np.abs(freqs - (h_freq - f_spindle)) <= 10.0
+        sb_energy = float(np.sum(psd[sb_mask]))
+        features["freq_sideband_ratio"] = (
+            sb_energy / harm_energy if harm_energy > 0 else 0.0
+        )
+    else:
+        features["freq_spectral_kurtosis"] = 0.0
+        features["freq_spindle_harmonic_ratio"] = 0.0
+        features["freq_sideband_ratio"] = 0.0
+
+    # IMF centre frequencies, bandwidth, entropy, mode-mixing
+    if num_imfs > 0:
+        cfs, bws, ents = [], [], []
+        for i in range(num_imfs):
+            f_i, p_i = scipy.signal.welch(imfs[i], fs, nperseg=min(len(imfs[i]), 1024))
+            tot = np.sum(p_i)
+            if tot > 0:
+                pn = p_i / tot
+                cfs.append(float(np.sum(f_i * pn)))
+                bws.append(float(np.sqrt(np.sum((f_i - np.sum(f_i * pn)) ** 2 * pn))))
+                ents.append(float(-np.sum(pn * np.log2(pn + 1e-12))))
+        features["imf_centre_freq_mean"] = float(np.mean(cfs)) if cfs else 0.0
+        features["imf_bandwidth_mean"] = float(np.mean(bws)) if bws else 0.0
+        features["imf_entropy_mean"] = float(np.mean(ents)) if ents else 0.0
+        mm = []
+        for i in range(num_imfs - 1):
+            if np.std(imfs[i]) > 0 and np.std(imfs[i + 1]) > 0:
+                c = np.corrcoef(imfs[i], imfs[i + 1])[0, 1]
+                mm.append(float(abs(c)) if not np.isnan(c) else 0.0)
+            else:
+                mm.append(0.0)
+        features["imf_mode_mixing_index"] = float(np.mean(mm)) if mm else 0.0
+    else:
+        features["imf_centre_freq_mean"] = 0.0
+        features["imf_bandwidth_mean"] = 0.0
+        features["imf_entropy_mean"] = 0.0
+        features["imf_mode_mixing_index"] = 0.0
+
     return features
