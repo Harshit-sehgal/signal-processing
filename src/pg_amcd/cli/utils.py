@@ -1,102 +1,160 @@
-"""Shared helpers for the PG-AMCD CLI."""
+"""Shared CLI helpers."""
 
-import csv
+from __future__ import annotations
+
 import hashlib
-import json
-import os
+import platform
 import subprocess
 import sys
+from importlib import metadata as importlib_metadata
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
-import scipy
-import pywt
+from pg_amcd.metadata import load_metadata_rows
+from pg_amcd.provenance import canonical_json_sha256
 
 
 def get_git_commit_sha() -> str:
-    """Retrieves the current git commit SHA of the repository."""
+    """Return the checked-out Git commit or ``Unknown`` outside a repository."""
+
     try:
-        res = subprocess.run(
-            ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=True,
         )
-        return res.stdout.strip()
-    except Exception:
+    except (OSError, subprocess.SubprocessError):
         return "Unknown"
+    return result.stdout.strip()
 
 
 def _git_is_dirty() -> bool:
-    """Return True if the working tree has uncommitted changes."""
+    """Return whether tracked or untracked files differ from the commit."""
+
     try:
-        res = subprocess.run(
+        result = subprocess.run(
             ["git", "status", "--porcelain"],
             capture_output=True,
             text=True,
             check=True,
         )
-        return bool(res.stdout.strip())
-    except Exception:
+    except (OSError, subprocess.SubprocessError):
         return False
+    return bool(result.stdout.strip())
 
 
-def _sha256_of_config(config: dict, config_path: str) -> str:
-    """SHA-256 of the resolved configuration (Goal 4.3)."""
-    from pg_amcd.provenance import compute_file_sha256
+def get_git_worktree_sha256() -> str:
+    """Hash tracked changes plus untracked, non-ignored file contents.
 
-    h = hashlib.sha256(json.dumps(config, sort_keys=True).encode("utf-8"))
-    if config_path and os.path.exists(config_path):
-        h.update(compute_file_sha256(config_path).encode("utf-8"))
-    return h.hexdigest()
+    The commit alone cannot identify code executed from a dirty checkout. The
+    digest follows Git's ignore rules, so ignored datasets, environments, and
+    generated outputs do not pollute the scientific run identity.
+    """
 
-
-def get_environment_info() -> dict:
-    """Collects python, packages, and OS information."""
-    import platform
-
-    import numpy as np
-
-    info = {
-        "python_version": sys.version.split()[0],
-        "os": platform.platform(),
-        "packages": {
-            "numpy": np.__version__,
-            "scipy": scipy.__version__,
-            "pywavelets": pywt.__version__,
-        },
-    }
     try:
-        import PyEMD
+        root_result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            check=True,
+        )
+        root = Path(root_result.stdout.decode("utf-8", errors="surrogateescape").strip())
+        diff_result = subprocess.run(
+            ["git", "diff", "--binary", "--no-ext-diff", "HEAD", "--"],
+            cwd=root,
+            capture_output=True,
+            check=True,
+        )
+        untracked_result = subprocess.run(
+            ["git", "ls-files", "--others", "--exclude-standard", "-z"],
+            cwd=root,
+            capture_output=True,
+            check=True,
+        )
+    except (OSError, subprocess.SubprocessError, UnicodeError):
+        return ""
 
-        info["packages"]["PyEMD"] = PyEMD.__version__
-    except Exception:
-        pass
-    return info
+    digest = hashlib.sha256()
+    digest.update(b"tracked-diff\0")
+    digest.update(diff_result.stdout)
+    untracked_paths = sorted(path for path in untracked_result.stdout.split(b"\0") if path)
+    for encoded_path in untracked_paths:
+        relative = encoded_path.decode("utf-8", errors="surrogateescape")
+        candidate = root / relative
+        digest.update(b"untracked-path\0")
+        digest.update(encoded_path)
+        digest.update(b"\0")
+        try:
+            if candidate.is_symlink():
+                digest.update(b"symlink\0")
+                digest.update(candidate.readlink().as_posix().encode("utf-8"))
+            elif candidate.is_file():
+                with candidate.open("rb") as handle:
+                    for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                        digest.update(chunk)
+            else:
+                digest.update(b"missing-or-non-file")
+        except OSError:
+            return ""
+    return digest.hexdigest()
+
+
+def _sha256_of_config(config: Dict[str, Any], config_path: Optional[str] = None) -> str:
+    """Return the canonical resolved-configuration digest.
+
+    The optional path is accepted for compatibility; run identity is based on
+    resolved values rather than formatting of the source JSON file.
+    """
+
+    del config_path
+    return canonical_json_sha256(config)
+
+
+def get_environment_info() -> Dict[str, Any]:
+    """Collect versioned runtime dependencies used by the scientific workflow."""
+
+    distributions = {
+        "numpy": "numpy",
+        "scipy": "scipy",
+        "matplotlib": "matplotlib",
+        "EMD-signal": "EMD-signal",
+        "PyWavelets": "PyWavelets",
+        "pandas": "pandas",
+        "openpyxl": "openpyxl",
+        "scikit-learn": "scikit-learn",
+    }
+    packages: Dict[str, str] = {}
+    for label, distribution in distributions.items():
+        try:
+            packages[label] = importlib_metadata.version(distribution)
+        except importlib_metadata.PackageNotFoundError:
+            packages[label] = "not-installed"
+    return {
+        "python_version": platform.python_version(),
+        "python_implementation": platform.python_implementation(),
+        "python_executable": sys.executable,
+        "os": platform.platform(),
+        "packages": packages,
+    }
 
 
 def _load_metadata_index(path: str) -> List[Dict[str, Any]]:
-    """Load a dataset metadata spreadsheet (CSV or XLSX) into a list of row dicts."""
-    ext = os.path.splitext(path)[1].lower()
-    if ext == ".csv":
-        with open(path, newline="", encoding="utf-8") as fh:
-            return list(csv.DictReader(fh))
-    if ext in (".xlsx", ".xls"):
-        try:
-            import pandas as pd
-        except ImportError as exc:
-            raise RuntimeError(
-                "Reading Excel metadata requires pandas+openpyxl; supply a CSV instead."
-            ) from exc
-        df = pd.read_excel(path)
-        return df.where(pd.notnull(df), None).to_dict(orient="records")
-    raise ValueError(f"Unsupported metadata format: {ext}")
+    """Compatibility wrapper for historical callers."""
+
+    return load_metadata_rows(Path(path))
 
 
 def get_case_insensitive(
-    d: Optional[Dict[str, Any]], keys: Sequence[str], default: Any = None
-):
-    """Return the first value from ``d`` whose key matches one of ``keys`` case-insensitively."""
-    if not d:
+    mapping: Optional[Dict[str, Any]],
+    keys: Sequence[str],
+    default: Any = None,
+) -> Any:
+    """Return the first case-insensitive matching mapping value."""
+
+    if not mapping:
         return default
-    for k in keys:
-        for dk in d:
-            if dk.lower() == k.lower():
-                return d[dk]
+    wanted = {key.casefold() for key in keys}
+    for key, value in mapping.items():
+        if key.casefold() in wanted:
+            return value
     return default

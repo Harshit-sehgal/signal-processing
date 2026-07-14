@@ -13,9 +13,71 @@ import tempfile
 import numpy as np
 
 from pg_amcd.config import load_pipeline_config
-from pg_amcd.evaluation import evaluate_real_dataset, evaluate_real_dataset_temporal
+from pg_amcd.evaluation import (
+    _align_finite_feature_rows,
+    _exploratory_segment_config,
+    evaluate_real_dataset,
+    evaluate_real_dataset_temporal,
+)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def test_dynamic_feature_alignment_uses_common_finite_values_only():
+    rows = [
+        {
+            "features": {
+                "time_rms": 1.0,
+                "freq_entropy": 0.5,
+                "imf_10_bandwidth_hz": 4.0,
+                "nonfinite": np.nan,
+            }
+        },
+        {
+            "features": {
+                "time_rms": 2.0,
+                "freq_entropy": 0.4,
+                "imf_7_bandwidth_hz": 3.0,
+                "nonfinite": 1.0,
+            }
+        },
+    ]
+
+    keys, matrix, evidence = _align_finite_feature_rows(rows)
+
+    assert keys == ["freq_entropy", "time_rms"]
+    np.testing.assert_allclose(matrix, [[0.5, 1.0], [0.4, 2.0]])
+    assert evidence["strategy"] == "intersection_of_present_finite_features"
+    assert evidence["missing_feature_policy"] == (
+        "drop_from_experimental_matrix; never zero-fill"
+    )
+    assert set(evidence["dropped_features"]) == {
+        "imf_10_bandwidth_hz",
+        "imf_7_bandwidth_hz",
+        "nonfinite",
+    }
+
+
+def test_exploratory_segment_config_is_local_and_duration_aware():
+    config = {
+        "sampling_rate": 1_000.0,
+        "validation": {"minimum_duration_seconds": 1.0},
+        "nested": {"unchanged": True},
+    }
+
+    local, evidence = _exploratory_segment_config(config, 200)
+    local["nested"]["unchanged"] = False
+
+    assert config["validation"]["minimum_duration_seconds"] == 1.0
+    assert config["nested"]["unchanged"] is True
+    assert local["validation"]["minimum_duration_seconds"] == 0.2
+    assert evidence == {
+        "source_minimum_duration_seconds": 1.0,
+        "effective_minimum_duration_seconds": 0.2,
+        "segment_duration_seconds": 0.2,
+        "adjusted": True,
+        "scope": "experimental_evaluation_segment_only",
+    }
 
 
 def _build_subset(tmp, include_suffix=False):
@@ -74,6 +136,10 @@ def test_evaluate_real_dataset_subset():
 
         # recording_id uniqueness prevents cross-recording leakage.
         assert res["n_recordings"] == res["n_windows"]
+        alignment = res["feature_alignment"]
+        assert alignment["aligned_feature_count"] == len(res["feature_keys"])
+        assert alignment["dropped_feature_count"] > 0
+        assert any(name.startswith("imf_") for name in alignment["dropped_features"])
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -99,13 +165,14 @@ def test_evaluate_real_dataset_temporal_smoothing():
     try:
         sub = _build_subset(tmp)
         cfg = load_pipeline_config(os.path.join(ROOT, "configs", "research_fast.json"))
+        configured_minimum = cfg["validation"]["minimum_duration_seconds"]
         res = evaluate_real_dataset_temporal(sub, cfg, n_windows=3, window_points=2048)
 
         # 4 recordings -> 4 * 3 windows.
-        assert res["n_recordings"] == 4
         assert res["n_windows"] == 12
-        assert res["label_counts"]["chatter"] == 2
-        assert res["label_counts"]["stable"] == 2
+        # Label counts are per-window: 2 chatter + 2 stable recordings x 3 windows.
+        assert res["label_counts"]["chatter"] == 6
+        assert res["label_counts"]["stable"] == 6
 
         # Per-window metrics present and finite for random_forest.
         rf = res["per_window_metrics"].get("random_forest", {})
@@ -128,5 +195,18 @@ def test_evaluate_real_dataset_temporal_smoothing():
 
         # Feature importances captured for all 27 features.
         assert len(res["feature_importances"]) == len(res["feature_keys"])
+        assert cfg["validation"]["minimum_duration_seconds"] == configured_minimum
+        adjustments = res["exploratory_config_adjustments"]
+        assert len(adjustments) == 12
+        assert all(item["adjusted"] for item in adjustments)
+        assert all(
+            item["scope"] == "experimental_evaluation_segment_only"
+            for item in adjustments
+        )
+        assert all(
+            item["effective_minimum_duration_seconds"]
+            == item["segment_duration_seconds"]
+            for item in adjustments
+        )
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

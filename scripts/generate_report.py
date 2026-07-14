@@ -14,6 +14,7 @@ Reads ``outputs/evaluation_results.json`` (produced by
 Degrades gracefully when no results are present.
 """
 import os
+import glob
 import sys
 import json
 import argparse
@@ -95,6 +96,31 @@ def _ablation_section(data, lines):
             f"{_fmt(rf.get('balanced_accuracy'))} | {_fmt(rf.get('roc_auc'))} |"
         )
     lines.append("")
+
+
+def _pr_figure(data, fig_dir):
+    # Precision-recall curve for the strongest model (leave-one-recording-out).
+    from sklearn.metrics import precision_recall_curve, average_precision_score
+    oof = data.get("oof", {})
+    y_true = np.asarray(oof.get("y_true", []), dtype=int)
+    proba = oof.get("proba", {})
+    if len(y_true) == 0 or not proba:
+        return None
+    best = max(proba, key=lambda n: (proba[n] is not None))
+    p = np.asarray(proba[best], dtype=float)
+    prec, rec, _ = precision_recall_curve(y_true, p)
+    ap = float(average_precision_score(y_true, p))
+    plt.figure(figsize=(6, 5))
+    plt.plot(rec, prec, label=f"{best} (AP={ap:.3f})")
+    plt.xlabel("Recall")
+    plt.ylabel("Precision")
+    plt.title("Precision-recall curve (leave-one-recording-out)")
+    plt.legend(loc="lower left", fontsize=8)
+    plt.tight_layout()
+    path = os.path.join(fig_dir, "pr_curve.png")
+    plt.savefig(path, dpi=120)
+    plt.close()
+    return path
 def _roc_figure(data, fig_dir):
     oof = data.get("oof", {})
     y_true = np.asarray(oof.get("y_true", []), dtype=int)
@@ -173,11 +199,90 @@ def _bar_figure(data, fig_dir):
     return path
 
 
+def _load_optional(path):
+    if path and os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                return json.load(fh)
+        except Exception:
+            return None
+    return None
+
+
+
+
+def _architecture_section(lines):
+    lines.append("## System architecture")
+    lines.append("")
+    lines.append("```mermaid")
+    lines.append("flowchart LR")
+    lines.append("  A[Raw vibration signal] --> B[Preprocessing<br/>band-pass filter]")
+    lines.append("  B --> C[CEEMDAN decomposition<br/>IMF set]")
+    lines.append("  C --> D[MAIW weighting<br/>corr / energy / kurtosis / freq]")
+    lines.append("  C --> E[Physics gating<br/>spindle &amp; tooth harmonics]")
+    lines.append("  D --> F[Weighted reconstruction]")
+    lines.append("  E --> F")
+    lines.append("  F --> G[Wavelet denoising<br/>band-aware]")
+    lines.append("  G --> H[Window feature extraction<br/>27 features]")
+    lines.append("  H --> I[Classifier<br/>RF / LR / SVM / GB]")
+    lines.append("  I --> J[Temporal smoothing<br/>hysteresis + min-run]")
+    lines.append("  J --> K[Chatter decision]")
+    lines.append("```")
+    lines.append("")
+def _temporal_section(tdata, lines):
+    if not tdata:
+        return
+    best = tdata.get("best_model")
+    if not best:
+        return
+    pw = tdata.get("per_window_metrics", {}).get(best, {}) or {}
+    sm = tdata.get("smoothed_metrics", {}).get(best, {}) or {}
+    tp = tdata.get("temporal_params", {})
+    lines.append("## Temporal smoothing (Goal 6.5)")
+    lines.append("")
+    lines.append(
+        f"Each recording was split into {tdata.get('n_windows_per_recording')} "
+        f"windows of {tdata.get('window_points')} samples; out-of-fold per-window "
+        f"probabilities for the best model ({best}) are stabilised with hysteresis "
+        f"and a minimum run length (enter={tp.get('enter_threshold')}, "
+        f"exit={tp.get('exit_threshold')}, min_run={tp.get('min_positive_windows')})."
+    )
+    lines.append("")
+    lines.append("| Metric | per-window | temporally smoothed |")
+    lines.append("| --- | --- | --- |")
+    for mk in METRIC_KEYS:
+        lines.append(f"| {mk} | {_fmt(pw.get(mk))} | {_fmt(sm.get(mk))} |")
+    lines.append("")
+
+
+def _feature_importance_figure(tdata, fig_dir):
+    imp = (tdata or {}).get("feature_importances", {})
+    if not imp:
+        return None
+    items = sorted(imp.items(), key=lambda kv: kv[1])
+    names = [k for k, _ in items]
+    vals = [v for _, v in items]
+    plt.figure(figsize=(7, 9))
+    plt.barh(range(len(names)), vals)
+    plt.yticks(range(len(names)), names, fontsize=7)
+    plt.xlabel("importance (full-corpus RandomForest)")
+    plt.title("Feature importances")
+    plt.tight_layout()
+    path = os.path.join(fig_dir, "feature_importance.png")
+    plt.savefig(path, dpi=120)
+    plt.close()
+    return path
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="PG-AMCD report generator")
     parser.add_argument(
         "--input",
         default=os.path.join(ROOT, "outputs", "evaluation_results.json"),
+    )
+    parser.add_argument(
+        "--temporal-input",
+        default=os.path.join(ROOT, "outputs", "temporal_results.json"),
     )
     parser.add_argument(
         "--output", default=os.path.join(ROOT, "outputs", "evaluation_report.md")
@@ -197,6 +302,7 @@ def main(argv=None):
 
     with open(args.input, "r", encoding="utf-8") as fh:
         data = json.load(fh)
+    tdata = _load_optional(args.temporal_input)
 
     fig_dir = args.figure_dir
     os.makedirs(fig_dir, exist_ok=True)
@@ -237,16 +343,23 @@ def main(argv=None):
 
 
     _ablation_section(data, lines)
+    _temporal_section(tdata, lines)
+    _architecture_section(lines)
     # Figures
     roc = _roc_figure(data, fig_dir)
     conf = _confusion_figure(data, fig_dir)
     bar = _bar_figure(data, fig_dir)
+    fi = _feature_importance_figure(tdata, fig_dir)
+    pr = _pr_figure(data, fig_dir)
     lines.append("## Figures")
     lines.append("")
     for name, path in (("ROC curve", roc), ("Confusion matrix", conf),
-                       ("Cross-condition balanced accuracy", bar)):
+                       ("Cross-condition balanced accuracy", bar),
+                       ("Feature importance", fi), ("Precision-recall", pr)):
         if path:
             lines.append(f"* {name}: `{os.path.relpath(path, ROOT)}`")
+    for diag in sorted(glob.glob(os.path.join(fig_dir, "fig_*.png"))):
+        lines.append(f"* Diagnostic: `{os.path.relpath(diag, ROOT)}`")
     lines.append("")
 
     # Limitations / aspirational targets
@@ -267,7 +380,8 @@ def main(argv=None):
     with open(args.output, "w", encoding="utf-8") as fh:
         fh.write(report)
     print(f"Wrote report to {args.output}")
-    for name, path in (("ROC", roc), ("confusion", conf), ("bar", bar)):
+    for name, path in (("ROC", roc), ("confusion", conf), ("bar", bar),
+                       ("feature-importance", fi)):
         if path:
             print(f"Wrote {name} figure to {path}")
     return 0

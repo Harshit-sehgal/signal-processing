@@ -1,0 +1,28 @@
+{
+  "gating": {
+    "chatter_band_center": 320.0,
+    "chatter_band_spread": 60.0,
+    "chatter_energy_weight": 4.0,
+    "correlation_weight": 2.0,
+    "frequency_proximity_weight": 1.0,
+    "harmonic_count": 5,
+    "harmonic_penalty": 5.0,
+    "harmonic_tolerance_hz": 15.0,
+    "include_residual": false,
+    "kurtosis_scale": 10.0,
+    "kurtosis_weight": 1.0,
+    "method": "physics_guided_independent_gates",
+    "offset": 1.5,
+    "residual_policy": "last_row",
+    "selection_threshold": 0.5
+  },
+  "physics_metadata": {
+    "depth_of_cut": 0.015,
+    "feed_rate": null,
+    "rpm": 600.0,
+    "stickout": 2.5,
+    "tool_identifier": null,
+    "tooth_count": 2
+  },
+  "use_physics_gating": true
+}

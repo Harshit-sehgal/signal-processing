@@ -1,0 +1,61 @@
+{
+  "chatter_band_retention": 0.9641264914499866,
+  "correlation_with_source": 0.5182668834472588,
+  "energy_after": 41.40614407035986,
+  "energy_before": 101.04541253840418,
+  "gate_normalisation": "independent_not_sum_normalised",
+  "gate_sum": 0.9904591096353089,
+  "gate_vector_stability": {
+    "available": true,
+    "max_gate_std": 6.348392618799048e-05,
+    "mean_gate_by_imf": [
+      0.9815124658632921,
+      0.005759719841725834,
+      0.0021957649911779485
+    ],
+    "mean_gate_std": 4.296106351029663e-05,
+    "mean_gates": [
+      0.9815124658632921,
+      0.005759719841725834,
+      0.0021957649911779485
+    ],
+    "n_seeds": 2,
+    "physical_imf_count": 3,
+    "physical_imf_counts": [
+      3,
+      3
+    ],
+    "seeds": [
+      42,
+      43
+    ],
+    "selected_count_by_seed": [
+      1,
+      1
+    ],
+    "selected_imf_consistency": 1.0,
+    "selection_threshold": 0.5,
+    "standard_deviation": [
+      6.348392618799048e-05,
+      5.940577076031864e-05,
+      5.993493582580767e-06
+    ],
+    "std_gate_by_imf": [
+      6.348392618799048e-05,
+      5.940577076031864e-05,
+      5.993493582580767e-06
+    ]
+  },
+  "method": "physics_guided_independent_gates",
+  "out_of_band_attenuation": 0.9410026388711062,
+  "physical_imf_count": 3,
+  "reconstruction_runtime_seconds": 0.0020905620185658336,
+  "residual_excluded": true,
+  "rms_after": 0.28437892878590987,
+  "rms_before": 0.4442457893599788,
+  "runtime_seconds": 0.0020905620185658336,
+  "source_correlation": 0.5182668834472588,
+  "spectral_distortion": 1.102836667011147,
+  "spindle_harmonic_attenuation": 0.9790417322014104,
+  "tooth_harmonic_attenuation": 0.976790366478537
+}

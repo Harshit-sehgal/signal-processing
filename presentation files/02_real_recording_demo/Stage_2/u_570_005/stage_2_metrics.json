@@ -1,0 +1,36 @@
+{
+  "chatter_band_retention": 0.06597768324106637,
+  "correlation_with_source": 0.9439530759640873,
+  "energy_after": 119.42014883513086,
+  "energy_before": 1250.750771456369,
+  "gate_normalisation": "legacy_sum_normalised_baseline",
+  "gate_sum": 1.0,
+  "gate_vector_stability": {
+    "available": false,
+    "n_seeds": 3,
+    "physical_imf_counts": [
+      9,
+      9,
+      10
+    ],
+    "reason": "Gate vectors cannot be compared by row index because CEEMDAN returned different physical-IMF counts across seeds: [9, 9, 10].",
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "selection_threshold": 0.5
+  },
+  "method": "legacy_maiw_baseline",
+  "out_of_band_attenuation": 0.9016991713574206,
+  "physical_imf_count": 9,
+  "reconstruction_runtime_seconds": 0.014286419958807528,
+  "residual_excluded": true,
+  "rms_after": 0.10927952636936658,
+  "rms_before": 0.35365954977299413,
+  "runtime_seconds": 0.014286419958807528,
+  "source_correlation": 0.9439530759640873,
+  "spectral_distortion": 0.4568425231561668,
+  "spindle_harmonic_attenuation": null,
+  "tooth_harmonic_attenuation": null
+}

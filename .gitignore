@@ -7,6 +7,14 @@ Python/share/
 Python/include/
 **/__pycache__/
 *.pyc
+*.egg-info/
+build/
+dist/
+.coverage
+.coverage.*
+.mypy_cache/
+.ruff_cache/
+htmlcov/
 
 # Raw and Preprocessed Datasets
 Vibration - ML/
@@ -20,6 +28,7 @@ Vibration_MAIW/
 Vibration_Clean/
 old_files/
 outputs/
+validation_report*.json
 .pytest_cache/
 
 # Temporary and local log directories

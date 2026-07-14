@@ -1,0 +1,1320 @@
+{
+  "dynamic_feature_patterns": [
+    "freq_band_energy_ratio_{band_name}",
+    "imf_{index}_{energy_ratio|centre_frequency_hz|bandwidth_hz|spectral_entropy|kurtosis|source_correlation|gate}",
+    "wavelet_{coefficient_name}_{energy|energy_ratio}"
+  ],
+  "feature_schema_version": "1.0.0",
+  "features": [
+    {
+      "description": "least-squares slope of per-frame chatter-band STFT energy",
+      "dimensionless": false,
+      "family": "early_chatter",
+      "metadata_required": false,
+      "name": "early_chatter_band_energy_growth",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2/s"
+    },
+    {
+      "description": "least-squares slope of smoothed Hilbert instantaneous energy versus time",
+      "dimensionless": false,
+      "family": "early_chatter",
+      "metadata_required": false,
+      "name": "early_energy_growth_rate",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2/s"
+    },
+    {
+      "description": "Hilbert Energy Growth Rate: mean(max(dE_s(t)/dt, 0)), where E_s is a 10 ms moving-average of |hilbert(x)|^2",
+      "dimensionless": false,
+      "family": "early_chatter",
+      "metadata_required": false,
+      "name": "early_hegr",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2/s"
+    },
+    {
+      "description": "maximum magnitude of scipy.signal.hilbert(x)",
+      "dimensionless": false,
+      "family": "early_chatter",
+      "metadata_required": false,
+      "name": "early_instantaneous_amplitude_max",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit"
+    },
+    {
+      "description": "mean magnitude of scipy.signal.hilbert(x)",
+      "dimensionless": false,
+      "family": "early_chatter",
+      "metadata_required": false,
+      "name": "early_instantaneous_amplitude_mean",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit"
+    },
+    {
+      "description": "maximum squared analytic-signal magnitude",
+      "dimensionless": false,
+      "family": "early_chatter",
+      "metadata_required": false,
+      "name": "early_instantaneous_energy_max",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "mean squared analytic-signal magnitude",
+      "dimensionless": false,
+      "family": "early_chatter",
+      "metadata_required": false,
+      "name": "early_instantaneous_energy_mean",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "least-squares slope of total per-frame STFT energy",
+      "dimensionless": false,
+      "family": "early_chatter",
+      "metadata_required": false,
+      "name": "early_short_term_spectral_energy_growth",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2/s"
+    },
+    {
+      "description": "PSD energy in [0.0, 250.0] Hz divided by total PSD energy",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": false,
+      "name": "freq_band_energy_ratio_band_1_0_250_hz",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD energy in [250.0, 750.0] Hz divided by total PSD energy",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": false,
+      "name": "freq_band_energy_ratio_band_2_250_750_hz",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD energy in [750.0, 1750.0] Hz divided by total PSD energy",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": false,
+      "name": "freq_band_energy_ratio_band_3_750_1750_hz",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD energy in [1750.0, 4000.0] Hz divided by total PSD energy",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": false,
+      "name": "freq_band_energy_ratio_band_4_1750_4000_hz",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted mean frequency",
+      "dimensionless": false,
+      "family": "frequency",
+      "metadata_required": false,
+      "name": "freq_centroid",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "chatter-band PSD energy divided by total PSD energy",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": false,
+      "name": "freq_chatter_band_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Shannon entropy of normalised PSD divided by log2(number of bins)",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": false,
+      "name": "freq_entropy",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "compatibility alias of tooth-passing harmonic energy ratio",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": true,
+      "name": "freq_harmonics_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "frequency of maximum Welch PSD",
+      "dimensionless": false,
+      "family": "frequency",
+      "metadata_required": false,
+      "name": "freq_peak",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "tooth sideband energy divided by tooth-harmonic energy",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": true,
+      "name": "freq_sideband_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis across non-negative Welch PSD bins",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": false,
+      "name": "freq_spectral_kurtosis",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD energy near spindle harmonics divided by total PSD energy",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": true,
+      "name": "freq_spindle_harmonic_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted standard deviation around centroid",
+      "dimensionless": false,
+      "family": "frequency",
+      "metadata_required": false,
+      "name": "freq_spread",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "PSD energy near tooth-passing harmonics divided by total PSD energy",
+      "dimensionless": true,
+      "family": "frequency",
+      "metadata_required": true,
+      "name": "freq_tooth_harmonic_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "absolute correlation of IMF 1 with the preprocessed source",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf1_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted IMF bandwidth",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_1_bandwidth_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "PSD-weighted IMF centre frequency",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_1_centre_frequency_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "IMF energy divided by total physical-IMF energy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_1_energy_ratio",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "independent Stage 2 relevance gate",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_1_gate",
+      "required_source_stage": "Stage_2",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis of the IMF",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_1_kurtosis",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "absolute correlation with preprocessed source",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_1_source_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "normalised IMF spectral entropy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_1_spectral_entropy",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted IMF bandwidth",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_2_bandwidth_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "PSD-weighted IMF centre frequency",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_2_centre_frequency_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "IMF energy divided by total physical-IMF energy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_2_energy_ratio",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "independent Stage 2 relevance gate",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_2_gate",
+      "required_source_stage": "Stage_2",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis of the IMF",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_2_kurtosis",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "absolute correlation with preprocessed source",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_2_source_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "normalised IMF spectral entropy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_2_spectral_entropy",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted IMF bandwidth",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_3_bandwidth_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "PSD-weighted IMF centre frequency",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_3_centre_frequency_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "IMF energy divided by total physical-IMF energy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_3_energy_ratio",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "independent Stage 2 relevance gate",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_3_gate",
+      "required_source_stage": "Stage_2",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis of the IMF",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_3_kurtosis",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "absolute correlation with preprocessed source",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_3_source_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "normalised IMF spectral entropy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_3_spectral_entropy",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted IMF bandwidth",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_4_bandwidth_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "PSD-weighted IMF centre frequency",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_4_centre_frequency_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "IMF energy divided by total physical-IMF energy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_4_energy_ratio",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "independent Stage 2 relevance gate",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_4_gate",
+      "required_source_stage": "Stage_2",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis of the IMF",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_4_kurtosis",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "absolute correlation with preprocessed source",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_4_source_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "normalised IMF spectral entropy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_4_spectral_entropy",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted IMF bandwidth",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_5_bandwidth_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "PSD-weighted IMF centre frequency",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_5_centre_frequency_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "IMF energy divided by total physical-IMF energy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_5_energy_ratio",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "independent Stage 2 relevance gate",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_5_gate",
+      "required_source_stage": "Stage_2",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis of the IMF",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_5_kurtosis",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "absolute correlation with preprocessed source",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_5_source_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "normalised IMF spectral entropy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_5_spectral_entropy",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted IMF bandwidth",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_6_bandwidth_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "PSD-weighted IMF centre frequency",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_6_centre_frequency_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "IMF energy divided by total physical-IMF energy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_6_energy_ratio",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "independent Stage 2 relevance gate",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_6_gate",
+      "required_source_stage": "Stage_2",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis of the IMF",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_6_kurtosis",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "absolute correlation with preprocessed source",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_6_source_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "normalised IMF spectral entropy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_6_spectral_entropy",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted IMF bandwidth",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_7_bandwidth_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "PSD-weighted IMF centre frequency",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_7_centre_frequency_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "IMF energy divided by total physical-IMF energy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_7_energy_ratio",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "independent Stage 2 relevance gate",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_7_gate",
+      "required_source_stage": "Stage_2",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis of the IMF",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_7_kurtosis",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "absolute correlation with preprocessed source",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_7_source_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "normalised IMF spectral entropy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_7_spectral_entropy",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted IMF bandwidth",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_8_bandwidth_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "PSD-weighted IMF centre frequency",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_8_centre_frequency_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "IMF energy divided by total physical-IMF energy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_8_energy_ratio",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "independent Stage 2 relevance gate",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_8_gate",
+      "required_source_stage": "Stage_2",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis of the IMF",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_8_kurtosis",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "absolute correlation with preprocessed source",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_8_source_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "normalised IMF spectral entropy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_8_spectral_entropy",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "PSD-weighted IMF bandwidth",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_9_bandwidth_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "PSD-weighted IMF centre frequency",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_9_centre_frequency_hz",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "IMF energy divided by total physical-IMF energy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_9_energy_ratio",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "independent Stage 2 relevance gate",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_9_gate",
+      "required_source_stage": "Stage_2",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis of the IMF",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_9_kurtosis",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "absolute correlation with preprocessed source",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_9_source_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "normalised IMF spectral entropy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_9_spectral_entropy",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "mean physical-IMF PSD bandwidth",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_bandwidth_mean",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "mean physical-IMF centre frequency",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_centre_freq_mean",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "number of physical IMFs after explicit residual exclusion",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_count",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "count"
+    },
+    {
+      "description": "mean normalised physical-IMF spectral entropy",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_entropy_mean",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "fraction of adjacent physical IMF centre frequencies in non-increasing order",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_frequency_ordering_score",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "maximum absolute adjacent physical-IMF correlation",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_max_adjacent_correlation",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "maximum physical-IMF energy fraction",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_max_energy_ratio",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "mean absolute adjacent physical-IMF correlation",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_mode_mixing_index",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "2*sum(i<j)<c_i,c_j>/sum_i||c_i||^2",
+      "dimensionless": true,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_orthogonality_index",
+      "required_source_stage": "Stage_1",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "number of gates at or above the configured selection threshold",
+      "dimensionless": false,
+      "family": "imf",
+      "metadata_required": false,
+      "name": "imf_selected_count",
+      "required_source_stage": "Stage_2",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "count"
+    },
+    {
+      "description": "Welch PSD energy within the configured chatter band",
+      "dimensionless": false,
+      "family": "physics",
+      "metadata_required": false,
+      "name": "physics_chatter_band_energy",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "chatter-band energy divided by forced-harmonic energy",
+      "dimensionless": true,
+      "family": "physics",
+      "metadata_required": true,
+      "name": "physics_chatter_to_harmonic_energy_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Welch PSD energy in the union of spindle and tooth harmonic windows",
+      "dimensionless": false,
+      "family": "physics",
+      "metadata_required": true,
+      "name": "physics_forced_vibration_energy",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "Gaussian proximity of peak frequency to the configured chatter-band interval",
+      "dimensionless": true,
+      "family": "physics",
+      "metadata_required": false,
+      "name": "physics_frequency_proximity",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "distance from spectral peak to nearest spindle harmonic",
+      "dimensionless": false,
+      "family": "physics",
+      "metadata_required": true,
+      "name": "physics_peak_to_spindle_harmonic_distance_hz",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "distance from spectral peak to nearest tooth-passing harmonic",
+      "dimensionless": false,
+      "family": "physics",
+      "metadata_required": true,
+      "name": "physics_peak_to_tooth_harmonic_distance_hz",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "Welch PSD energy around tooth harmonics plus/minus spindle frequency",
+      "dimensionless": false,
+      "family": "physics",
+      "metadata_required": true,
+      "name": "physics_sideband_strength",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "RPM/60",
+      "dimensionless": false,
+      "family": "physics",
+      "metadata_required": true,
+      "name": "physics_spindle_frequency_hz",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "RPM*tooth_count/60",
+      "dimensionless": false,
+      "family": "physics",
+      "metadata_required": true,
+      "name": "physics_tooth_passing_frequency_hz",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "max(abs(x))/mean(sqrt(abs(x)))^2",
+      "dimensionless": true,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_clearance_factor",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "max(abs(x))/RMS",
+      "dimensionless": true,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_crest_factor",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "max(abs(x))/mean(abs(x))",
+      "dimensionless": true,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_impulse_factor",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "Pearson kurtosis E[(x-mu)^4]/sigma^4",
+      "dimensionless": true,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_kurtosis",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "mean(abs(x))",
+      "dimensionless": false,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_mean_absolute",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit"
+    },
+    {
+      "description": "max(x)-min(x)",
+      "dimensionless": false,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_peak_to_peak",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit"
+    },
+    {
+      "description": "sqrt(mean(x^2))",
+      "dimensionless": false,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_rms",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit"
+    },
+    {
+      "description": "RMS/mean(abs(x))",
+      "dimensionless": true,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_shape_factor",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "standardised third central moment",
+      "dimensionless": true,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_skewness",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "population standard deviation of x",
+      "dimensionless": false,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_std",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit"
+    },
+    {
+      "description": "population variance of x",
+      "dimensionless": false,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_variance",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "sign changes divided by N-1",
+      "dimensionless": true,
+      "family": "time",
+      "metadata_required": false,
+      "name": "time_zero_crossing_rate",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "cA_4 coefficient energy",
+      "dimensionless": false,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_cA_4_energy",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "cA_4 coefficient energy ratio",
+      "dimensionless": true,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_cA_4_energy_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "cD_1 coefficient energy",
+      "dimensionless": false,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_cD_1_energy",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "cD_1 coefficient energy ratio",
+      "dimensionless": true,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_cD_1_energy_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "cD_2 coefficient energy",
+      "dimensionless": false,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_cD_2_energy",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "cD_2 coefficient energy ratio",
+      "dimensionless": true,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_cD_2_energy_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "cD_3 coefficient energy",
+      "dimensionless": false,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_cD_3_energy",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "cD_3 coefficient energy ratio",
+      "dimensionless": true,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_cD_3_energy_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "cD_4 coefficient energy",
+      "dimensionless": false,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_cD_4_energy",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "signal unit^2"
+    },
+    {
+      "description": "cD_4 coefficient energy ratio",
+      "dimensionless": true,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_cD_4_energy_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "median frequency of the maximum-energy STFT bin per frame",
+      "dimensionless": false,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_dominant_ridge_hz",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "Hz"
+    },
+    {
+      "description": "Shannon entropy of normalised coefficient energies divided by log2(number of subbands)",
+      "dimensionless": true,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_entropy",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "energy in cD1 and cD2 divided by total coefficient energy",
+      "dimensionless": true,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_high_freq_ratio",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    },
+    {
+      "description": "maximum STFT-bin energy divided by total STFT energy",
+      "dimensionless": true,
+      "family": "wavelet",
+      "metadata_required": false,
+      "name": "wavelet_time_frequency_concentration",
+      "required_source_stage": "Stage_3",
+      "undefined_handling": "Stored as null with a reason when its denominator or input is invalid.",
+      "unit": "dimensionless"
+    }
+  ]
+}

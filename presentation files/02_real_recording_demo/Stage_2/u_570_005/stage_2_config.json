@@ -1,0 +1,19 @@
+{
+  "gating": {
+    "alpha": 0.25,
+    "beta": 0.25,
+    "chatter_band_center": 1250.0,
+    "chatter_band_spread": 500.0,
+    "delta": 0.25,
+    "gamma": 0.25,
+    "harmonic_count": 5,
+    "include_residual": false,
+    "method": "legacy_maiw_baseline",
+    "residual_policy": "last_row_explicitly_excluded",
+    "selection_threshold": 0.5
+  },
+  "physics_metadata": {
+    "physics_metadata_required": false
+  },
+  "use_physics_gating": false
+}

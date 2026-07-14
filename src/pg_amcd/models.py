@@ -7,9 +7,80 @@ module.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 import numpy as np
+
+
+@dataclass
+class Stage1Output:
+    """Canonical preprocessing and CEEMDAN output for one controlled segment."""
+
+    time: np.ndarray
+    raw_signal: np.ndarray
+    preprocessed_physical: np.ndarray
+    preprocessed_scaled: np.ndarray
+    segment_time: np.ndarray
+    segment_raw: np.ndarray
+    segment_physical: np.ndarray
+    segment_scaled: np.ndarray
+    imfs_scaled: np.ndarray
+    residual_scaled: np.ndarray
+    imfs_physical: np.ndarray
+    residual_physical: np.ndarray
+    start_index: int
+    end_index: int
+    sampling_rate: float
+    scale_factor: float
+    selected_cutoff: float
+    random_seed: int
+    ceemdan_parameters: Dict[str, Any]
+    cutoff_search: List[Dict[str, Any]]
+    imf_metrics: List[Dict[str, Any]]
+    seed_stability: Dict[str, Any]
+    metrics: Dict[str, Any]
+    runtime_seconds: float
+
+
+@dataclass
+class Stage2Output:
+    """Canonical physics-guided IMF gating output."""
+
+    indicators: List[Dict[str, Any]]
+    gates: np.ndarray
+    weighted_scaled: np.ndarray
+    weighted_physical: np.ndarray
+    metadata: Dict[str, Any]
+    metrics: Dict[str, Any]
+    config: Dict[str, Any]
+    runtime_seconds: float
+
+
+@dataclass
+class Stage3Output:
+    """Canonical reconstruction-level wavelet-denoising output."""
+
+    coefficients: List[np.ndarray]
+    threshold_rows: List[Dict[str, Any]]
+    denoised_scaled: np.ndarray
+    denoised_physical: np.ndarray
+    metrics: Dict[str, Any]
+    config: Dict[str, Any]
+    runtime_seconds: float
+    synthetic_signals: Dict[str, np.ndarray] = field(default_factory=dict)
+
+
+@dataclass
+class Stage4Output:
+    """Canonical per-window feature extraction output."""
+
+    feature_rows: List[Dict[str, Any]]
+    feature_records: List[Dict[str, Any]]
+    feature_schema: Dict[str, Any]
+    feature_quality: Dict[str, Any]
+    metrics: Dict[str, Any]
+    config: Dict[str, Any]
+    runtime_seconds: float
 
 
 @dataclass
@@ -29,6 +100,7 @@ class WindowResult:
     imfs: np.ndarray  # (num_layers, N)
     maiw_reconstructed: np.ndarray  # (N,)
     denoised_clean: np.ndarray  # (N,)
+    gates: np.ndarray = field(default_factory=lambda: np.empty(0, dtype=float))
 
 
 @dataclass
@@ -43,6 +115,13 @@ class PipelineResult:
     scale_factors: Dict[str, float]
     selected_parameters: Dict[str, Any]
     warnings: List[str]
+    recording_id: str = "recording"
+    input_path: str = ""
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    stage_1: Stage1Output | None = None
+    stage_2: Stage2Output | None = None
+    stage_3: Stage3Output | None = None
+    stage_4: Stage4Output | None = None
 
 
 @dataclass

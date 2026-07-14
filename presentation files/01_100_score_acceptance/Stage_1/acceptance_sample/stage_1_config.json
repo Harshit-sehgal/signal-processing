@@ -1,0 +1,33 @@
+{
+  "ceemdan": {
+    "algorithm": "CEEMDAN",
+    "beta_progress": true,
+    "emd_signal_version": "1.10.0",
+    "epsilon": 0.02,
+    "implementation": "PyEMD.CEEMDAN",
+    "max_imf": 3,
+    "noise_kind": "normal",
+    "noise_scale": 1.0,
+    "noise_seed": 42,
+    "parallel": false,
+    "processes": null,
+    "range_threshold": 0.01,
+    "residual_included_in_later_stage_gates": false,
+    "residual_policy": "explicit_verified_final_row",
+    "sifting_iterations": 2,
+    "total_power_threshold": 0.05,
+    "trials": 2
+  },
+  "preprocessing": {
+    "filter_order": 3,
+    "low_pass_cutoff_hz": null,
+    "scale_percentile": 99.5
+  },
+  "sampling_rate": 1000.0,
+  "scale_factor": 1.1607437822809028,
+  "selected_cutoff": 20.0,
+  "source_window": [
+    93,
+    605
+  ]
+}

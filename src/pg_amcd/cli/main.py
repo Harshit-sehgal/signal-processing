@@ -1,55 +1,80 @@
-"""Argument parsing and command routing for the PG-AMCD CLI."""
+"""Argument parsing and routing for the Stage 1--4 PG-AMCD CLI."""
+
+from __future__ import annotations
 
 import argparse
-
-from pg_amcd.cli.run import run_pipeline_on_dataset
-from pg_amcd.cli.validate import run_validation_on_dataset
+from collections.abc import Sequence
 
 
-def main():
-    """Entry point for the ``pg-amcd`` command-line interface."""
+def _stage_number(value: str) -> int:
+    try:
+        stage = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("--through-stage must be an integer from 1 to 4") from exc
+    if stage > 4:
+        raise argparse.ArgumentTypeError(
+            "Stages above 4 are outside the current project scope; the workflow ends at feature extraction"
+        )
+    if stage < 1:
+        raise argparse.ArgumentTypeError("--through-stage must be between 1 and 4")
+    return stage
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the public Stage 1--4 command-line interface."""
+
     parser = argparse.ArgumentParser(
-        description="PG-AMCD Signal Processing CLI Command Line Interface"
+        prog="pg-amcd",
+        description="PG-AMCD machining-signal processing through Stage 4 feature extraction",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    run_parser = subparsers.add_parser(
-        "run", help="Run signal processing pipeline on a dataset"
-    )
+    run_parser = subparsers.add_parser("run", help="Run the canonical signal pipeline")
+    run_parser.add_argument("--input-dir", required=True, help="Directory containing raw MAT files")
+    run_parser.add_argument("--metadata", help="CSV/XLSX machining metadata file")
+    run_parser.add_argument("--output-dir", default="outputs", help="Parent output directory")
+    run_parser.add_argument("--config", help="JSON configuration (packaged default when omitted)")
+    run_parser.add_argument("--through-stage", type=_stage_number, default=4)
     run_parser.add_argument(
-        "--input-dir", required=True, help="Path to Vibration - ML raw data directory"
-    )
-    run_parser.add_argument("--metadata", required=False, help="Path to combination spreadsheet")
-    run_parser.add_argument("--output-dir", required=True, help="Path to output processed results")
-    run_parser.add_argument("--config", required=False, help="Path to config.json file")
-    run_parser.add_argument(
-        "--continue-on-error", action="store_true", help="Continue processing on file failure"
+        "--continue-on-error",
+        action="store_true",
+        help="Process remaining recordings, but still return non-zero if any recording fails",
     )
 
     validate_parser = subparsers.add_parser(
-        "validate",
-        help="Validate raw signals against the input contract without processing",
+        "validate", help="Validate raw inputs and metadata without processing"
     )
-    validate_parser.add_argument(
-        "--input-dir", required=True, help="Path to Vibration - ML raw data directory"
-    )
-    validate_parser.add_argument("--config", required=False, help="Path to config.json file")
-    validate_parser.add_argument(
-        "--output", required=False, help="Path to write the JSON validation report"
-    )
-    validate_parser.add_argument(
-        "--metadata",
-        required=False,
-        help="Path to metadata CSV/XLSX for dataset validation reporting",
-    )
+    validate_parser.add_argument("--input-dir", required=True)
+    validate_parser.add_argument("--metadata")
+    validate_parser.add_argument("--config")
+    validate_parser.add_argument("--output", default="validation_report.json")
 
-    args = parser.parse_args()
+    report_parser = subparsers.add_parser(
+        "report", help="Regenerate the Stage 1--4 report for an existing run"
+    )
+    report_parser.add_argument("--run-dir", required=True)
 
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Run the selected command and return its process exit status."""
+
+    args = build_parser().parse_args(argv)
     if args.command == "run":
-        run_pipeline_on_dataset(args)
-    elif args.command == "validate":
-        run_validation_on_dataset(args)
+        from pg_amcd.cli.run import run_pipeline_on_dataset
+
+        return int(run_pipeline_on_dataset(args))
+    if args.command == "validate":
+        from pg_amcd.cli.validate import run_validation_on_dataset
+
+        return int(run_validation_on_dataset(args))
+
+    from pg_amcd.stage_reporting import generate_pipeline_report
+
+    generate_pipeline_report(args.run_dir)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

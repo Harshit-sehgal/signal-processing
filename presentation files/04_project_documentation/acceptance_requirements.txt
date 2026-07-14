@@ -1,0 +1,1275 @@
+You are working on the latest `main` branch of the repository:
+
+Harshit-sehgal/signal-processing
+
+Your task is to bring the PG-AMCD project to a high-quality, reproducible and visually understandable implementation through Stage 4 only.
+
+You must continue auditing, implementing, testing, running and improving the repository until each of Stages 1–4 reaches at least 90/100 according to the scoring criteria in this prompt. Aim for 100/100 wherever reasonably possible.
+
+Do not stop after adding placeholder files or functions. A stage is complete only when it runs successfully, produces correct artifacts, generates useful visualisations, passes its tests and satisfies its acceptance criteria.
+
+==================================================
+1. PROJECT OBJECTIVE
+==================================================
+
+The project processes machining vibration signals to isolate chatter-related behaviour and extract meaningful features.
+
+The required scope is:
+
+Preprocessing
+    ↓
+Stage 1: CEEMDAN/ICEEMDAN-style signal decomposition
+    ↓
+Stage 2: Multi-criteria or physics-guided IMF weighting
+    ↓
+Stage 3: Adaptive wavelet denoising
+    ↓
+Stage 4: Feature extraction
+
+The project must stop at Stage 4 for now.
+
+Do not implement or activate:
+
+- Stage 5 feature selection
+- mRMR
+- Genetic algorithms
+- Stage 6 classifiers
+- OS-APNN
+- Stage 7 decision output
+- Production chatter classification
+- Chatter probability generation
+- Stable/chatter final decisions
+
+Existing experimental code for later stages may remain in the repository, but it must not be part of the primary pipeline, primary documentation, stage scoring or default CLI workflow.
+
+The default production workflow must end after feature extraction.
+
+==================================================
+2. SOURCE-OF-TRUTH RULES
+==================================================
+
+Do not trust the README, old reports, old generated outputs, comments, commit messages or legacy Python scripts without verifying them against the actual current source code.
+
+Use the latest checked-out repository state as the source of truth.
+
+Before modifying anything:
+
+1. Inspect the complete repository tree.
+2. Identify the canonical implementation under `src/pg_amcd`.
+3. Identify duplicate, legacy or contradictory implementations.
+4. Inspect current tests.
+5. Inspect current CLI commands.
+6. Inspect current configuration files.
+7. Inspect generated-output conventions.
+8. Run the current tests and record the initial failures.
+9. Produce a short internal implementation plan before editing.
+
+Do not create another parallel implementation.
+
+The reusable implementation must remain inside:
+
+`src/pg_amcd/`
+
+Scripts should only call canonical package functions.
+
+There must be one canonical implementation for each operation.
+
+==================================================
+3. REQUIRED OUTPUT DIRECTORY STRUCTURE
+==================================================
+
+Every processing run must create a unique run directory:
+
+outputs/<run_id>/
+
+Inside it, create exactly these stage directories:
+
+outputs/<run_id>/
+├── run_manifest.json
+├── stage_scorecard.json
+├── stage_scorecard.png
+├── Stage_1/
+├── Stage_2/
+├── Stage_3/
+├── Stage_4/
+└── report/
+    ├── pipeline_report.md
+    ├── pipeline_report.html
+    └── figures/
+
+Every stage directory must contain:
+
+1. Machine-readable outputs
+2. Human-readable summaries
+3. Quantitative metrics
+4. Visualisations
+5. Configuration/provenance details relevant to that stage
+
+Use the names exactly:
+
+`Stage_1`
+`Stage_2`
+`Stage_3`
+`Stage_4`
+
+Do not create vague folders such as `results`, `temp`, `new`, `final2` or `misc` for primary outputs.
+
+Temporary files may use a temporary directory but must not pollute the repository.
+
+==================================================
+4. RUN ID AND PROVENANCE
+==================================================
+
+Generate `run_id` from:
+
+- Git commit SHA
+- Resolved configuration
+- Input-file checksums
+- Metadata checksum
+- Package/dependency versions
+- Pipeline version
+- Feature-schema version
+
+Use SHA-256.
+
+The run manifest must include:
+
+- Run ID
+- Git commit
+- Whether the Git working tree is dirty
+- Start and end timestamps
+- CLI command
+- Python version
+- Operating system
+- Dependency versions
+- Resolved configuration
+- Input files
+- Input SHA-256 checksums
+- Metadata checksum
+- Selected processing parameters
+- Warnings
+- Failures
+- Per-stage runtime
+- Per-recording runtime
+- Output checksums
+
+Do not reuse previous outputs based only on modification time.
+
+Outputs may only be reused when their full run identity matches.
+
+==================================================
+5. REQUIRED CLI BEHAVIOUR
+==================================================
+
+The primary command should support:
+
+pg-amcd run \
+  --input-dir <raw-data-directory> \
+  --metadata <metadata-file> \
+  --output-dir outputs \
+  --config configs/default.json \
+  --through-stage 4
+
+Also support:
+
+pg-amcd validate \
+  --input-dir <raw-data-directory> \
+  --metadata <metadata-file> \
+  --config configs/default.json \
+  --output validation_report.json
+
+And:
+
+pg-amcd report \
+  --run-dir outputs/<run_id>
+
+The default value of `--through-stage` must be `4`.
+
+Reject values above 4 with a clear message that later stages are outside the current project scope.
+
+The pipeline must fail with a non-zero exit code when a required stage fails.
+
+`--continue-on-error` may continue to other recordings, but the final run must still report partial failure and return a non-zero status.
+
+==================================================
+6. PREPROCESSING REQUIREMENTS
+==================================================
+
+Preprocessing occurs before decomposition and supports Stage 1.
+
+Implement and verify:
+
+- MAT-file loading
+- `tsDS` extraction
+- Time-column validation
+- Signal-column selection
+- Sampling-rate estimation
+- Sampling-rate consistency validation
+- Finite-value checks
+- Timestamp monotonicity
+- Timestamp-jitter checks
+- Minimum-duration checks
+- Constant-signal rejection
+- Detrending
+- Numerically stable SOS Butterworth filtering
+- Configurable high-pass and low-pass bounds
+- Physical-amplitude preservation
+- Separate physical and scaled signals
+- Explicit scale-factor storage
+
+Do not repeatedly peak-normalise signals after each stage.
+
+Store:
+
+- Physical preprocessed signal
+- Scaled signal used for numerical processing
+- Scale factor
+- Selected filter cutoff
+- Sampling rate
+- Selected source-window indices
+
+The same source segment must be used to compare candidate cutoff frequencies.
+
+==================================================
+7. STAGE 1 — DECOMPOSITION
+==================================================
+
+Stage 1 is responsible for adaptive preprocessing and CEEMDAN decomposition.
+
+Use the algorithm name accurately.
+
+If the code uses PyEMD `CEEMDAN`, call it CEEMDAN in code, reports and figures.
+
+Do not label it ICEEMDAN unless a genuine and verified ICEEMDAN implementation is added.
+
+--------------------------------------------------
+7.1 Stage 1 processing requirements
+--------------------------------------------------
+
+For each recording:
+
+1. Validate the input.
+2. Select one controlled source segment.
+3. Test configured candidate filter cutoffs on that same segment.
+4. Select the best cutoff using a meaningful decomposition-quality objective.
+5. Preprocess the full signal using the selected cutoff.
+6. Extract the chosen segment.
+7. Run final CEEMDAN decomposition.
+8. Separate physical IMFs and residual explicitly.
+9. Preserve reconstruction traceability.
+10. Record all parameters and random seeds.
+
+The final CEEMDAN output must make clear whether the final row is:
+
+- A residual produced by the implementation, or
+- Another IMF
+
+Do not blindly assume the final row is a residual without verifying the library behaviour.
+
+--------------------------------------------------
+7.2 Stage 1 quantitative metrics
+--------------------------------------------------
+
+Calculate and save:
+
+- Number of IMFs
+- Reconstruction NRMSE
+- Absolute orthogonality index
+- Signed orthogonality index
+- Mean adjacent IMF correlation
+- Maximum adjacent IMF correlation
+- Spectral overlap
+- Frequency-ordering score
+- Per-IMF energy percentage
+- Per-IMF centre frequency
+- Per-IMF bandwidth
+- Per-IMF spectral entropy
+- Seed-stability metrics
+- Cutoff-search metrics
+- CEEMDAN runtime
+
+Frequency ordering must be mathematically correct:
+
+Ideal EMD ordering means centre frequency generally decreases as IMF index increases.
+
+Test this with genuinely descending synthetic IMF frequencies.
+
+Seed stability must not rely only on reconstruction NRMSE because all valid CEEMDAN decompositions can reconstruct the source nearly perfectly.
+
+Seed stability should compare:
+
+- IMF centre frequencies
+- IMF energy distributions
+- Matched-IMF correlations
+- Spectral-overlap variation
+- IMF-count variation
+
+--------------------------------------------------
+7.3 Stage 1 files
+--------------------------------------------------
+
+Store under:
+
+Stage_1/<recording_id>/
+
+Required files:
+
+- `preprocessed_physical.npz`
+- `preprocessed_scaled.npz`
+- `decomposition.npz`
+- `imf_metrics.csv`
+- `cutoff_search.csv`
+- `stage_1_metrics.json`
+- `stage_1_summary.md`
+- `stage_1_config.json`
+
+The decomposition file must include:
+
+- Time segment
+- Scaled source segment
+- Physical source segment
+- IMFs
+- Residual, if applicable
+- Start index
+- End index
+- Sampling rate
+- Scale factor
+- Selected cutoff
+- Random seed
+- CEEMDAN parameters
+
+--------------------------------------------------
+7.4 Stage 1 visualisations
+--------------------------------------------------
+
+Generate:
+
+1. Raw full-signal waveform
+2. Selected-segment waveform
+3. Raw versus preprocessed waveform
+4. Raw versus preprocessed PSD
+5. Cutoff-objective comparison
+6. CEEMDAN decomposition plot
+7. Individual IMF plots
+8. Residual plot
+9. IMF energy-distribution chart
+10. IMF centre-frequency chart
+11. IMF bandwidth chart
+12. Adjacent-IMF correlation heatmap
+13. Seed-stability chart
+14. Reconstruction-error plot
+15. Time-frequency representation of the selected segment
+
+Use correct units and aligned time axes.
+
+Save figures as:
+
+- PNG
+- SVG where practical
+
+Use descriptive names such as:
+
+- `01_raw_signal.png`
+- `02_selected_segment.png`
+- `03_preprocessing_comparison.png`
+- `04_psd_comparison.png`
+- `05_cutoff_search.png`
+- `06_ceemdan_decomposition.png`
+- `07_imf_energy_distribution.png`
+- `08_imf_frequency_ordering.png`
+- `09_seed_stability.png`
+
+--------------------------------------------------
+7.5 Stage 1 acceptance criteria
+--------------------------------------------------
+
+Stage 1 cannot score above 90 unless:
+
+- All Stage 1 tests pass.
+- No alternate decomposition implementation is active.
+- Candidate cutoffs use the same source segment.
+- Reconstruction NRMSE is measured.
+- Orthogonality and mode-mixing metrics are generated.
+- Seed stability is structurally evaluated.
+- Physical amplitude is traceable.
+- All required files are generated.
+- All required graphs are generated.
+- A synthetic end-to-end test succeeds.
+- At least one real recording succeeds when real data is available.
+
+==================================================
+8. STAGE 2 — IMF WEIGHTING
+==================================================
+
+Stage 2 performs multi-criteria or physics-guided IMF weighting.
+
+The current preferred approach should be physics-guided independent gating, while original MAIW may remain as a baseline.
+
+Do not force independent gates to sum to one.
+
+--------------------------------------------------
+8.1 Stage 2 processing requirements
+--------------------------------------------------
+
+For every physical IMF, calculate:
+
+- Correlation with source signal
+- Relative energy
+- Kurtosis
+- Chatter-band energy ratio
+- Spindle-harmonic energy ratio
+- Tooth-passing harmonic energy ratio
+- Frequency proximity
+- Centre frequency
+- Bandwidth
+- Spectral entropy
+- Final gate or weight
+
+Physics metadata must include:
+
+- RPM
+- Tooth count
+- Stickout
+- Depth of cut where available
+- Feed rate where available
+- Tool identifier where available
+
+When physics-guided gating is enabled:
+
+- Missing RPM must fail.
+- Missing tooth count must fail.
+- Do not silently use arbitrary fallback values.
+- Record all metadata used by the stage.
+
+Move every gate coefficient into configuration.
+
+Do not leave hidden values hard-coded in source code.
+
+--------------------------------------------------
+8.2 Stage 2 reconstruction
+--------------------------------------------------
+
+Reconstruct:
+
+weighted_signal = sum(gate_i × IMF_i)
+
+Exclude the residual unless explicitly justified and configured.
+
+Restore physical units using the Stage 1 scale factor.
+
+Save both:
+
+- Scaled reconstruction
+- Physical reconstruction
+
+--------------------------------------------------
+8.3 Stage 2 quantitative metrics
+--------------------------------------------------
+
+Calculate:
+
+- Gate value per IMF
+- Chatter-band retention
+- Spindle-harmonic attenuation
+- Tooth-harmonic attenuation
+- Out-of-band attenuation
+- RMS before and after weighting
+- Energy before and after weighting
+- Correlation with the preprocessed signal
+- Spectral distortion
+- Gate-vector stability across seeds
+- Selected-IMF consistency
+- Reconstruction runtime
+
+--------------------------------------------------
+8.4 Stage 2 files
+--------------------------------------------------
+
+Store under:
+
+Stage_2/<recording_id>/
+
+Required files:
+
+- `imf_indicators.csv`
+- `imf_gates.csv`
+- `weighted_reconstruction_scaled.npz`
+- `weighted_reconstruction_physical.npz`
+- `stage_2_metrics.json`
+- `stage_2_summary.md`
+- `stage_2_config.json`
+
+`imf_indicators.csv` must contain one row per IMF and columns for all indicators and final gate values.
+
+--------------------------------------------------
+8.5 Stage 2 visualisations
+--------------------------------------------------
+
+Generate:
+
+1. Gate value by IMF
+2. All indicator values by IMF
+3. IMF centre frequency versus gate
+4. IMF energy versus gate
+5. Chatter-band energy versus gate
+6. Forced-harmonic energy versus gate
+7. Before/after weighted reconstruction waveform
+8. Before/after PSD
+9. Retained-versus-suppressed IMF visual
+10. Gate stability across seeds
+11. Harmonic markers over PSD
+12. Chatter-band highlighting over PSD
+
+Use descriptive names such as:
+
+- `01_imf_gate_values.png`
+- `02_imf_indicator_comparison.png`
+- `03_frequency_vs_gate.png`
+- `04_energy_vs_gate.png`
+- `05_weighted_reconstruction.png`
+- `06_weighted_psd_comparison.png`
+- `07_gate_stability.png`
+
+--------------------------------------------------
+8.6 Stage 2 acceptance criteria
+--------------------------------------------------
+
+Stage 2 cannot score above 90 unless:
+
+- Physics metadata is correctly passed into the stage.
+- No arbitrary RPM fallback is used in physics mode.
+- All gate parameters are configurable.
+- IMF indicators are finite and validated.
+- Gate length matches physical IMF count.
+- Residual handling is explicit.
+- Physical units are restored.
+- Stage 2 files and plots are generated.
+- Physics gates are tested using synthetic forced-harmonic and chatter components.
+- Original MAIW and physics-guided gating can be compared as baselines.
+
+==================================================
+9. STAGE 3 — ADAPTIVE WAVELET DENOISING
+==================================================
+
+Stage 3 performs adaptive wavelet denoising.
+
+The current project may use either:
+
+A. Wavelet denoising on the weighted reconstructed signal, or
+B. IMF-specific wavelet denoising before reconstruction
+
+Choose one canonical production approach.
+
+If the project claims “IMF-specific wavelet denoising”, it must actually denoise each selected IMF individually.
+
+Do not claim IMF-specific processing when only the final combined signal is denoised.
+
+--------------------------------------------------
+9.1 Stage 3 processing requirements
+--------------------------------------------------
+
+Implement:
+
+- Valid wavelet-name validation
+- Valid decomposition-level validation
+- Maximum-level handling
+- Noise estimation from appropriate detail coefficients
+- BayesShrink thresholding
+- Configurable soft thresholding
+- Band-aware threshold adjustment
+- Explicit chatter-band overlap calculation
+- Exact output-length restoration
+- Physical-amplitude preservation
+- Storage of thresholds per wavelet level
+
+Put these values in configuration:
+
+- Wavelet name
+- Wavelet level
+- Thresholding mode
+- Chatter-band threshold multiplier
+- Noise-band threshold multiplier
+- Minimum noise sigma
+- Whether band-aware mode is active
+
+--------------------------------------------------
+9.2 Stage 3 quantitative metrics
+--------------------------------------------------
+
+Calculate:
+
+- RMS before and after denoising
+- Energy before and after denoising
+- Chatter-band retention
+- Out-of-band attenuation
+- Spectral distortion
+- Correlation before and after
+- Wavelet coefficient energy by level
+- Threshold by level
+- Estimated noise sigma
+- Transient preservation
+- Synthetic-reference RMSE
+- Synthetic-reference SNR
+- Runtime
+
+For synthetic signals, compare with known clean ground truth.
+
+Do not claim SNR improvement on real signals unless a valid clean reference exists.
+
+--------------------------------------------------
+9.3 Stage 3 files
+--------------------------------------------------
+
+Store under:
+
+Stage_3/<recording_id>/
+
+Required files:
+
+- `wavelet_coefficients.npz`
+- `wavelet_thresholds.csv`
+- `denoised_scaled.npz`
+- `denoised_physical.npz`
+- `stage_3_metrics.json`
+- `stage_3_summary.md`
+- `stage_3_config.json`
+
+--------------------------------------------------
+9.4 Stage 3 visualisations
+--------------------------------------------------
+
+Generate:
+
+1. Weighted versus denoised waveform
+2. Raw, preprocessed, weighted and denoised waveform comparison
+3. Weighted versus denoised PSD
+4. Wavelet coefficient energy by level
+5. Threshold value by level
+6. Wavelet subband frequency ranges
+7. Chatter-band overlap by subband
+8. Spectrogram before and after denoising
+9. Synthetic clean/noisy/recovered comparison
+10. Residual-noise waveform
+11. Residual-noise PSD
+12. Time-frequency energy comparison
+
+Use names such as:
+
+- `01_weighted_vs_denoised.png`
+- `02_all_signal_stages.png`
+- `03_psd_before_after.png`
+- `04_wavelet_level_energies.png`
+- `05_wavelet_thresholds.png`
+- `06_spectrogram_comparison.png`
+- `07_synthetic_recovery.png`
+
+--------------------------------------------------
+9.5 Stage 3 acceptance criteria
+--------------------------------------------------
+
+Stage 3 cannot score above 90 unless:
+
+- Wavelet configuration is validated.
+- Noise estimation uses the correct detail level.
+- Threshold values are stored.
+- Output length matches input length exactly.
+- Physical amplitude remains traceable.
+- Chatter-band retention is measured.
+- Synthetic ground-truth tests are included.
+- Stage 3 files and plots are generated.
+- The documentation accurately describes whether denoising is IMF-specific or reconstruction-level.
+
+==================================================
+10. STAGE 4 — FEATURE EXTRACTION
+==================================================
+
+Stage 4 extracts meaningful features from the processed signal.
+
+Stage 4 must not perform:
+
+- Feature selection
+- Classifier training
+- Final chatter prediction
+- Model calibration
+- Decision output
+
+It only extracts, validates, stores and visualises features.
+
+--------------------------------------------------
+10.1 Required feature families
+--------------------------------------------------
+
+A. Time-domain features
+
+- RMS
+- Variance
+- Standard deviation
+- Peak-to-peak
+- Mean absolute value
+- Crest factor
+- Kurtosis
+- Skewness
+- Impulse factor
+- Shape factor
+- Clearance factor
+- Zero-crossing rate
+
+B. Frequency-domain features
+
+- Spectral centroid
+- Spectral spread
+- Spectral entropy
+- Peak frequency
+- Chatter-band energy ratio
+- Spindle-harmonic energy ratio
+- Tooth-passing harmonic energy ratio
+- Sideband-energy ratio
+- Spectral kurtosis
+- Band-energy ratios
+
+C. IMF-domain features
+
+- IMF count
+- IMF energy ratios
+- IMF centre frequencies
+- IMF bandwidths
+- IMF entropies
+- IMF kurtoses
+- IMF/source correlations
+- IMF gates
+- Mean mode-mixing index
+- Maximum adjacent correlation
+- Orthogonality index
+- Frequency-ordering score
+- Selected-IMF count
+
+D. Wavelet/time-frequency features
+
+- Wavelet energy by level
+- Wavelet energy ratios
+- Wavelet entropy
+- High-frequency coefficient ratio
+- Time-frequency concentration
+- Dominant time-frequency ridge where practical
+
+E. Early-chatter-related features
+
+Implement and document:
+
+- Analytic signal using Hilbert transform
+- Instantaneous amplitude
+- Instantaneous energy
+- Energy growth rate
+- HEGR or equivalent energy-growth-rate feature
+- Chatter-band energy growth
+- Short-term spectral-energy growth
+
+Do not invent a formula silently.
+
+Document the exact HEGR definition used and cite it in the code comments or project documentation.
+
+F. Physics-guided features
+
+- Chatter-band energy
+- Frequency proximity to expected chatter band
+- Spindle frequency
+- Tooth-passing frequency
+- Harmonic distances
+- Sideband strength
+- Forced-vibration energy
+- Chatter-to-harmonic energy ratio
+- Stability-margin proxy only if mathematically defined and justified
+
+Do not call something “stability margin” unless a valid formula and required machining parameters are available.
+
+--------------------------------------------------
+10.2 Stage 4 feature schema
+--------------------------------------------------
+
+Create a versioned feature schema.
+
+Example:
+
+`feature_schema_version = "1.0.0"`
+
+Store:
+
+- Feature name
+- Feature family
+- Formula/description
+- Unit
+- Required source stage
+- Whether metadata is required
+- Whether the feature is dimensionless
+- Handling of invalid or undefined values
+
+All output features must be finite unless the feature is explicitly marked undefined.
+
+Do not silently replace meaningful undefined values with zero.
+
+Record missing or undefined features with a reason.
+
+--------------------------------------------------
+10.3 Stage 4 files
+--------------------------------------------------
+
+Store under:
+
+Stage_4/<recording_id>/
+
+Required files:
+
+- `window_features.csv`
+- `window_features.json`
+- `feature_schema.json`
+- `feature_quality.json`
+- `stage_4_metrics.json`
+- `stage_4_summary.md`
+- `stage_4_config.json`
+
+Create run-level aggregate files under:
+
+Stage_4/aggregate/
+
+Required:
+
+- `all_recording_features.csv`
+- `feature_summary.csv`
+- `feature_missingness.csv`
+- `feature_correlations.csv`
+- `feature_schema.json`
+
+Do not select “top features” because that belongs to Stage 5.
+
+--------------------------------------------------
+10.4 Stage 4 visualisations
+--------------------------------------------------
+
+Generate per recording:
+
+1. RMS over time
+2. Kurtosis over time
+3. Spectral entropy over time
+4. Chatter-band energy over time
+5. Harmonic-energy ratio over time
+6. HEGR over time
+7. Instantaneous energy over time
+8. IMF gate values
+9. Wavelet energy ratios
+10. Feature-family summary
+
+Generate aggregate dataset visuals:
+
+1. Feature distributions
+2. Feature missingness chart
+3. Feature correlation heatmap
+4. Feature variance chart
+5. Feature values grouped by recording
+6. Feature values grouped by RPM
+7. Feature values grouped by stickout
+8. Feature values grouped by depth of cut
+9. Label-group comparisons only when labels are available
+10. Feature stability across repeated runs
+
+Do not train a classifier from these features.
+
+Use names such as:
+
+- `01_rms_timeline.png`
+- `02_kurtosis_timeline.png`
+- `03_spectral_entropy_timeline.png`
+- `04_chatter_energy_timeline.png`
+- `05_hegr_timeline.png`
+- `06_feature_family_summary.png`
+- `aggregate_feature_distributions.png`
+- `aggregate_feature_correlation_heatmap.png`
+- `aggregate_feature_missingness.png`
+
+--------------------------------------------------
+10.5 Stage 4 acceptance criteria
+--------------------------------------------------
+
+Stage 4 cannot score above 90 unless:
+
+- Feature extraction uses the canonical Stage 1–3 outputs.
+- Feature formulas are documented.
+- Feature schema is versioned.
+- Per-window features are generated.
+- Metadata-dependent features are validated.
+- HEGR or the chosen early-energy-growth feature is implemented and tested.
+- Undefined features are handled transparently.
+- No classifier or feature selector is invoked.
+- Per-recording files are generated.
+- Aggregate feature files are generated.
+- Required feature plots are generated.
+- Synthetic tests verify major feature behaviour.
+
+==================================================
+11. AUTOMATIC VISUAL REPORT
+==================================================
+
+Generate one combined report after Stage 4.
+
+Required report sections:
+
+1. Run overview
+2. Input validation
+3. Preprocessing summary
+4. Stage 1 decomposition
+5. Stage 2 IMF gating
+6. Stage 3 wavelet denoising
+7. Stage 4 feature extraction
+8. Stage scorecard
+9. Warnings and failures
+10. Limitations
+
+The report must link or embed:
+
+- Signal waveforms
+- PSD comparisons
+- IMF decomposition
+- IMF metrics
+- Gate charts
+- Wavelet-threshold charts
+- Spectrograms
+- Feature timelines
+- Feature-distribution plots
+- Correlation heatmap
+
+Generate:
+
+- Markdown report
+- Interactive HTML report where practical
+- PNG figures
+- SVG figures where practical
+
+Do not manually type measured values into the report.
+
+Read them from JSON or CSV output files.
+
+==================================================
+12. STAGE SCORING SYSTEM
+==================================================
+
+Create an automatic score for every stage.
+
+Do not hard-code an arbitrary final score.
+
+Every score must be traceable to pass/fail checks.
+
+Each stage receives 100 points.
+
+Use this base rubric:
+
+- 20 points: algorithmic correctness
+- 15 points: input/output validation
+- 15 points: quantitative metrics
+- 15 points: automated tests
+- 15 points: required artifacts generated
+- 10 points: visualisations generated
+- 5 points: reproducibility and provenance
+- 5 points: documentation accuracy
+
+A stage cannot score above 89 when it has:
+
+- A known P0 correctness issue
+- A failing integration test
+- Missing required output files
+- Missing required visualisations
+- Fabricated metrics
+- Unvalidated metadata assumptions
+- Multiple active implementations of the stage
+
+Produce:
+
+`stage_scorecard.json`
+
+Example structure:
+
+{
+  "Stage_1": {
+    "score": 94,
+    "passed": [...],
+    "failed": [...],
+    "warnings": [...]
+  },
+  "Stage_2": {
+    "score": 92,
+    "passed": [...],
+    "failed": [...],
+    "warnings": [...]
+  },
+  "Stage_3": {
+    "score": 95,
+    "passed": [...],
+    "failed": [...],
+    "warnings": [...]
+  },
+  "Stage_4": {
+    "score": 91,
+    "passed": [...],
+    "failed": [...],
+    "warnings": [...]
+  }
+}
+
+Also generate:
+
+- `stage_scorecard.png`
+- `stage_progress.png`
+
+The charts should clearly show the score and failed criteria for each stage.
+
+==================================================
+13. TESTING REQUIREMENTS
+==================================================
+
+Add or improve tests for:
+
+Stage 1:
+
+- Input-segment consistency
+- Cutoff search
+- CEEMDAN output
+- Reconstruction NRMSE
+- Frequency ordering
+- Seed stability
+- File generation
+- Figure generation
+
+Stage 2:
+
+- Gate-input validation
+- Metadata validation
+- Gate bounds
+- Gate length
+- Harmonic suppression
+- Chatter-band preservation
+- Reconstruction
+- File generation
+- Figure generation
+
+Stage 3:
+
+- Wavelet validation
+- Level clamping
+- Noise estimation
+- Threshold generation
+- Output length
+- Chatter-band handling
+- Synthetic denoising
+- File generation
+- Figure generation
+
+Stage 4:
+
+- Every feature family
+- Constant-signal handling
+- Undefined-feature handling
+- Hilbert energy
+- HEGR behaviour
+- Harmonic features
+- Feature schema
+- Window-feature generation
+- Aggregate feature generation
+- Figure generation
+
+Required general tests:
+
+- End-to-end synthetic Stage 1–4 run
+- End-to-end CLI run
+- Invalid-input CLI run
+- Missing-metadata failure
+- Reproducible run ID
+- Output-folder structure
+- Report generation
+- No Stage 5–7 execution
+
+Run:
+
+pytest --cov=pg_amcd --cov-report=term-missing --cov-fail-under=90
+ruff check .
+mypy src/pg_amcd
+
+Do not weaken MyPy by disabling major error categories merely to make it pass.
+
+Fix the types.
+
+==================================================
+14. CODE QUALITY REQUIREMENTS
+==================================================
+
+Use:
+
+- Typed dataclasses
+- `pathlib.Path`
+- Small focused functions
+- Clear error messages
+- NumPy array shape validation
+- Finite-value validation
+- Deterministic random seeds
+- Explicit configuration
+- Reusable plotting functions
+- Headless Matplotlib support
+- No hard-coded personal paths
+- No hard-coded usernames
+- No hidden global configuration
+- No silent `except Exception: pass`
+- No fabricated metrics
+- No misleading algorithm names
+
+Do not commit:
+
+- Virtual environments
+- `*.egg-info`
+- Cache directories
+- Temporary outputs
+- Large raw datasets
+- Generated test artifacts unless intentionally used as compact fixtures
+
+==================================================
+15. EXECUTION STRATEGY
+==================================================
+
+Work in this order.
+
+Phase A — Audit and stabilise
+
+1. Run all current tests.
+2. Find current failures.
+3. Map current modules to Stages 1–4.
+4. Identify duplicate implementations.
+5. Verify metadata flow.
+6. Verify output naming.
+7. Verify README accuracy.
+8. Record initial stage scores.
+
+Phase B — Output architecture
+
+1. Implement run ID.
+2. Implement run manifest.
+3. Create Stage_1–Stage_4 directory generation.
+4. Implement artifact writers.
+5. Implement stage-level metrics JSON.
+6. Implement stage scorecard.
+
+Phase C — Stage 1 completion
+
+1. Correct preprocessing.
+2. Correct controlled cutoff search.
+3. Verify decomposition.
+4. Add metrics.
+5. Add visuals.
+6. Add tests.
+7. Raise Stage 1 to at least 90.
+
+Phase D — Stage 2 completion
+
+1. Validate metadata.
+2. Validate physics gates.
+3. Move parameters to config.
+4. Add reconstruction metrics.
+5. Add visuals.
+6. Add tests.
+7. Raise Stage 2 to at least 90.
+
+Phase E — Stage 3 completion
+
+1. Validate wavelet logic.
+2. Store thresholds and coefficients.
+3. Add quantitative metrics.
+4. Add synthetic validation.
+5. Add visuals.
+6. Add tests.
+7. Raise Stage 3 to at least 90.
+
+Phase F — Stage 4 completion
+
+1. Finalise feature schema.
+2. Implement missing feature families.
+3. Add HEGR.
+4. Add per-window outputs.
+5. Add aggregate outputs.
+6. Add visuals.
+7. Add tests.
+8. Raise Stage 4 to at least 90.
+
+Phase G — Final integration
+
+1. Run the complete Stage 1–4 pipeline.
+2. Generate all outputs.
+3. Generate the report.
+4. Generate the scorecard.
+5. Run tests, Ruff and MyPy.
+6. Fix all regressions.
+7. Verify clean-clone installation.
+8. Update the README.
+9. Produce the final completion report.
+
+==================================================
+16. STOPPING CONDITIONS
+==================================================
+
+Do not stop merely because:
+
+- Files were created.
+- Functions were stubbed.
+- Unit tests were added but not run.
+- Synthetic tests passed while integration tests failed.
+- Figures were generated but contained empty data.
+- Scores were manually set to 90.
+- A README claims completion.
+- One recording worked.
+
+Stop only when:
+
+1. Stage 1 score is at least 90.
+2. Stage 2 score is at least 90.
+3. Stage 3 score is at least 90.
+4. Stage 4 score is at least 90.
+5. All required tests pass.
+6. Coverage is at least 90%.
+7. Ruff passes.
+8. MyPy passes without suppressing important errors.
+9. The end-to-end Stage 1–4 CLI run succeeds.
+10. Required files exist under every stage folder.
+11. Required graphs are valid and non-empty.
+12. The report is generated successfully.
+13. No Stage 5–7 component runs in the default pipeline.
+14. The final README matches actual commands and outputs.
+
+If real data is unavailable:
+
+- Do not fabricate real-data results.
+- Complete all synthetic and structural validation.
+- Clearly mark real-data acceptance tests as data-blocked.
+- Still create the pipeline so it runs immediately when the real dataset is supplied.
+- Do not assign full points for data-blocked real-data criteria.
+- Explain exactly what data is needed.
+
+==================================================
+17. FINAL RESPONSE FORMAT
+==================================================
+
+When the work is complete, report:
+
+1. Latest commit inspected
+2. Files added
+3. Files modified
+4. Files retired
+5. Stage 1 score with evidence
+6. Stage 2 score with evidence
+7. Stage 3 score with evidence
+8. Stage 4 score with evidence
+9. Test count and pass count
+10. Coverage
+11. Ruff status
+12. MyPy status
+13. Example output directory tree
+14. Generated graphs
+15. Remaining limitations
+16. Exact commands to reproduce everything
+
+Do not claim a score that is not supported by the generated scorecard and test evidence.
+
+Begin by auditing the latest repository state. Do not start by rewriting everything. Preserve correct existing code and improve it systematically.

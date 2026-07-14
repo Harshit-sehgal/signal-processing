@@ -1,0 +1,1959 @@
+{
+  "generated_at": "2026-07-14T01:21:33.820714+00:00",
+  "run_id": "ea3ee0528b6980082ec6b13e0a5a62873c8ee2454e276a35831e1aa7de1342f4",
+  "rubric": {
+    "algorithmic_correctness": 20.0,
+    "input_output_validation": 15.0,
+    "quantitative_metrics": 15.0,
+    "automated_tests": 15.0,
+    "required_artifacts": 15.0,
+    "visualisations": 10.0,
+    "reproducibility_provenance": 5.0,
+    "documentation_accuracy": 5.0
+  },
+  "Stage_1": {
+    "score": 100.0,
+    "raw_score": 100.0,
+    "passed": [
+      "stage_completed",
+      "scientific_sanity",
+      "physical_traceability",
+      "stage_4_scope_only",
+      "stage_inputs_validated",
+      "output_shapes_valid",
+      "finite_or_explained",
+      "metric_number_of_imfs",
+      "metric_reconstruction_nrmse",
+      "metric_absolute_orthogonality_index",
+      "metric_signed_orthogonality_index",
+      "metric_mean_adjacent_imf_correlation",
+      "metric_maximum_adjacent_imf_correlation",
+      "metric_spectral_overlap",
+      "metric_frequency_ordering_score",
+      "metric_per_imf_energy_percentage",
+      "metric_per_imf_centre_frequency",
+      "metric_per_imf_bandwidth",
+      "metric_per_imf_spectral_entropy",
+      "metric_seed_centre_frequency_stability",
+      "metric_seed_energy_distribution_stability",
+      "metric_seed_matched_imf_correlation",
+      "metric_seed_spectral_overlap_variation",
+      "metric_seed_imf_count_variation",
+      "metric_cutoff_search",
+      "metric_ceemdan_runtime",
+      "unit_tests",
+      "synthetic_tests",
+      "integration_tests",
+      "artifact_preprocessed_physical_npz",
+      "artifact_preprocessed_scaled_npz",
+      "artifact_decomposition_npz",
+      "artifact_imf_metrics_csv",
+      "artifact_cutoff_search_csv",
+      "artifact_stage_1_metrics_json",
+      "artifact_stage_1_summary_md",
+      "artifact_stage_1_config_json",
+      "visual_raw_signal",
+      "visual_selected_segment",
+      "visual_preprocessing_comparison",
+      "visual_psd_comparison",
+      "visual_cutoff_search",
+      "visual_ceemdan_decomposition",
+      "visual_individual_imfs",
+      "visual_residual",
+      "visual_imf_energy_distribution",
+      "visual_imf_centre_frequency",
+      "visual_imf_bandwidth",
+      "visual_adjacent_imf_correlation",
+      "visual_seed_stability",
+      "visual_reconstruction_error",
+      "visual_time_frequency",
+      "complete_run_identity",
+      "stage_runtime_and_checksums",
+      "substantive_stage_summaries",
+      "documented_stage_contract"
+    ],
+    "failed": [],
+    "warnings": [],
+    "cap_reasons": [],
+    "recording_count": 1,
+    "categories": {
+      "algorithmic_correctness": {
+        "earned": 20.0,
+        "possible": 20.0,
+        "checks": [
+          {
+            "check_id": "stage_completed",
+            "description": "Stage completed without recorded failures",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "recorded status='completed'"
+          },
+          {
+            "check_id": "scientific_sanity",
+            "description": "Core scientific invariants hold",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "IMF count, NRMSE and frequency ordering are physically bounded"
+          },
+          {
+            "check_id": "physical_traceability",
+            "description": "Physical/scaled values or units are traceable",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "scaled and physical sources plus scale factors are stored"
+          },
+          {
+            "check_id": "stage_4_scope_only",
+            "description": "No Stage 5--7 output is active",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "no Stage 5--7 outputs"
+          }
+        ]
+      },
+      "input_output_validation": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "stage_inputs_validated",
+            "description": "Stage-specific inputs/configuration are validated",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest input-validation evidence=True"
+          },
+          {
+            "check_id": "output_shapes_valid",
+            "description": "Machine outputs have valid non-empty shapes",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "stored arrays/tables are non-empty and shape-valid"
+          },
+          {
+            "check_id": "finite_or_explained",
+            "description": "Numeric values are finite or explicitly undefined",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "finite or explicitly explained"
+          }
+        ]
+      },
+      "quantitative_metrics": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "metric_number_of_imfs",
+            "description": "Required metric is recorded: number_of_imfs",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_reconstruction_nrmse",
+            "description": "Required metric is recorded: reconstruction_nrmse",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_absolute_orthogonality_index",
+            "description": "Required metric is recorded: absolute_orthogonality_index",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_signed_orthogonality_index",
+            "description": "Required metric is recorded: signed_orthogonality_index",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_mean_adjacent_imf_correlation",
+            "description": "Required metric is recorded: mean_adjacent_imf_correlation",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_maximum_adjacent_imf_correlation",
+            "description": "Required metric is recorded: maximum_adjacent_imf_correlation",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_spectral_overlap",
+            "description": "Required metric is recorded: spectral_overlap",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_frequency_ordering_score",
+            "description": "Required metric is recorded: frequency_ordering_score",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_per_imf_energy_percentage",
+            "description": "Required metric is recorded: per_imf_energy_percentage",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_per_imf_centre_frequency",
+            "description": "Required metric is recorded: per_imf_centre_frequency",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_per_imf_bandwidth",
+            "description": "Required metric is recorded: per_imf_bandwidth",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_per_imf_spectral_entropy",
+            "description": "Required metric is recorded: per_imf_spectral_entropy",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_seed_centre_frequency_stability",
+            "description": "Required metric is recorded: seed_centre_frequency_stability",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_seed_energy_distribution_stability",
+            "description": "Required metric is recorded: seed_energy_distribution_stability",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_seed_matched_imf_correlation",
+            "description": "Required metric is recorded: seed_matched_imf_correlation",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_seed_spectral_overlap_variation",
+            "description": "Required metric is recorded: seed_spectral_overlap_variation",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_seed_imf_count_variation",
+            "description": "Required metric is recorded: seed_imf_count_variation",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_cutoff_search",
+            "description": "Required metric is recorded: cutoff_search",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_ceemdan_runtime",
+            "description": "Required metric is recorded: ceemdan_runtime",
+            "points": 0.7894736842105263,
+            "passed": true,
+            "evidence": "present for all recordings"
+          }
+        ]
+      },
+      "automated_tests": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "unit_tests",
+            "description": "Unit Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          },
+          {
+            "check_id": "synthetic_tests",
+            "description": "Synthetic Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          },
+          {
+            "check_id": "integration_tests",
+            "description": "Integration Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          }
+        ]
+      },
+      "required_artifacts": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "artifact_preprocessed_physical_npz",
+            "description": "Required artifact exists: preprocessed_physical.npz",
+            "points": 1.875,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_preprocessed_scaled_npz",
+            "description": "Required artifact exists: preprocessed_scaled.npz",
+            "points": 1.875,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_decomposition_npz",
+            "description": "Required artifact exists: decomposition.npz",
+            "points": 1.875,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_imf_metrics_csv",
+            "description": "Required artifact exists: imf_metrics.csv",
+            "points": 1.875,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_cutoff_search_csv",
+            "description": "Required artifact exists: cutoff_search.csv",
+            "points": 1.875,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_1_metrics_json",
+            "description": "Required artifact exists: stage_1_metrics.json",
+            "points": 1.875,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_1_summary_md",
+            "description": "Required artifact exists: stage_1_summary.md",
+            "points": 1.875,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_1_config_json",
+            "description": "Required artifact exists: stage_1_config.json",
+            "points": 1.875,
+            "passed": true,
+            "evidence": "all recordings"
+          }
+        ]
+      },
+      "visualisations": {
+        "earned": 10.0,
+        "possible": 10.0,
+        "checks": [
+          {
+            "check_id": "visual_raw_signal",
+            "description": "Required visual is generated: raw_signal",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_selected_segment",
+            "description": "Required visual is generated: selected_segment",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_preprocessing_comparison",
+            "description": "Required visual is generated: preprocessing_comparison",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_psd_comparison",
+            "description": "Required visual is generated: psd_comparison",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_cutoff_search",
+            "description": "Required visual is generated: cutoff_search",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_ceemdan_decomposition",
+            "description": "Required visual is generated: ceemdan_decomposition",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_individual_imfs",
+            "description": "Required visual is generated: individual_imfs",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_residual",
+            "description": "Required visual is generated: residual",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_imf_energy_distribution",
+            "description": "Required visual is generated: imf_energy_distribution",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_imf_centre_frequency",
+            "description": "Required visual is generated: imf_centre_frequency",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_imf_bandwidth",
+            "description": "Required visual is generated: imf_bandwidth",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_adjacent_imf_correlation",
+            "description": "Required visual is generated: adjacent_imf_correlation",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_seed_stability",
+            "description": "Required visual is generated: seed_stability",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_reconstruction_error",
+            "description": "Required visual is generated: reconstruction_error",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_time_frequency",
+            "description": "Required visual is generated: time_frequency",
+            "points": 0.6666666666666666,
+            "passed": true,
+            "evidence": "present for all recordings"
+          }
+        ]
+      },
+      "reproducibility_provenance": {
+        "earned": 5.0,
+        "possible": 5.0,
+        "checks": [
+          {
+            "check_id": "complete_run_identity",
+            "description": "Run identity contains required provenance",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "complete run identity"
+          },
+          {
+            "check_id": "stage_runtime_and_checksums",
+            "description": "Stage runtime, config and output checksums are recorded",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "runtime=True, output_checksums=True, configs=True"
+          }
+        ]
+      },
+      "documentation_accuracy": {
+        "earned": 5.0,
+        "possible": 5.0,
+        "checks": [
+          {
+            "check_id": "substantive_stage_summaries",
+            "description": "Human-readable stage summaries are substantive",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "all summaries >=80 bytes"
+          },
+          {
+            "check_id": "documented_stage_contract",
+            "description": "Algorithm/formula scope is documented accurately",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "CEEMDAN is named accurately"
+          }
+        ]
+      }
+    }
+  },
+  "Stage_2": {
+    "score": 99.38,
+    "raw_score": 99.38,
+    "passed": [
+      "stage_completed",
+      "scientific_sanity",
+      "physical_traceability",
+      "stage_4_scope_only",
+      "stage_inputs_validated",
+      "output_shapes_valid",
+      "finite_or_explained",
+      "metric_gate_per_imf",
+      "metric_imf_source_correlation",
+      "metric_imf_relative_energy",
+      "metric_imf_kurtosis",
+      "metric_imf_chatter_band_energy_ratio",
+      "metric_imf_spindle_harmonic_energy_ratio",
+      "metric_imf_tooth_harmonic_energy_ratio",
+      "metric_imf_frequency_proximity",
+      "metric_imf_centre_frequency",
+      "metric_imf_bandwidth",
+      "metric_imf_spectral_entropy",
+      "metric_chatter_band_retention",
+      "metric_spindle_harmonic_attenuation",
+      "metric_tooth_harmonic_attenuation",
+      "metric_out_of_band_attenuation",
+      "metric_rms_before",
+      "metric_rms_after",
+      "metric_energy_before",
+      "metric_energy_after",
+      "metric_source_correlation",
+      "metric_spectral_distortion",
+      "metric_gate_vector_stability",
+      "metric_reconstruction_runtime",
+      "unit_tests",
+      "synthetic_tests",
+      "integration_tests",
+      "artifact_imf_indicators_csv",
+      "artifact_imf_gates_csv",
+      "artifact_weighted_reconstruction_scaled_npz",
+      "artifact_weighted_reconstruction_physical_npz",
+      "artifact_stage_2_metrics_json",
+      "artifact_stage_2_summary_md",
+      "artifact_stage_2_config_json",
+      "visual_imf_gate_values",
+      "visual_imf_indicator_comparison",
+      "visual_frequency_vs_gate",
+      "visual_energy_vs_gate",
+      "visual_chatter_energy_vs_gate",
+      "visual_forced_harmonic_vs_gate",
+      "visual_weighted_reconstruction",
+      "visual_weighted_psd_comparison",
+      "visual_retained_suppressed_imfs",
+      "visual_gate_stability",
+      "visual_harmonic_markers",
+      "visual_chatter_band_highlight",
+      "complete_run_identity",
+      "stage_runtime_and_checksums",
+      "substantive_stage_summaries",
+      "documented_stage_contract"
+    ],
+    "failed": [
+      "metric_selected_imf_consistency"
+    ],
+    "warnings": [],
+    "cap_reasons": [],
+    "recording_count": 1,
+    "categories": {
+      "algorithmic_correctness": {
+        "earned": 20.0,
+        "possible": 20.0,
+        "checks": [
+          {
+            "check_id": "stage_completed",
+            "description": "Stage completed without recorded failures",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "recorded status='completed'"
+          },
+          {
+            "check_id": "scientific_sanity",
+            "description": "Core scientific invariants hold",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "all gates are finite, bounded and match physical IMF counts"
+          },
+          {
+            "check_id": "physical_traceability",
+            "description": "Physical/scaled values or units are traceable",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "scaled and physical outputs have matching shapes"
+          },
+          {
+            "check_id": "stage_4_scope_only",
+            "description": "No Stage 5--7 output is active",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "no Stage 5--7 outputs"
+          }
+        ]
+      },
+      "input_output_validation": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "stage_inputs_validated",
+            "description": "Stage-specific inputs/configuration are validated",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "RPM and tooth count validated"
+          },
+          {
+            "check_id": "output_shapes_valid",
+            "description": "Machine outputs have valid non-empty shapes",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "stored arrays/tables are non-empty and shape-valid"
+          },
+          {
+            "check_id": "finite_or_explained",
+            "description": "Numeric values are finite or explicitly undefined",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "finite or explicitly explained"
+          }
+        ]
+      },
+      "quantitative_metrics": {
+        "earned": 14.38,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "metric_gate_per_imf",
+            "description": "Required metric is recorded: gate_per_imf",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_imf_source_correlation",
+            "description": "Required metric is recorded: imf_source_correlation",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_imf_relative_energy",
+            "description": "Required metric is recorded: imf_relative_energy",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_imf_kurtosis",
+            "description": "Required metric is recorded: imf_kurtosis",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_imf_chatter_band_energy_ratio",
+            "description": "Required metric is recorded: imf_chatter_band_energy_ratio",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_imf_spindle_harmonic_energy_ratio",
+            "description": "Required metric is recorded: imf_spindle_harmonic_energy_ratio",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_imf_tooth_harmonic_energy_ratio",
+            "description": "Required metric is recorded: imf_tooth_harmonic_energy_ratio",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_imf_frequency_proximity",
+            "description": "Required metric is recorded: imf_frequency_proximity",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_imf_centre_frequency",
+            "description": "Required metric is recorded: imf_centre_frequency",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_imf_bandwidth",
+            "description": "Required metric is recorded: imf_bandwidth",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_imf_spectral_entropy",
+            "description": "Required metric is recorded: imf_spectral_entropy",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_chatter_band_retention",
+            "description": "Required metric is recorded: chatter_band_retention",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_spindle_harmonic_attenuation",
+            "description": "Required metric is recorded: spindle_harmonic_attenuation",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_tooth_harmonic_attenuation",
+            "description": "Required metric is recorded: tooth_harmonic_attenuation",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_out_of_band_attenuation",
+            "description": "Required metric is recorded: out_of_band_attenuation",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_rms_before",
+            "description": "Required metric is recorded: rms_before",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_rms_after",
+            "description": "Required metric is recorded: rms_after",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_energy_before",
+            "description": "Required metric is recorded: energy_before",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_energy_after",
+            "description": "Required metric is recorded: energy_after",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_source_correlation",
+            "description": "Required metric is recorded: source_correlation",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_spectral_distortion",
+            "description": "Required metric is recorded: spectral_distortion",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_gate_vector_stability",
+            "description": "Required metric is recorded: gate_vector_stability",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_selected_imf_consistency",
+            "description": "Required metric is recorded: selected_imf_consistency",
+            "points": 0.625,
+            "passed": false,
+            "evidence": "missing for: u_570_005"
+          },
+          {
+            "check_id": "metric_reconstruction_runtime",
+            "description": "Required metric is recorded: reconstruction_runtime",
+            "points": 0.625,
+            "passed": true,
+            "evidence": "present for all recordings"
+          }
+        ]
+      },
+      "automated_tests": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "unit_tests",
+            "description": "Unit Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          },
+          {
+            "check_id": "synthetic_tests",
+            "description": "Synthetic Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          },
+          {
+            "check_id": "integration_tests",
+            "description": "Integration Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          }
+        ]
+      },
+      "required_artifacts": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "artifact_imf_indicators_csv",
+            "description": "Required artifact exists: imf_indicators.csv",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_imf_gates_csv",
+            "description": "Required artifact exists: imf_gates.csv",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_weighted_reconstruction_scaled_npz",
+            "description": "Required artifact exists: weighted_reconstruction_scaled.npz",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_weighted_reconstruction_physical_npz",
+            "description": "Required artifact exists: weighted_reconstruction_physical.npz",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_2_metrics_json",
+            "description": "Required artifact exists: stage_2_metrics.json",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_2_summary_md",
+            "description": "Required artifact exists: stage_2_summary.md",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_2_config_json",
+            "description": "Required artifact exists: stage_2_config.json",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          }
+        ]
+      },
+      "visualisations": {
+        "earned": 10.0,
+        "possible": 10.0,
+        "checks": [
+          {
+            "check_id": "visual_imf_gate_values",
+            "description": "Required visual is generated: imf_gate_values",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_imf_indicator_comparison",
+            "description": "Required visual is generated: imf_indicator_comparison",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_frequency_vs_gate",
+            "description": "Required visual is generated: frequency_vs_gate",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_energy_vs_gate",
+            "description": "Required visual is generated: energy_vs_gate",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_chatter_energy_vs_gate",
+            "description": "Required visual is generated: chatter_energy_vs_gate",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_forced_harmonic_vs_gate",
+            "description": "Required visual is generated: forced_harmonic_vs_gate",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_weighted_reconstruction",
+            "description": "Required visual is generated: weighted_reconstruction",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_weighted_psd_comparison",
+            "description": "Required visual is generated: weighted_psd_comparison",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_retained_suppressed_imfs",
+            "description": "Required visual is generated: retained_suppressed_imfs",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_gate_stability",
+            "description": "Required visual is generated: gate_stability",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_harmonic_markers",
+            "description": "Required visual is generated: harmonic_markers",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_chatter_band_highlight",
+            "description": "Required visual is generated: chatter_band_highlight",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          }
+        ]
+      },
+      "reproducibility_provenance": {
+        "earned": 5.0,
+        "possible": 5.0,
+        "checks": [
+          {
+            "check_id": "complete_run_identity",
+            "description": "Run identity contains required provenance",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "complete run identity"
+          },
+          {
+            "check_id": "stage_runtime_and_checksums",
+            "description": "Stage runtime, config and output checksums are recorded",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "runtime=True, output_checksums=True, configs=True"
+          }
+        ]
+      },
+      "documentation_accuracy": {
+        "earned": 5.0,
+        "possible": 5.0,
+        "checks": [
+          {
+            "check_id": "substantive_stage_summaries",
+            "description": "Human-readable stage summaries are substantive",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "all summaries >=80 bytes"
+          },
+          {
+            "check_id": "documented_stage_contract",
+            "description": "Algorithm/formula scope is documented accurately",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "residual handling is explicit"
+          }
+        ]
+      }
+    }
+  },
+  "Stage_3": {
+    "score": 100.0,
+    "raw_score": 100.0,
+    "passed": [
+      "stage_completed",
+      "scientific_sanity",
+      "physical_traceability",
+      "stage_4_scope_only",
+      "stage_inputs_validated",
+      "output_shapes_valid",
+      "finite_or_explained",
+      "metric_rms_before",
+      "metric_rms_after",
+      "metric_energy_before",
+      "metric_energy_after",
+      "metric_chatter_band_retention",
+      "metric_out_of_band_attenuation",
+      "metric_spectral_distortion",
+      "metric_correlation_before",
+      "metric_correlation_after",
+      "metric_wavelet_coefficient_energy",
+      "metric_threshold_by_level",
+      "metric_noise_sigma",
+      "metric_transient_preservation",
+      "metric_synthetic_reference_rmse",
+      "metric_synthetic_reference_snr",
+      "metric_runtime",
+      "unit_tests",
+      "synthetic_tests",
+      "integration_tests",
+      "artifact_wavelet_coefficients_npz",
+      "artifact_wavelet_thresholds_csv",
+      "artifact_denoised_scaled_npz",
+      "artifact_denoised_physical_npz",
+      "artifact_stage_3_metrics_json",
+      "artifact_stage_3_summary_md",
+      "artifact_stage_3_config_json",
+      "visual_weighted_vs_denoised",
+      "visual_all_signal_stages",
+      "visual_psd_before_after",
+      "visual_wavelet_level_energies",
+      "visual_wavelet_thresholds",
+      "visual_wavelet_subbands",
+      "visual_chatter_band_overlap",
+      "visual_spectrogram_comparison",
+      "visual_synthetic_recovery",
+      "visual_residual_noise_waveform",
+      "visual_residual_noise_psd",
+      "visual_time_frequency_energy",
+      "complete_run_identity",
+      "stage_runtime_and_checksums",
+      "substantive_stage_summaries",
+      "documented_stage_contract"
+    ],
+    "failed": [],
+    "warnings": [],
+    "cap_reasons": [],
+    "recording_count": 1,
+    "categories": {
+      "algorithmic_correctness": {
+        "earned": 20.0,
+        "possible": 20.0,
+        "checks": [
+          {
+            "check_id": "stage_completed",
+            "description": "Stage completed without recorded failures",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "recorded status='completed'"
+          },
+          {
+            "check_id": "scientific_sanity",
+            "description": "Core scientific invariants hold",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "output lengths match and level thresholds are stored"
+          },
+          {
+            "check_id": "physical_traceability",
+            "description": "Physical/scaled values or units are traceable",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "scaled and physical outputs have matching shapes"
+          },
+          {
+            "check_id": "stage_4_scope_only",
+            "description": "No Stage 5--7 output is active",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "no Stage 5--7 outputs"
+          }
+        ]
+      },
+      "input_output_validation": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "stage_inputs_validated",
+            "description": "Stage-specific inputs/configuration are validated",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "wavelet configuration validated"
+          },
+          {
+            "check_id": "output_shapes_valid",
+            "description": "Machine outputs have valid non-empty shapes",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "stored arrays/tables are non-empty and shape-valid"
+          },
+          {
+            "check_id": "finite_or_explained",
+            "description": "Numeric values are finite or explicitly undefined",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "finite or explicitly explained"
+          }
+        ]
+      },
+      "quantitative_metrics": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "metric_rms_before",
+            "description": "Required metric is recorded: rms_before",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_rms_after",
+            "description": "Required metric is recorded: rms_after",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_energy_before",
+            "description": "Required metric is recorded: energy_before",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_energy_after",
+            "description": "Required metric is recorded: energy_after",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_chatter_band_retention",
+            "description": "Required metric is recorded: chatter_band_retention",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_out_of_band_attenuation",
+            "description": "Required metric is recorded: out_of_band_attenuation",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_spectral_distortion",
+            "description": "Required metric is recorded: spectral_distortion",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_correlation_before",
+            "description": "Required metric is recorded: correlation_before",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_correlation_after",
+            "description": "Required metric is recorded: correlation_after",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_wavelet_coefficient_energy",
+            "description": "Required metric is recorded: wavelet_coefficient_energy",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_threshold_by_level",
+            "description": "Required metric is recorded: threshold_by_level",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_noise_sigma",
+            "description": "Required metric is recorded: noise_sigma",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_transient_preservation",
+            "description": "Required metric is recorded: transient_preservation",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_synthetic_reference_rmse",
+            "description": "Required metric is recorded: synthetic_reference_rmse",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_synthetic_reference_snr",
+            "description": "Required metric is recorded: synthetic_reference_snr",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "metric_runtime",
+            "description": "Required metric is recorded: runtime",
+            "points": 0.9375,
+            "passed": true,
+            "evidence": "present for all recordings"
+          }
+        ]
+      },
+      "automated_tests": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "unit_tests",
+            "description": "Unit Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          },
+          {
+            "check_id": "synthetic_tests",
+            "description": "Synthetic Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          },
+          {
+            "check_id": "integration_tests",
+            "description": "Integration Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          }
+        ]
+      },
+      "required_artifacts": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "artifact_wavelet_coefficients_npz",
+            "description": "Required artifact exists: wavelet_coefficients.npz",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_wavelet_thresholds_csv",
+            "description": "Required artifact exists: wavelet_thresholds.csv",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_denoised_scaled_npz",
+            "description": "Required artifact exists: denoised_scaled.npz",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_denoised_physical_npz",
+            "description": "Required artifact exists: denoised_physical.npz",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_3_metrics_json",
+            "description": "Required artifact exists: stage_3_metrics.json",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_3_summary_md",
+            "description": "Required artifact exists: stage_3_summary.md",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_3_config_json",
+            "description": "Required artifact exists: stage_3_config.json",
+            "points": 2.142857142857143,
+            "passed": true,
+            "evidence": "all recordings"
+          }
+        ]
+      },
+      "visualisations": {
+        "earned": 10.0,
+        "possible": 10.0,
+        "checks": [
+          {
+            "check_id": "visual_weighted_vs_denoised",
+            "description": "Required visual is generated: weighted_vs_denoised",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_all_signal_stages",
+            "description": "Required visual is generated: all_signal_stages",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_psd_before_after",
+            "description": "Required visual is generated: psd_before_after",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_wavelet_level_energies",
+            "description": "Required visual is generated: wavelet_level_energies",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_wavelet_thresholds",
+            "description": "Required visual is generated: wavelet_thresholds",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_wavelet_subbands",
+            "description": "Required visual is generated: wavelet_subbands",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_chatter_band_overlap",
+            "description": "Required visual is generated: chatter_band_overlap",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_spectrogram_comparison",
+            "description": "Required visual is generated: spectrogram_comparison",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_synthetic_recovery",
+            "description": "Required visual is generated: synthetic_recovery",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_residual_noise_waveform",
+            "description": "Required visual is generated: residual_noise_waveform",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_residual_noise_psd",
+            "description": "Required visual is generated: residual_noise_psd",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_time_frequency_energy",
+            "description": "Required visual is generated: time_frequency_energy",
+            "points": 0.8333333333333334,
+            "passed": true,
+            "evidence": "present for all recordings"
+          }
+        ]
+      },
+      "reproducibility_provenance": {
+        "earned": 5.0,
+        "possible": 5.0,
+        "checks": [
+          {
+            "check_id": "complete_run_identity",
+            "description": "Run identity contains required provenance",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "complete run identity"
+          },
+          {
+            "check_id": "stage_runtime_and_checksums",
+            "description": "Stage runtime, config and output checksums are recorded",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "runtime=True, output_checksums=True, configs=True"
+          }
+        ]
+      },
+      "documentation_accuracy": {
+        "earned": 5.0,
+        "possible": 5.0,
+        "checks": [
+          {
+            "check_id": "substantive_stage_summaries",
+            "description": "Human-readable stage summaries are substantive",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "all summaries >=80 bytes"
+          },
+          {
+            "check_id": "documented_stage_contract",
+            "description": "Algorithm/formula scope is documented accurately",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "denoising scope is explicit"
+          }
+        ]
+      }
+    }
+  },
+  "Stage_4": {
+    "score": 100.0,
+    "raw_score": 100.0,
+    "passed": [
+      "stage_completed",
+      "scientific_sanity",
+      "physical_traceability",
+      "stage_4_scope_only",
+      "stage_inputs_validated",
+      "output_shapes_valid",
+      "finite_or_explained",
+      "feature_family_time_domain",
+      "feature_family_frequency_domain",
+      "feature_family_imf_domain",
+      "feature_family_wavelet_time_frequency",
+      "feature_family_early_chatter",
+      "feature_family_physics_guided",
+      "unit_tests",
+      "synthetic_tests",
+      "integration_tests",
+      "artifact_window_features_csv",
+      "artifact_window_features_json",
+      "artifact_feature_schema_json",
+      "artifact_feature_quality_json",
+      "artifact_stage_4_metrics_json",
+      "artifact_stage_4_summary_md",
+      "artifact_stage_4_config_json",
+      "artifact_aggregate_all_recording_features_csv",
+      "artifact_aggregate_feature_summary_csv",
+      "artifact_aggregate_feature_missingness_csv",
+      "artifact_aggregate_feature_correlations_csv",
+      "artifact_aggregate_feature_schema_json",
+      "visual_rms_timeline",
+      "visual_kurtosis_timeline",
+      "visual_spectral_entropy_timeline",
+      "visual_chatter_energy_timeline",
+      "visual_harmonic_energy_timeline",
+      "visual_hegr_timeline",
+      "visual_instantaneous_energy_timeline",
+      "visual_imf_gate_values",
+      "visual_wavelet_energy_ratios",
+      "visual_feature_family_summary",
+      "visual_aggregate_feature_distributions",
+      "visual_aggregate_feature_missingness",
+      "visual_aggregate_feature_correlations",
+      "visual_aggregate_feature_variance",
+      "visual_aggregate_grouped_by_recording",
+      "visual_aggregate_grouped_by_rpm",
+      "visual_aggregate_grouped_by_stickout",
+      "visual_aggregate_grouped_by_depth_of_cut",
+      "visual_aggregate_feature_stability",
+      "complete_run_identity",
+      "stage_runtime_and_checksums",
+      "substantive_stage_summaries",
+      "documented_stage_contract"
+    ],
+    "failed": [],
+    "warnings": [],
+    "cap_reasons": [],
+    "recording_count": 1,
+    "categories": {
+      "algorithmic_correctness": {
+        "earned": 20.0,
+        "possible": 20.0,
+        "checks": [
+          {
+            "check_id": "stage_completed",
+            "description": "Stage completed without recorded failures",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "recorded status='completed'"
+          },
+          {
+            "check_id": "scientific_sanity",
+            "description": "Core scientific invariants hold",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "versioned schemas, window rows and repeated-extraction stability are present"
+          },
+          {
+            "check_id": "physical_traceability",
+            "description": "Physical/scaled values or units are traceable",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "feature units are schema-traceable"
+          },
+          {
+            "check_id": "stage_4_scope_only",
+            "description": "No Stage 5--7 output is active",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "no Stage 5--7 outputs"
+          }
+        ]
+      },
+      "input_output_validation": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "stage_inputs_validated",
+            "description": "Stage-specific inputs/configuration are validated",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "feature quality/undefined handling recorded"
+          },
+          {
+            "check_id": "output_shapes_valid",
+            "description": "Machine outputs have valid non-empty shapes",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "stored arrays/tables are non-empty and shape-valid"
+          },
+          {
+            "check_id": "finite_or_explained",
+            "description": "Numeric values are finite or explicitly undefined",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "finite or explicitly explained"
+          }
+        ]
+      },
+      "quantitative_metrics": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "feature_family_time_domain",
+            "description": "Required time domain features are represented",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "complete"
+          },
+          {
+            "check_id": "feature_family_frequency_domain",
+            "description": "Required frequency domain features are represented",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "complete"
+          },
+          {
+            "check_id": "feature_family_imf_domain",
+            "description": "Required imf domain features are represented",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "complete"
+          },
+          {
+            "check_id": "feature_family_wavelet_time_frequency",
+            "description": "Required wavelet time frequency features are represented",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "complete"
+          },
+          {
+            "check_id": "feature_family_early_chatter",
+            "description": "Required early chatter features are represented",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "complete"
+          },
+          {
+            "check_id": "feature_family_physics_guided",
+            "description": "Required physics guided features are represented",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "complete"
+          }
+        ]
+      },
+      "automated_tests": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "unit_tests",
+            "description": "Unit Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          },
+          {
+            "check_id": "synthetic_tests",
+            "description": "Synthetic Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          },
+          {
+            "check_id": "integration_tests",
+            "description": "Integration Tests passed",
+            "points": 5.0,
+            "passed": true,
+            "evidence": "manifest evidence=True"
+          }
+        ]
+      },
+      "required_artifacts": {
+        "earned": 15.0,
+        "possible": 15.0,
+        "checks": [
+          {
+            "check_id": "artifact_window_features_csv",
+            "description": "Required artifact exists: window_features.csv",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_window_features_json",
+            "description": "Required artifact exists: window_features.json",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_feature_schema_json",
+            "description": "Required artifact exists: feature_schema.json",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_feature_quality_json",
+            "description": "Required artifact exists: feature_quality.json",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_4_metrics_json",
+            "description": "Required artifact exists: stage_4_metrics.json",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_4_summary_md",
+            "description": "Required artifact exists: stage_4_summary.md",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_stage_4_config_json",
+            "description": "Required artifact exists: stage_4_config.json",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "all recordings"
+          },
+          {
+            "check_id": "artifact_aggregate_all_recording_features_csv",
+            "description": "Required aggregate artifact exists: all_recording_features.csv",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "artifact_aggregate_feature_summary_csv",
+            "description": "Required aggregate artifact exists: feature_summary.csv",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "artifact_aggregate_feature_missingness_csv",
+            "description": "Required aggregate artifact exists: feature_missingness.csv",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "artifact_aggregate_feature_correlations_csv",
+            "description": "Required aggregate artifact exists: feature_correlations.csv",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "artifact_aggregate_feature_schema_json",
+            "description": "Required aggregate artifact exists: feature_schema.json",
+            "points": 1.25,
+            "passed": true,
+            "evidence": "present"
+          }
+        ]
+      },
+      "visualisations": {
+        "earned": 10.0,
+        "possible": 10.0,
+        "checks": [
+          {
+            "check_id": "visual_rms_timeline",
+            "description": "Required visual is generated: rms_timeline",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_kurtosis_timeline",
+            "description": "Required visual is generated: kurtosis_timeline",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_spectral_entropy_timeline",
+            "description": "Required visual is generated: spectral_entropy_timeline",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_chatter_energy_timeline",
+            "description": "Required visual is generated: chatter_energy_timeline",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_harmonic_energy_timeline",
+            "description": "Required visual is generated: harmonic_energy_timeline",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_hegr_timeline",
+            "description": "Required visual is generated: hegr_timeline",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_instantaneous_energy_timeline",
+            "description": "Required visual is generated: instantaneous_energy_timeline",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_imf_gate_values",
+            "description": "Required visual is generated: imf_gate_values",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_wavelet_energy_ratios",
+            "description": "Required visual is generated: wavelet_energy_ratios",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_feature_family_summary",
+            "description": "Required visual is generated: feature_family_summary",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present for all recordings"
+          },
+          {
+            "check_id": "visual_aggregate_feature_distributions",
+            "description": "Required aggregate visual is generated: feature_distributions",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "visual_aggregate_feature_missingness",
+            "description": "Required aggregate visual is generated: feature_missingness",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "visual_aggregate_feature_correlations",
+            "description": "Required aggregate visual is generated: feature_correlations",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "visual_aggregate_feature_variance",
+            "description": "Required aggregate visual is generated: feature_variance",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "visual_aggregate_grouped_by_recording",
+            "description": "Required aggregate visual is generated: grouped_by_recording",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "visual_aggregate_grouped_by_rpm",
+            "description": "Required aggregate visual is generated: grouped_by_rpm",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "visual_aggregate_grouped_by_stickout",
+            "description": "Required aggregate visual is generated: grouped_by_stickout",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "visual_aggregate_grouped_by_depth_of_cut",
+            "description": "Required aggregate visual is generated: grouped_by_depth_of_cut",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present"
+          },
+          {
+            "check_id": "visual_aggregate_feature_stability",
+            "description": "Required aggregate visual is generated: feature_stability",
+            "points": 0.5263157894736842,
+            "passed": true,
+            "evidence": "present"
+          }
+        ]
+      },
+      "reproducibility_provenance": {
+        "earned": 5.0,
+        "possible": 5.0,
+        "checks": [
+          {
+            "check_id": "complete_run_identity",
+            "description": "Run identity contains required provenance",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "complete run identity"
+          },
+          {
+            "check_id": "stage_runtime_and_checksums",
+            "description": "Stage runtime, config and output checksums are recorded",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "runtime=True, output_checksums=True, configs=True"
+          }
+        ]
+      },
+      "documentation_accuracy": {
+        "earned": 5.0,
+        "possible": 5.0,
+        "checks": [
+          {
+            "check_id": "substantive_stage_summaries",
+            "description": "Human-readable stage summaries are substantive",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "all summaries >=80 bytes"
+          },
+          {
+            "check_id": "documented_stage_contract",
+            "description": "Algorithm/formula scope is documented accurately",
+            "points": 2.5,
+            "passed": true,
+            "evidence": "feature formulas and units are documented"
+          }
+        ]
+      }
+    }
+  }
+}

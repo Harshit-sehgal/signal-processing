@@ -89,12 +89,14 @@ def frequency_ordering_index(imfs: np.ndarray, fs: float) -> float:
     n_samples = imfs.shape[1]
     freqs = np.fft.fftfreq(n_samples, d=1.0 / fs)
     pos = freqs >= 0
-    mean_freqs = []
+    mean_frequency_values: list[float] = []
     for i in range(n):
         spec = np.abs(np.fft.fft(imfs[i]))[pos]
         s = float(spec.sum())
-        mean_freqs.append(float(np.sum(freqs[pos] * spec) / s) if s > 0 else 0.0)
-    mean_freqs = np.asarray(mean_freqs)
+        mean_frequency_values.append(
+            float(np.sum(freqs[pos] * spec) / s) if s > 0 else 0.0
+        )
+    mean_freqs = np.asarray(mean_frequency_values)
     idx = np.arange(n)
     if np.std(mean_freqs) == 0 or np.std(idx) == 0:
         return 1.0 if np.all(np.diff(mean_freqs) <= 0) else 0.0

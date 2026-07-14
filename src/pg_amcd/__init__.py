@@ -1,3 +1,3 @@
-"""PG-AMCD: Physics-Guided Adaptive Multi-Stage Chatter Detection."""
+"""PG-AMCD signal processing through Stage 4 feature extraction."""
 
-__version__ = "2.0.0"
+__version__ = "4.0.0"

@@ -1,0 +1,2905 @@
+{
+  "generated_at": "2026-07-14T01:20:57.228279+00:00",
+  "input_dir": "/home/harshit/Documents/Research/Vibration - ML",
+  "files": [
+    {
+      "path": "2inch_stickout/c_320_005.mat",
+      "sha256": "5cbe8a6b1be5b9a86bb0e667964daeae59d4654d75768bf48d7c540b78c80389",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 175001,
+      "duration_seconds": 17.500099999959215,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_320_005",
+        "relative_path": "2inch_stickout/c_320_005.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_425_020.mat",
+      "sha256": "6fe5c9c5afe0e7248f2666de70dcc44dbecb2c9fb21cbd3b838d8d24231b599f",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 50001,
+      "duration_seconds": 5.000099999988346,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_425_020",
+        "relative_path": "2inch_stickout/c_425_020.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.02,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_425_025.mat",
+      "sha256": "3f7f7f9a66a2298a41cbea947f043ed88983facbfd49dfe8cd93d54c0f4cf482",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 112501,
+      "duration_seconds": 11.250099999973779,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_425_025",
+        "relative_path": "2inch_stickout/c_425_025.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.025,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_570_001.mat",
+      "sha256": "a40c4e87dc2bcf9603215944414e9ad30aa71e9f7e50e331d6ca788f30931b0d",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 100001,
+      "duration_seconds": 10.000099999976692,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_570_001",
+        "relative_path": "2inch_stickout/c_570_001.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.001,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_570_002.mat",
+      "sha256": "d3d579914816fcbcb214ed52c62a26aae28c1468d90450ce20c16c9cdcc17caa",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 41876,
+      "duration_seconds": 4.1875999999902405,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_570_002",
+        "relative_path": "2inch_stickout/c_570_002.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.002,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_570_005.mat",
+      "sha256": "375008fc01bb8ea80b7e9061a8dfaa6e7ef4d69d4506a7e5f3b0803f8dc622b9",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 13751,
+      "duration_seconds": 1.375099999996795,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_570_005",
+        "relative_path": "2inch_stickout/c_570_005.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_570_010.mat",
+      "sha256": "ad523bc7c43307bb53ccfa6b1cf08ead2899095ca325b48ff6e258fa756e7a25",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 100001,
+      "duration_seconds": 10.000099999976692,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_570_010",
+        "relative_path": "2inch_stickout/c_570_010.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_770_001.mat",
+      "sha256": "c73f61242f604d421631cd1fedf92b211c606e748a2d72867f85a03b8516c7bb",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 50001,
+      "duration_seconds": 5.000099999988346,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_770_001",
+        "relative_path": "2inch_stickout/c_770_001.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.001,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_770_002.mat",
+      "sha256": "806801125e940d428ac4767b55d1fda318f79869d1c74f5771ca11121da85479",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 37501,
+      "duration_seconds": 3.7500999999912596,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_770_002",
+        "relative_path": "2inch_stickout/c_770_002.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.002,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_770_002_2.mat",
+      "sha256": "d59c7af54c722f06cb082a082d3d48ae112e15f4cad170e8fd89d44e562f7484",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 50001,
+      "duration_seconds": 5.000099999988346,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_770_002_2",
+        "relative_path": "2inch_stickout/c_770_002_2.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.002,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_770_005.mat",
+      "sha256": "63f2c3f9b6be1e82a4f03643e9e7e6cdfc162ef750e2b09c806f5255e753090e",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 225001,
+      "duration_seconds": 22.500099999947558,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_770_005",
+        "relative_path": "2inch_stickout/c_770_005.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/c_770_010.mat",
+      "sha256": "61043126a58a7abb877e3f24f4ef0320ef4e4f1b49c39479aea9446ed1f9f94a",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 250001,
+      "duration_seconds": 25.00009999994173,
+      "metadata": {
+        "recording_id": "2inch_stickout__c_770_010",
+        "relative_path": "2inch_stickout/c_770_010.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/i_320_005.mat",
+      "sha256": "d2c59854fe2e54ead4c0cc9a91e245244834c5d2d7a95d8ccc434ce3f3b029cf",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 25001,
+      "duration_seconds": 2.500099999994173,
+      "metadata": {
+        "recording_id": "2inch_stickout__i_320_005",
+        "relative_path": "2inch_stickout/i_320_005.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/i_320_010.mat",
+      "sha256": "c943cc349a1a9be320e6acabc547536d31778279f9784d8743f1c22c6ee35b31",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 50001,
+      "duration_seconds": 5.000099999988346,
+      "metadata": {
+        "recording_id": "2inch_stickout__i_320_010",
+        "relative_path": "2inch_stickout/i_320_010.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/i_425_020.mat",
+      "sha256": "eae735ace3174255f5d7af87152b0a0015aa944aa98cdbb62b17aace75a8abbc",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 75001,
+      "duration_seconds": 7.5000999999825195,
+      "metadata": {
+        "recording_id": "2inch_stickout__i_425_020",
+        "relative_path": "2inch_stickout/i_425_020.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.02,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/i_425_025.mat",
+      "sha256": "a55d892d458984ab6346ab8ea80d64226eda6bb7c4570098410c03d65a618d2a",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 25001,
+      "duration_seconds": 2.500099999994173,
+      "metadata": {
+        "recording_id": "2inch_stickout__i_425_025",
+        "relative_path": "2inch_stickout/i_425_025.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.025,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/i_570_002.mat",
+      "sha256": "2f2778fb3d9d31adb1ad28cea2f9dfeba57534b9eae0dcdb3c27a513e3cb240f",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 15626,
+      "duration_seconds": 1.562599999996358,
+      "metadata": {
+        "recording_id": "2inch_stickout__i_570_002",
+        "relative_path": "2inch_stickout/i_570_002.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.002,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/i_570_005.mat",
+      "sha256": "b2af99fe8692d08695283e3e1c52c4415bb42f9850709ac2b9a19d09bf3302b6",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 21876,
+      "duration_seconds": 2.1875999999949016,
+      "metadata": {
+        "recording_id": "2inch_stickout__i_570_005",
+        "relative_path": "2inch_stickout/i_570_005.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/i_570_010.mat",
+      "sha256": "a5157862556f10f5901c7a5496bdf92079820446440714472baf36ddd3773dea",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 12501,
+      "duration_seconds": 1.2500999999970863,
+      "metadata": {
+        "recording_id": "2inch_stickout__i_570_010",
+        "relative_path": "2inch_stickout/i_570_010.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/i_770_001.mat",
+      "sha256": "a161274dfa4a4440a35965505d352b49c4f3c09bdb17e08753a2843570a8c3e0",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 112501,
+      "duration_seconds": 11.250099999973779,
+      "metadata": {
+        "recording_id": "2inch_stickout__i_770_001",
+        "relative_path": "2inch_stickout/i_770_001.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.001,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_005.mat",
+      "sha256": "9d0f4e08c28543dcaf4d151b46748d5c2b4008975fcbad2adfb28f1e23bbd92f",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 9999.999999668034,
+      "sample_count": 200001,
+      "duration_seconds": 20.000100000663934,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_005",
+        "relative_path": "2inch_stickout/s_320_005.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_010.mat",
+      "sha256": "bbe1534ea047dd7cc9e5f3ec7d3d18a6461534d4a75911d442c87d1dbdf84840",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 100001,
+      "duration_seconds": 10.000099999976692,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_010",
+        "relative_path": "2inch_stickout/s_320_010.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_015.mat",
+      "sha256": "d79cec736b8083b5a5ae379e54e031048322d5b80f88262236b1e8a59192b706",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 450001,
+      "duration_seconds": 45.00009999989512,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_015",
+        "relative_path": "2inch_stickout/s_320_015.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_020.mat",
+      "sha256": "83888099ade9e734b4fbfb4adc3176e3112654845bc1febf0fdf06534ad9b84d",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 100001,
+      "duration_seconds": 10.000099999976692,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_020",
+        "relative_path": "2inch_stickout/s_320_020.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.02,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_020_2.mat",
+      "sha256": "30b068d513fd17924de488ea269857a493f9849a26655b716e719d46f1a42acc",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 337501,
+      "duration_seconds": 33.75009999992134,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_020_2",
+        "relative_path": "2inch_stickout/s_320_020_2.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.02,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_025.mat",
+      "sha256": "fd9c596d6a5bd0931bd836bc76d81de9db701f3ef4a989abd04de9280a132246",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 500001,
+      "duration_seconds": 50.00009999988347,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_025",
+        "relative_path": "2inch_stickout/s_320_025.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.025,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_030.mat",
+      "sha256": "66df08627ac399797bf07776de9337dd7dbe673ff7867dfae0906da89b92f980",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 500001,
+      "duration_seconds": 50.00009999988347,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_030",
+        "relative_path": "2inch_stickout/s_320_030.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.03,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_035.mat",
+      "sha256": "2c49d8da037fd3705ea7fdb31d123f472cd4ea29d630486993e4bbb8896ae556",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 475001,
+      "duration_seconds": 47.500099999889294,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_035",
+        "relative_path": "2inch_stickout/s_320_035.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.035,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_040.mat",
+      "sha256": "b4e2f1b05d234407aae4dd72d68b66719a80e054a73854182dfe2a22a01fcf0e",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 475001,
+      "duration_seconds": 47.500099999889294,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_040",
+        "relative_path": "2inch_stickout/s_320_040.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.04,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_045.mat",
+      "sha256": "1d6c583b4561ede38c581ca10583ccca1728327ea00b465a8c89b67ad8adeeca",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 500001,
+      "duration_seconds": 50.00009999988347,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_045",
+        "relative_path": "2inch_stickout/s_320_045.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.045,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_050.mat",
+      "sha256": "d886c8fd56ef3087c399cfe46a0594bbd6c76187f910e6d484acd28c5df9d915",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 125001,
+      "duration_seconds": 12.500099999970866,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_050",
+        "relative_path": "2inch_stickout/s_320_050.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.05,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_320_050_2.mat",
+      "sha256": "05d3fa6a649859adfcf4b19f69a8126a0f00c18427bb0778125b5140fa1716c5",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 9999.999999668034,
+      "sample_count": 300001,
+      "duration_seconds": 30.0001000009959,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_320_050_2",
+        "relative_path": "2inch_stickout/s_320_050_2.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.05,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_425_005.mat",
+      "sha256": "03bda4bdb02a8fe9729dfd654bd53c25ed1fd28f7ab12df822dfc8981d2c1b4a",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 125001,
+      "duration_seconds": 12.500099999970866,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_425_005",
+        "relative_path": "2inch_stickout/s_425_005.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_425_010.mat",
+      "sha256": "c6c95c548d62413150d6e6955c965fa57f4bdf253eb9cb36015212f7f12b804e",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 125001,
+      "duration_seconds": 12.500099999970866,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_425_010",
+        "relative_path": "2inch_stickout/s_425_010.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_425_015.mat",
+      "sha256": "98cca76a50760c93baaf581824e2e0f5807d0a1612526675dea02f9ff0038350",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 125001,
+      "duration_seconds": 12.500099999970866,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_425_015",
+        "relative_path": "2inch_stickout/s_425_015.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_425_017.mat",
+      "sha256": "0e217adc3a1ecc0dd24d3a1cef6f1f07c5a00e1b2fe67d103216cb2c5d29179d",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 12501,
+      "duration_seconds": 1.2500999999970863,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_425_017",
+        "relative_path": "2inch_stickout/s_425_017.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.017,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_425_020.mat",
+      "sha256": "1c2e4280387471e884570cfc839de674df4c3c5d38e344a4194d8cdf75b3929c",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 12501,
+      "duration_seconds": 1.2500999999970863,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_425_020",
+        "relative_path": "2inch_stickout/s_425_020.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.02,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_570_002.mat",
+      "sha256": "76556594fef525407d0b66f9bee158f8d98936c67dccfbec803d6437b3c60fac",
+      "signal_valid": false,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Signal duration (0.7501 s) is shorter than the required 1 s.",
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "metadata": {
+        "recording_id": "2inch_stickout__s_570_002",
+        "relative_path": "2inch_stickout/s_570_002.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.002,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/s_570_005.mat",
+      "sha256": "0509b2de4d326aff7c29b988d20699a93ea04d0c97507c5ec83372f9ab608914",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 10001,
+      "duration_seconds": 1.0000999999976692,
+      "metadata": {
+        "recording_id": "2inch_stickout__s_570_005",
+        "relative_path": "2inch_stickout/s_570_005.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/u_320_005.mat",
+      "sha256": "6654edfa08792ffb3fcb6d236c21c4c38e2ec2b88af20472d22a33026bf9a22a",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 9999.999999668034,
+      "sample_count": 75001,
+      "duration_seconds": 7.5001000002489775,
+      "metadata": {
+        "recording_id": "2inch_stickout__u_320_005",
+        "relative_path": "2inch_stickout/u_320_005.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/u_320_010.mat",
+      "sha256": "98519fb1b6f18a7f21006b4565b5979d4c5313182dc24c5680566d1aa14d0e5d",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 350001,
+      "duration_seconds": 35.000099999918426,
+      "metadata": {
+        "recording_id": "2inch_stickout__u_320_010",
+        "relative_path": "2inch_stickout/u_320_010.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/u_320_020.mat",
+      "sha256": "0ff9fb9b87781f409a7e9698693e9a3a2f5730567b3390330e28d5be23b980f2",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 37501,
+      "duration_seconds": 3.7500999999912596,
+      "metadata": {
+        "recording_id": "2inch_stickout__u_320_020",
+        "relative_path": "2inch_stickout/u_320_020.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.02,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/u_320_050.mat",
+      "sha256": "8831f395cfe7f3bd15364cb4086cd25e00add8eec34b098932148645d3c5fb78",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 75001,
+      "duration_seconds": 7.5000999999825195,
+      "metadata": {
+        "recording_id": "2inch_stickout__u_320_050",
+        "relative_path": "2inch_stickout/u_320_050.mat",
+        "rpm": 320.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.05,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/u_425_017.mat",
+      "sha256": "3ddaacb87773d27a1a2c9fb41c576836645e13556eea4186ec4da3b3fb4c50c9",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 50001,
+      "duration_seconds": 5.000099999988346,
+      "metadata": {
+        "recording_id": "2inch_stickout__u_425_017",
+        "relative_path": "2inch_stickout/u_425_017.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.017,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/u_425_017_2.mat",
+      "sha256": "7f3c519ba59d32bd48b99171787d8a65860b54c281e037ef3e6ff4b5fab7a55e",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 87501,
+      "duration_seconds": 8.750099999979607,
+      "metadata": {
+        "recording_id": "2inch_stickout__u_425_017_2",
+        "relative_path": "2inch_stickout/u_425_017_2.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.017,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/u_425_020.mat",
+      "sha256": "658c28733c3c4d428ba1d45e8bad94b1359c4994f07e1cbd4eebfdf809adcf0a",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 12501,
+      "duration_seconds": 1.2500999999970863,
+      "metadata": {
+        "recording_id": "2inch_stickout__u_425_020",
+        "relative_path": "2inch_stickout/u_425_020.mat",
+        "rpm": 425.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.02,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/u_570_002.mat",
+      "sha256": "ad9840b30cdd61bd13815f93e3c9cc883c0df29f9c0124d475582373ce58a665",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 44376,
+      "duration_seconds": 4.437599999989658,
+      "metadata": {
+        "recording_id": "2inch_stickout__u_570_002",
+        "relative_path": "2inch_stickout/u_570_002.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.002,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/u_570_005.mat",
+      "sha256": "01441c264258c7a070fa80275df8318c7b2c493fac2992d02de9dbea45c69909",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 13751,
+      "duration_seconds": 1.375099999996795,
+      "metadata": {
+        "recording_id": "2inch_stickout__u_570_005",
+        "relative_path": "2inch_stickout/u_570_005.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2inch_stickout/u_770_002.mat",
+      "sha256": "dcd6db5f7247bb67c0c6670a078271029e7c7175545fb4034ad66d736e85894e",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 75001,
+      "duration_seconds": 7.5000999999825195,
+      "metadata": {
+        "recording_id": "2inch_stickout__u_770_002",
+        "relative_path": "2inch_stickout/u_770_002.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.0,
+        "depth_of_cut": 0.002,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/c_570_014.mat",
+      "sha256": "f2a47c5577aec3f961180c32f2e94ce97f94b039733c67ffbadfb801f0722bc7",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 43751,
+      "duration_seconds": 4.3750999999898035,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__c_570_014",
+        "relative_path": "2p5inch_stickout/c_570_014.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.014,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/c_570_015s.mat",
+      "sha256": "7662a8fca2517201249ec02df41699291f30aece1678d7bcc84671c773197871",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 87501,
+      "duration_seconds": 8.750099999979607,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__c_570_015s",
+        "relative_path": "2p5inch_stickout/c_570_015s.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/c_770_005.mat",
+      "sha256": "e26a11eed8f3e6d19b25e0cf6d11eeaa3601e1d84568fa3673e0875ad5f93dae",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 18751,
+      "duration_seconds": 1.8750999999956297,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__c_770_005",
+        "relative_path": "2p5inch_stickout/c_770_005.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/i_570_012.mat",
+      "sha256": "4f27a2cc1e45735c1d876172b4190e9ffe14fa3cfca6113c79c3aa31b5d145d5",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 200001,
+      "duration_seconds": 20.000099999953385,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__i_570_012",
+        "relative_path": "2p5inch_stickout/i_570_012.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.012,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/i_570_014.mat",
+      "sha256": "c2d63be0fc5c31d32012bb6473cb6010edd2c44632be6e053ae7ce60211275bd",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 75001,
+      "duration_seconds": 7.5000999999825195,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__i_570_014",
+        "relative_path": "2p5inch_stickout/i_570_014.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.014,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/i_570_015s.mat",
+      "sha256": "64a617a4a49ce0c46edd235cfd23ddde81567053656312882beb99155cb80360",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 18751,
+      "duration_seconds": 1.8750999999956297,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__i_570_015s",
+        "relative_path": "2p5inch_stickout/i_570_015s.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/i_770_005.mat",
+      "sha256": "9cd52ceaa0e548f09f978c28e33321657dbb8bf1efab9fcb9593e240c91e2ac5",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 57501,
+      "duration_seconds": 5.750099999986598,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__i_770_005",
+        "relative_path": "2p5inch_stickout/i_770_005.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/s_570_003.mat",
+      "sha256": "2c69e32307fc0c78308cb570817d22acc14d4157f92acc09db5e5b323c5117ac",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 200001,
+      "duration_seconds": 20.000099999953385,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__s_570_003",
+        "relative_path": "2p5inch_stickout/s_570_003.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.003,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/s_570_005.mat",
+      "sha256": "a166d7ae51994d0ecb5b1e6ef45216bcc44a1c8c11acf50de9ca6d6440679570",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 75001,
+      "duration_seconds": 7.5000999999825195,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__s_570_005",
+        "relative_path": "2p5inch_stickout/s_570_005.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/s_570_005_2.mat",
+      "sha256": "55fde2077435947194697b8b791d1a6f2fa97c4d4b835c0ce2d6205f997fdfb1",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 62501,
+      "duration_seconds": 6.250099999985433,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__s_570_005_2",
+        "relative_path": "2p5inch_stickout/s_570_005_2.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/s_570_008.mat",
+      "sha256": "bdd231eefbc1f196cc344fdf64a81ca38558732dd2ec5624452585bd01ab9205",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 218751,
+      "duration_seconds": 21.875099999949015,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__s_570_008",
+        "relative_path": "2p5inch_stickout/s_570_008.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.008,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/s_570_010.mat",
+      "sha256": "b864be4c7afce5df6fe243de7f4ade89d10de9b05cdb2a9ca0247d6663ede383",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 200001,
+      "duration_seconds": 20.000099999953385,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__s_570_010",
+        "relative_path": "2p5inch_stickout/s_570_010.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/s_570_015.mat",
+      "sha256": "702e10a365e08e8a8be9a80d5223f3e34af4943c30f595efdcb57eb27f74e86f",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 31251,
+      "duration_seconds": 3.1250999999927163,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__s_570_015",
+        "relative_path": "2p5inch_stickout/s_570_015.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/s_570_015_2.mat",
+      "sha256": "a0865b011a408558d7afcc04b46a7a3466ac86991b7cfe0fc56224c66f2ffe57",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 28126,
+      "duration_seconds": 2.8125999999934446,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__s_570_015_2",
+        "relative_path": "2p5inch_stickout/s_570_015_2.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/s_770_002.mat",
+      "sha256": "f0037a8cbcc64e911cdf0b882a3343fb9b440bc2684f540f90727d77797c4f96",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 25001,
+      "duration_seconds": 2.500099999994173,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__s_770_002",
+        "relative_path": "2p5inch_stickout/s_770_002.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.002,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/s_770_005.mat",
+      "sha256": "4f37e06f96f762120513b95002e55eb62b3d9526e5090c257a6e196cbb0dbc82",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 18751,
+      "duration_seconds": 1.8750999999956297,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__s_770_005",
+        "relative_path": "2p5inch_stickout/s_770_005.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/u_570_005.mat",
+      "sha256": "1cddbd54fb93a320699db8dc1774e36c03c3127f50c4432edf4c5b620f00c78d",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 31251,
+      "duration_seconds": 3.1250999999927163,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__u_570_005",
+        "relative_path": "2p5inch_stickout/u_570_005.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/u_570_005_2.mat",
+      "sha256": "c8eae8ddf73cdb2f2bdc9ace89f81f4e99feaca9d5921b68e386a46bf1cacfa9",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 37501,
+      "duration_seconds": 3.7500999999912596,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__u_570_005_2",
+        "relative_path": "2p5inch_stickout/u_570_005_2.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/u_570_015.mat",
+      "sha256": "c61ed86ff922277d23bbe22e0e6be8b01968412e345e3ac3c0da66e06b72b89f",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 50001,
+      "duration_seconds": 5.000099999988346,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__u_570_015",
+        "relative_path": "2p5inch_stickout/u_570_015.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/u_570_015_2.mat",
+      "sha256": "14076572bac819f2b2afc01f499aba2e6e2851cc3becd4f39854bdc35f530c1c",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 15626,
+      "duration_seconds": 1.562599999996358,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__u_570_015_2",
+        "relative_path": "2p5inch_stickout/u_570_015_2.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/u_570_015_3.mat",
+      "sha256": "ecbb6386a9169c9824ba4bc5c4f9d119f1753a30f3eb27b1d01a92fc5b4b25ee",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 62501,
+      "duration_seconds": 6.250099999985433,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__u_570_015_3",
+        "relative_path": "2p5inch_stickout/u_570_015_3.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/u_570_015_4.mat",
+      "sha256": "bbf8ee43ce7ab4c0c818f792fb4a94ac579178972164cf4d02ce7aa32513470b",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 25001,
+      "duration_seconds": 2.500099999994173,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__u_570_015_4",
+        "relative_path": "2p5inch_stickout/u_570_015_4.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "2p5inch_stickout/u_770_002.mat",
+      "sha256": "59a3b8b02be415cdeb46f087895084a218a74549cacc3b57823a7f7ab86f5851",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 70001,
+      "duration_seconds": 7.000099999983685,
+      "metadata": {
+        "recording_id": "2p5inch_stickout__u_770_002",
+        "relative_path": "2p5inch_stickout/u_770_002.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 2.5,
+        "depth_of_cut": 0.002,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/c_1030_002.mat",
+      "sha256": "c9eb897a27a37d37311c9612fd6e14781d17f57dcc2c22670357ba2807096fa4",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "No metadata row maps to this relative input path"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 42501,
+      "duration_seconds": 4.250099999990095
+    },
+    {
+      "path": "3p5inch_stickout/c_770_015.mat",
+      "sha256": "4af0469e6d03a26815fac40476b0b7859e8d5e1c927177054e6a25c38cad5160",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 26251,
+      "duration_seconds": 2.6250999999938815,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__c_770_015",
+        "relative_path": "3p5inch_stickout/c_770_015.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/i_770_010.mat",
+      "sha256": "78de4749afb77cd60d9aec103d5b18fd346fc7d7e5326d8ead72b37558e91b90",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 15626,
+      "duration_seconds": 1.562599999996358,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__i_770_010",
+        "relative_path": "3p5inch_stickout/i_770_010.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/i_770_010_2.mat",
+      "sha256": "e3d3250b346f42a7df37bc3d99181d79f438e559dffc458300c111e3fc6f82b5",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 32501,
+      "duration_seconds": 3.250099999992425,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__i_770_010_2",
+        "relative_path": "3p5inch_stickout/i_770_010_2.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/i_770_015.mat",
+      "sha256": "7de869e3176950ab6ac5805a07ab3d0da1fe5ea4177b935495f3eeb94a6bf77e",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 18751,
+      "duration_seconds": 1.8750999999956297,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__i_770_015",
+        "relative_path": "3p5inch_stickout/i_770_015.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/s_570_015.mat",
+      "sha256": "9dd7e80d16e29a98adbc84703a280ced2c53d4c0c8d4787e376bab008349ec28",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 106251,
+      "duration_seconds": 10.625099999975236,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__s_570_015",
+        "relative_path": "3p5inch_stickout/s_570_015.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/s_570_025.mat",
+      "sha256": "0cdcb1e10b4f22d428e56abd3d13e25b5dce27b2503fad21c3da93ecbed90c77",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 93751,
+      "duration_seconds": 9.37509999997815,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__s_570_025",
+        "relative_path": "3p5inch_stickout/s_570_025.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.025,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/s_570_025_2.mat",
+      "sha256": "d8d62fc107aba00e166a92fb675c82ce8dd94cc995c66bec07da281508261378",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 50001,
+      "duration_seconds": 5.000099999988346,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__s_570_025_2",
+        "relative_path": "3p5inch_stickout/s_570_025_2.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.025,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/s_570_030.mat",
+      "sha256": "85bef86bbaf73fa3d5a952eade3680d2eb4511d192c3d3c8e5909d878491a115",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 131251,
+      "duration_seconds": 13.12509999996941,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__s_570_030",
+        "relative_path": "3p5inch_stickout/s_570_030.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.03,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/s_770_005.mat",
+      "sha256": "4ea749dc14c920c969fabeaa9e145e4e1f100375b04daa75976d36af70113cf6",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 62501,
+      "duration_seconds": 6.250099999985433,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__s_770_005",
+        "relative_path": "3p5inch_stickout/s_770_005.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/s_770_008.mat",
+      "sha256": "269813359c6d8ad01ce4cca51cc9b19c1610cd90a6c486bc85c2fe43ee7a5936",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 70001,
+      "duration_seconds": 7.000099999983685,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__s_770_008",
+        "relative_path": "3p5inch_stickout/s_770_008.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.008,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/s_770_010.mat",
+      "sha256": "5da8b87dcfc32589e9f61a99e6fb0cfab04b9a9bf740503fe5ce28fd7870bca9",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 21876,
+      "duration_seconds": 2.1875999999949016,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__s_770_010",
+        "relative_path": "3p5inch_stickout/s_770_010.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/s_770_010_2.mat",
+      "sha256": "6887393a8660812e2e12a3c494d28c63cffd929adc9fbdce9e51ae53d6ad6cfb",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 12501,
+      "duration_seconds": 1.2500999999970863,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__s_770_010_2",
+        "relative_path": "3p5inch_stickout/s_770_010_2.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/s_770_015.mat",
+      "sha256": "a05457d070930563d1a48843ea40f33c78926557d33d708bdf1ed7d3d23110ec",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 23751,
+      "duration_seconds": 2.3750999999944646,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__s_770_015",
+        "relative_path": "3p5inch_stickout/s_770_015.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/u_570_015.mat",
+      "sha256": "1a75e4b2cdd51307e30ca70892f5ae5d2c2caf988ffe9960858fd89907194c5e",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 106251,
+      "duration_seconds": 10.625099999975236,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__u_570_015",
+        "relative_path": "3p5inch_stickout/u_570_015.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/u_570_025.mat",
+      "sha256": "755b9ded06cd516fbb1a2c05a8d9cd6bdc01ebfbbdc90ce5b788b98ec1056690",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 62501,
+      "duration_seconds": 6.250099999985433,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__u_570_025",
+        "relative_path": "3p5inch_stickout/u_570_025.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.025,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/u_570_030.mat",
+      "sha256": "896e5c7f3684646e8bdb69504c9841de40b39ec3db2d0b7a81c554bd69476b90",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 62501,
+      "duration_seconds": 6.250099999985433,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__u_570_030",
+        "relative_path": "3p5inch_stickout/u_570_030.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.03,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/u_770_005.mat",
+      "sha256": "676459f43871ef2fbb5e0f6c0d314ea148652e2a55a9ef33e2b0989444bedb1e",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 13751,
+      "duration_seconds": 1.375099999996795,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__u_770_005",
+        "relative_path": "3p5inch_stickout/u_770_005.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "3p5inch_stickout/u_770_015.mat",
+      "sha256": "b256783ada0ba997cd773e8178ae37f6cb2dfb73ee32633c73faae6ef7be5ae3",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 13751,
+      "duration_seconds": 1.375099999996795,
+      "metadata": {
+        "recording_id": "3p5inch_stickout__u_770_015",
+        "relative_path": "3p5inch_stickout/u_770_015.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 3.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/c_1030_010.mat",
+      "sha256": "01643ec4ba4c3c08fef6a68f1cc2fba54e39cb71f44095cc46138c1dbdbc3b54",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 21876,
+      "duration_seconds": 2.1875999999949016,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__c_1030_010",
+        "relative_path": "4p5inch_stickout/c_1030_010.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/c_1030_015.mat",
+      "sha256": "4e1001ee6fa4e422af2c6af1d54352d1fe7eba6d95645435e6dacd4f7fac5c97",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 56251,
+      "duration_seconds": 5.625099999986889,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__c_1030_015",
+        "relative_path": "4p5inch_stickout/c_1030_015.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/c_1030_016.mat",
+      "sha256": "9845584515f2e7d33fee5f6d19b57f5b8f3ae8c85d9880d0aa2f9a8019095040",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 68751,
+      "duration_seconds": 6.875099999983976,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__c_1030_016",
+        "relative_path": "4p5inch_stickout/c_1030_016.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.016,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/c_570_035.mat",
+      "sha256": "b2ec43952e7f1cde6470cf5c5b4c86a3cb0a5b4cecb87940febb37d52f9e6cb8",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 228126,
+      "duration_seconds": 22.81259999994683,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__c_570_035",
+        "relative_path": "4p5inch_stickout/c_570_035.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.035,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/c_570_040.mat",
+      "sha256": "50384ffc031e8a0d536eeeca84450478d57c123567b3252830434df2e7466df7",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 131251,
+      "duration_seconds": 13.12509999996941,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__c_570_040",
+        "relative_path": "4p5inch_stickout/c_570_040.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.04,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/i_1030_010.mat",
+      "sha256": "2314e7ca98d08a6a1714feb106bda6a71c1f841b40e993b74f63cbd30edb0ee7",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 40626,
+      "duration_seconds": 4.062599999990532,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__i_1030_010",
+        "relative_path": "4p5inch_stickout/i_1030_010.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/i_1030_012.mat",
+      "sha256": "3b07896580926cadc188edb7fef3ee6d5d1adf8267b2a32bdfea4ecf4c655631",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 62501,
+      "duration_seconds": 6.250099999985433,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__i_1030_012",
+        "relative_path": "4p5inch_stickout/i_1030_012.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.012,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/i_1030_013.mat",
+      "sha256": "e891b09a751a02641d99468d3e61110e9607f708ad15fd9ee463ad03eee88e32",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 21876,
+      "duration_seconds": 2.1875999999949016,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__i_1030_013",
+        "relative_path": "4p5inch_stickout/i_1030_013.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.013,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/i_1030_014.mat",
+      "sha256": "998166af1a30d15dcd8bda2f632665c00347bcba8ff358d07f9c5a6e2b2f2276",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 28126,
+      "duration_seconds": 2.8125999999934446,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__i_1030_014",
+        "relative_path": "4p5inch_stickout/i_1030_014.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.014,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_1030_005.mat",
+      "sha256": "73fa3015eb8a6bff07a8c2a201885b26eb5244bcef131cf7cdbc5ab8a3f2bc78",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 68751,
+      "duration_seconds": 6.875099999983976,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_1030_005",
+        "relative_path": "4p5inch_stickout/s_1030_005.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_1030_007.mat",
+      "sha256": "c01c8051f1719a4b6ab386fb20ceae829d269ec77671e0e10a577c0f598fe4ba",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 62501,
+      "duration_seconds": 6.250099999985433,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_1030_007",
+        "relative_path": "4p5inch_stickout/s_1030_007.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.007,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_1030_013.mat",
+      "sha256": "ca9c7d298e10f6c4fe1c88cbcc0674f7e32e4aa0705473453f3726ed9222dbf1",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 40626,
+      "duration_seconds": 4.062599999990532,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_1030_013",
+        "relative_path": "4p5inch_stickout/s_1030_013.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.013,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_1030_014.mat",
+      "sha256": "bdb81706735615f9b0623841529411cef5e29ef09bd9d89d3c65f43f4bdefa8e",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 40626,
+      "duration_seconds": 4.062599999990532,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_1030_014",
+        "relative_path": "4p5inch_stickout/s_1030_014.mat",
+        "rpm": 1030.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.014,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_570_005.mat",
+      "sha256": "6f95a64b7d6f153df6feba87378a04447433a74ed1286f24999fe4cce4b6e4a2",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 162501,
+      "duration_seconds": 16.250099999962128,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_570_005",
+        "relative_path": "4p5inch_stickout/s_570_005.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.005,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_570_010.mat",
+      "sha256": "6325f9ccdb10ff154b95f4e913a7c4a995c540b10b902e343a8b6e6f9cb6ec6e",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 162501,
+      "duration_seconds": 16.250099999962128,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_570_010",
+        "relative_path": "4p5inch_stickout/s_570_010.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_570_015.mat",
+      "sha256": "c7c5fa2ab88497e2c008126c4473770fec55a35465956cc4a01472f9dcafd84b",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 112501,
+      "duration_seconds": 11.250099999973779,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_570_015",
+        "relative_path": "4p5inch_stickout/s_570_015.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_570_025.mat",
+      "sha256": "cc2cd51359707ff3d2fa37ace6b35aeb9fced9a48a2ae0ee422d4647a2922ef9",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 175001,
+      "duration_seconds": 17.500099999959215,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_570_025",
+        "relative_path": "4p5inch_stickout/s_570_025.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.025,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_570_035.mat",
+      "sha256": "d46e2e0e76fae2fb223268d9610d15d6905e54c0e15fda6105b066c00962c028",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.0000000011,
+      "sample_count": 12500,
+      "duration_seconds": 1.2499999999998623,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_570_035",
+        "relative_path": "4p5inch_stickout/s_570_035.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.035,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_570_040.mat",
+      "sha256": "7070bf9e610cb277bbaf88757abc9463445e1e84998c9c4717d7e530c416ecc3",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 37501,
+      "duration_seconds": 3.7500999999912596,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_570_040",
+        "relative_path": "4p5inch_stickout/s_570_040.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.04,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_770_010.mat",
+      "sha256": "475bc247f3286f6578ba1ca94f018c781d39554779b2e27fd1a157a8e2716974",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 100001,
+      "duration_seconds": 10.000099999976692,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_770_010",
+        "relative_path": "4p5inch_stickout/s_770_010.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.01,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_770_015.mat",
+      "sha256": "4c44d343654ecb776e5ba2ad6632a8906431a1229862d66ddcf1bdeacf392c90",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 106251,
+      "duration_seconds": 10.625099999975236,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_770_015",
+        "relative_path": "4p5inch_stickout/s_770_015.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/s_770_020.mat",
+      "sha256": "19901c982956cdf550617625388592d15edbd80b7f2ffadd19a6a5feb736a911",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 100001,
+      "duration_seconds": 10.000099999976692,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__s_770_020",
+        "relative_path": "4p5inch_stickout/s_770_020.mat",
+        "rpm": 770.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.02,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/u_570_015.mat",
+      "sha256": "0a596b82f23f808c025f7a40668987becc2dd3da74f0f877660ef0070dcbf305",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 62501,
+      "duration_seconds": 6.250099999985433,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__u_570_015",
+        "relative_path": "4p5inch_stickout/u_570_015.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.015,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "No Chatter"
+      }
+    },
+    {
+      "path": "4p5inch_stickout/u_570_040.mat",
+      "sha256": "4a27c735db4af64cf53920cc3bf62223e66bc78039cb080aeba3bdf2a789b96d",
+      "signal_valid": true,
+      "metadata_valid": false,
+      "valid": false,
+      "errors": [
+        "Physics metadata is missing a positive tooth_count"
+      ],
+      "estimated_sampling_rate_hz": 10000.000000023307,
+      "sample_count": 18751,
+      "duration_seconds": 1.8750999999956297,
+      "metadata": {
+        "recording_id": "4p5inch_stickout__u_570_040",
+        "relative_path": "4p5inch_stickout/u_570_040.mat",
+        "rpm": 570.0,
+        "tooth_count": null,
+        "stickout": 4.5,
+        "depth_of_cut": 0.04,
+        "feed_rate": 0.002,
+        "tool_identifier": null,
+        "label": "Mild Chatter"
+      }
+    }
+  ],
+  "warnings": [],
+  "failures": [
+    "Metadata contains ambiguous or duplicate rows; each recording must map once"
+  ],
+  "resolved_config_sha256": "66947174ea8975a20f7c3b8f4785124072401591efa1ddf81c641f76c8ede359",
+  "metadata": {
+    "metadata_rows": 64,
+    "matched_recordings": 114,
+    "missing_recordings": [
+      "3p5inch_stickout/c_1030_002.mat"
+    ],
+    "ambiguous_rows": 8,
+    "unmappable_rows": 6,
+    "legacy_condition_rows": 64,
+    "duplicate_basenames": [
+      "c_770_005.mat",
+      "s_570_005.mat",
+      "s_570_010.mat",
+      "s_570_015.mat",
+      "s_570_025.mat",
+      "s_770_005.mat",
+      "s_770_010.mat",
+      "s_770_015.mat",
+      "u_570_005.mat",
+      "u_570_015.mat",
+      "u_770_002.mat"
+    ],
+    "duplicate_recording_ids": [],
+    "missing_tooth_count": [
+      "2inch_stickout/c_320_005.mat",
+      "2inch_stickout/c_425_020.mat",
+      "2inch_stickout/c_425_025.mat",
+      "2inch_stickout/c_570_001.mat",
+      "2inch_stickout/c_570_002.mat",
+      "2inch_stickout/c_570_005.mat",
+      "2inch_stickout/c_570_010.mat",
+      "2inch_stickout/c_770_001.mat",
+      "2inch_stickout/c_770_002.mat",
+      "2inch_stickout/c_770_002_2.mat",
+      "2inch_stickout/c_770_005.mat",
+      "2inch_stickout/c_770_010.mat",
+      "2inch_stickout/i_320_005.mat",
+      "2inch_stickout/i_320_010.mat",
+      "2inch_stickout/i_425_020.mat",
+      "2inch_stickout/i_425_025.mat",
+      "2inch_stickout/i_570_002.mat",
+      "2inch_stickout/i_570_005.mat",
+      "2inch_stickout/i_570_010.mat",
+      "2inch_stickout/i_770_001.mat",
+      "2inch_stickout/s_320_005.mat",
+      "2inch_stickout/s_320_010.mat",
+      "2inch_stickout/s_320_015.mat",
+      "2inch_stickout/s_320_020.mat",
+      "2inch_stickout/s_320_020_2.mat",
+      "2inch_stickout/s_320_025.mat",
+      "2inch_stickout/s_320_030.mat",
+      "2inch_stickout/s_320_035.mat",
+      "2inch_stickout/s_320_040.mat",
+      "2inch_stickout/s_320_045.mat",
+      "2inch_stickout/s_320_050.mat",
+      "2inch_stickout/s_320_050_2.mat",
+      "2inch_stickout/s_425_005.mat",
+      "2inch_stickout/s_425_010.mat",
+      "2inch_stickout/s_425_015.mat",
+      "2inch_stickout/s_425_017.mat",
+      "2inch_stickout/s_425_020.mat",
+      "2inch_stickout/s_570_002.mat",
+      "2inch_stickout/s_570_005.mat",
+      "2inch_stickout/u_320_005.mat",
+      "2inch_stickout/u_320_010.mat",
+      "2inch_stickout/u_320_020.mat",
+      "2inch_stickout/u_320_050.mat",
+      "2inch_stickout/u_425_017.mat",
+      "2inch_stickout/u_425_017_2.mat",
+      "2inch_stickout/u_425_020.mat",
+      "2inch_stickout/u_570_002.mat",
+      "2inch_stickout/u_570_005.mat",
+      "2inch_stickout/u_770_002.mat",
+      "2p5inch_stickout/c_570_014.mat",
+      "2p5inch_stickout/c_570_015s.mat",
+      "2p5inch_stickout/c_770_005.mat",
+      "2p5inch_stickout/i_570_012.mat",
+      "2p5inch_stickout/i_570_014.mat",
+      "2p5inch_stickout/i_570_015s.mat",
+      "2p5inch_stickout/i_770_005.mat",
+      "2p5inch_stickout/s_570_003.mat",
+      "2p5inch_stickout/s_570_005.mat",
+      "2p5inch_stickout/s_570_005_2.mat",
+      "2p5inch_stickout/s_570_008.mat",
+      "2p5inch_stickout/s_570_010.mat",
+      "2p5inch_stickout/s_570_015.mat",
+      "2p5inch_stickout/s_570_015_2.mat",
+      "2p5inch_stickout/s_770_002.mat",
+      "2p5inch_stickout/s_770_005.mat",
+      "2p5inch_stickout/u_570_005.mat",
+      "2p5inch_stickout/u_570_005_2.mat",
+      "2p5inch_stickout/u_570_015.mat",
+      "2p5inch_stickout/u_570_015_2.mat",
+      "2p5inch_stickout/u_570_015_3.mat",
+      "2p5inch_stickout/u_570_015_4.mat",
+      "2p5inch_stickout/u_770_002.mat",
+      "3p5inch_stickout/c_770_015.mat",
+      "3p5inch_stickout/i_770_010.mat",
+      "3p5inch_stickout/i_770_010_2.mat",
+      "3p5inch_stickout/i_770_015.mat",
+      "3p5inch_stickout/s_570_015.mat",
+      "3p5inch_stickout/s_570_025.mat",
+      "3p5inch_stickout/s_570_025_2.mat",
+      "3p5inch_stickout/s_570_030.mat",
+      "3p5inch_stickout/s_770_005.mat",
+      "3p5inch_stickout/s_770_008.mat",
+      "3p5inch_stickout/s_770_010.mat",
+      "3p5inch_stickout/s_770_010_2.mat",
+      "3p5inch_stickout/s_770_015.mat",
+      "3p5inch_stickout/u_570_015.mat",
+      "3p5inch_stickout/u_570_025.mat",
+      "3p5inch_stickout/u_570_030.mat",
+      "3p5inch_stickout/u_770_005.mat",
+      "3p5inch_stickout/u_770_015.mat",
+      "4p5inch_stickout/c_1030_010.mat",
+      "4p5inch_stickout/c_1030_015.mat",
+      "4p5inch_stickout/c_1030_016.mat",
+      "4p5inch_stickout/c_570_035.mat",
+      "4p5inch_stickout/c_570_040.mat",
+      "4p5inch_stickout/i_1030_010.mat",
+      "4p5inch_stickout/i_1030_012.mat",
+      "4p5inch_stickout/i_1030_013.mat",
+      "4p5inch_stickout/i_1030_014.mat",
+      "4p5inch_stickout/s_1030_005.mat",
+      "4p5inch_stickout/s_1030_007.mat",
+      "4p5inch_stickout/s_1030_013.mat",
+      "4p5inch_stickout/s_1030_014.mat",
+      "4p5inch_stickout/s_570_005.mat",
+      "4p5inch_stickout/s_570_010.mat",
+      "4p5inch_stickout/s_570_015.mat",
+      "4p5inch_stickout/s_570_025.mat",
+      "4p5inch_stickout/s_570_035.mat",
+      "4p5inch_stickout/s_570_040.mat",
+      "4p5inch_stickout/s_770_010.mat",
+      "4p5inch_stickout/s_770_015.mat",
+      "4p5inch_stickout/s_770_020.mat",
+      "4p5inch_stickout/u_570_015.mat",
+      "4p5inch_stickout/u_570_040.mat"
+    ],
+    "path": "/home/harshit/Documents/Research/Vibration - ML/rpm_doc_combinations.xlsx",
+    "sha256": "810fd908808bc63e22d744d935a20eb3bff508f0a9b4bcc712f0c2253c20e53f"
+  },
+  "n_files": 115,
+  "n_signal_valid": 114,
+  "n_valid": 0,
+  "n_invalid": 115,
+  "status": "invalid"
+}

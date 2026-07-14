@@ -1,13 +1,9 @@
-"""Unit tests for Sprint 4 scientific signal-processing modules.
+"""Cross-module scientific checks for the canonical Stage 1--4 workflow.
 
-Covers: synthetic data generation + denoising metrics (Goal 5.4), controlled
-cutoff optimisation + 5-component objective + multi-seed stability (Goals 5.1-5.3),
-provenance hashing (Goal 4.3/4.4), independent IMF gating (Goal 5.5), band-aware
-wavelet selection (Goal 5.6), and the pipeline wiring that populates `cutoff_search`.
+The narrowly focused module tests hold the detailed algorithmic assertions.
+This file verifies that the public scientific helpers compose without relying
+on invented machining metadata or the retired modification-time output cache.
 """
-
-import os
-import time
 
 import numpy as np
 from pytest import approx
@@ -15,7 +11,6 @@ import pytest
 
 from pg_amcd.synthetic import generate_synthetic_signal, evaluate_denoising_performance
 from pg_amcd.optimization import optimize_cutoff, compute_cutoff_objective, multi_seed_stability
-from pg_amcd.provenance import compute_file_sha256, is_output_stale, compute_run_id
 from pg_amcd.weighting import reconstruct_gated_signal, reconstruct_weighted_signal
 from pg_amcd.denoising import select_best_wavelet
 from pg_amcd.pipeline import process_recording
@@ -63,8 +58,14 @@ def test_evaluate_denoising_performance_signal_keys():
     rng = np.random.default_rng(0)
     noisy = clean + 0.3 * rng.standard_normal(clean.shape)
     m = evaluate_denoising_performance(clean, noisy, fs, 125.0, 50.0)
-    for key in ("rmse", "snr_db", "spectral_distortion",
-                "chatter_band_retention", "noise_band_attenuation", "onset_detection_error"):
+    for key in (
+        "rmse",
+        "snr_db",
+        "spectral_distortion",
+        "chatter_band_retention",
+        "noise_band_attenuation",
+        "onset_detection_error",
+    ):
         assert key in m
         assert np.isfinite(m[key]) or key == "snr_db"  # snr may be -inf for worse-than-noise
     assert m["rmse"] > 0.0
@@ -75,18 +76,57 @@ def test_evaluate_denoising_performance_signal_keys():
 # --------------------------------------------------------------------------- #
 def _minimal_config(cutoffs, fs=1000.0):
     return {
+        "through_stage": 4,
         "sampling_rate": fs,
         "segment_points": 1000,
+        "use_physics_gating": False,
+        "preprocessing": {
+            "filter_order": 3,
+            "low_pass_cutoff_hz": None,
+            "scale_percentile": 99.5,
+        },
         "ceemdan": {
-            "trials": 2, "search_trials": 1, "epsilon": 0.02,
-            "noise_seed": 42, "sifting_iterations": 2,
-            "search_cutoffs": cutoffs, "search_seeds": 2,
+            "trials": 2,
+            "search_trials": 1,
+            "epsilon": 0.02,
+            "noise_seed": 42,
+            "sifting_iterations": 2,
+            "search_cutoffs": cutoffs,
+            "search_seeds": 2,
+            "stability_seeds": [42, 43],
+            "parallel": False,
         },
         "maiw": {
-            "alpha": 0.25, "beta": 0.25, "gamma": 0.25, "delta": 0.25,
-            "chatter_band_center": 125.0, "chatter_band_spread": 50.0,
+            "alpha": 0.25,
+            "beta": 0.25,
+            "gamma": 0.25,
+            "delta": 0.25,
+            "chatter_band_center": 125.0,
+            "chatter_band_spread": 50.0,
         },
-        "wavelet": {"wavelet_name": "db4", "level": 3},
+        "physics_gating": {
+            "chatter_energy_weight": 4.0,
+            "correlation_weight": 2.0,
+            "kurtosis_weight": 1.0,
+            "frequency_proximity_weight": 1.0,
+            "harmonic_penalty": 5.0,
+            "offset": 1.5,
+            "harmonic_tolerance_hz": 15.0,
+            "harmonic_count": 5,
+            "kurtosis_scale": 10.0,
+            "selection_threshold": 0.5,
+            "include_residual": False,
+        },
+        "wavelet": {
+            "wavelet_name": "db4",
+            "level": 3,
+            "threshold_mode": "soft",
+            "band_aware": True,
+            "chatter_threshold_scale": 0.5,
+            "noise_threshold_scale": 1.4,
+            "minimum_noise_sigma": 1e-8,
+        },
+        "features": {"window_seconds": 1.0, "overlap_ratio": 0.75},
     }
 
 
@@ -101,7 +141,10 @@ def test_optimize_cutoff_returns_valid_candidate():
     assert len(res.per_cutoff_metrics) == len(cutoffs)
     for d in res.per_cutoff_metrics:
         for key in (
-            "cutoff", "objective", "seed_instability", "final_score",
+            "cutoff",
+            "objective",
+            "seed_instability",
+            "final_score",
             "mean_reconstruction_nrmse",
         ):
             assert key in d
@@ -138,39 +181,6 @@ def test_objective_deterministic_and_finite():
     b2 = compute_cutoff_objective(imfs, sig, fs, cfg)
     assert np.isfinite(b1)
     assert b1 == b2  # deterministic for fixed inputs
-
-
-# --------------------------------------------------------------------------- #
-# provenance (Goals 4.3 / 4.4)
-# --------------------------------------------------------------------------- #
-def test_sha256_deterministic(tmp_path):
-    p = tmp_path / "x.bin"
-    p.write_bytes(b"abc")
-    assert compute_file_sha256(str(p)) == compute_file_sha256(str(p))
-
-
-def test_is_output_stale_missing(tmp_path):
-    inp = tmp_path / "in.mat"
-    inp.write_bytes(b"data")
-    assert is_output_stale(str(inp), [str(tmp_path / "missing.npz")]) is True
-
-
-def test_is_output_stale_fresh(tmp_path):
-    inp = tmp_path / "in.mat"
-    inp.write_bytes(b"data")
-    out = tmp_path / "out.npz"
-    out.write_bytes(b"x")
-    older = time.time() - 10
-    os.utime(str(inp), (older, older))
-    os.utime(str(out), (time.time(), time.time()))
-    assert is_output_stale(str(inp), [str(out)]) is False
-
-
-def test_compute_run_id_deterministic():
-    a = compute_run_id("c", "g", ["a", "b"])
-    b = compute_run_id("c", "g", ["a", "b"])
-    assert a == b
-    assert isinstance(a, str) and len(a) > 0
 
 
 # --------------------------------------------------------------------------- #
@@ -212,9 +222,32 @@ def test_pipeline_populates_cutoff_search():
     t, sig, _ = generate_synthetic_signal(fs=fs, duration=1.0, seed=8, chatter_freq=125.0)
     cfg = _minimal_config(cutoffs, fs)
     res = process_recording(t, sig, cfg, mode="exploratory")
+    assert res.stage_1 is not None
+    assert res.stage_2 is not None
+    assert res.stage_3 is not None
+    assert res.stage_4 is not None
+    assert res.stage_1.selected_cutoff in cutoffs
+    assert len(res.stage_1.cutoff_search) == len(cutoffs)
     assert res.selected_parameters["cutoff_frequency"] in cutoffs
     search = res.selected_parameters["cutoff_search"]
     assert isinstance(search, list) and len(search) == len(cutoffs)
+
+
+def test_pipeline_physics_mode_never_invents_machining_metadata():
+    fs = 1000.0
+    t, sig, _ = generate_synthetic_signal(
+        fs=fs,
+        duration=1.0,
+        seed=10,
+        chatter_freq=125.0,
+    )
+    cfg = _minimal_config([50.0], fs)
+    cfg["use_physics_gating"] = True
+
+    with pytest.raises(ValueError, match="rpm is required"):
+        process_recording(t, sig, cfg, metadata=None)
+    with pytest.raises(ValueError, match="tooth_count is required"):
+        process_recording(t, sig, cfg, metadata={"rpm": 600.0})
 
 
 def test_optimize_cutoff_empty_raises():

@@ -1,392 +1,516 @@
-"""End-to-end CLI smoke test for the PG-AMCD pipeline.
+"""End-to-end checks for the canonical Stage 1--4 command-line contract."""
 
-Generates a synthetic ``tsDS`` MAT file, a lightweight configuration, runs
-the real ``pg-amcd`` CLI, and asserts that the run completes successfully
-with finite IMF / MAIW / Clean outputs and a valid provenance record.
-"""
-import os
-import sys
+from __future__ import annotations
+
+import csv
 import json
+import os
+from pathlib import Path
 import subprocess
+import sys
 
 import numpy as np
 import pytest
 import scipy.io
 
-# Repository root = tests/integration/../../  (two levels up)
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SRC_DIR = os.path.join(REPO_ROOT, "src")
+REPO_ROOT = Path(__file__).resolve().parents[2]
+SRC_DIR = REPO_ROOT / "src"
 
-# Lightweight configuration with reduced CEEMDAN settings for speed.
-# ``wavelet`` / ``maiw`` are intentionally omitted; the config loader
-# deep-merges them from the packaged default.
+PER_RECORDING_ARTIFACTS = {
+    "Stage_1": (
+        "preprocessed_physical.npz",
+        "preprocessed_scaled.npz",
+        "decomposition.npz",
+        "imf_metrics.csv",
+        "cutoff_search.csv",
+        "stage_1_metrics.json",
+        "stage_1_summary.md",
+        "stage_1_config.json",
+    ),
+    "Stage_2": (
+        "imf_indicators.csv",
+        "imf_gates.csv",
+        "weighted_reconstruction_scaled.npz",
+        "weighted_reconstruction_physical.npz",
+        "stage_2_metrics.json",
+        "stage_2_summary.md",
+        "stage_2_config.json",
+    ),
+    "Stage_3": (
+        "wavelet_coefficients.npz",
+        "wavelet_thresholds.csv",
+        "denoised_scaled.npz",
+        "denoised_physical.npz",
+        "stage_3_metrics.json",
+        "stage_3_summary.md",
+        "stage_3_config.json",
+    ),
+    "Stage_4": (
+        "window_features.csv",
+        "window_features.json",
+        "feature_schema.json",
+        "feature_quality.json",
+        "stage_4_metrics.json",
+        "stage_4_summary.md",
+        "stage_4_config.json",
+    ),
+}
+STAGE_4_AGGREGATE_ARTIFACTS = (
+    "all_recording_features.csv",
+    "feature_summary.csv",
+    "feature_missingness.csv",
+    "feature_correlations.csv",
+    "feature_schema.json",
+)
+
+# This deliberately resolves all scientific bands inside the 1 kHz fixture's
+# Nyquist range.  The production loader deep-merges unspecified defaults.
 TEST_CONFIG = {
-    "sampling_rate": 1000,
-    "segment_points": 1000,
+    "through_stage": 4,
+    "sampling_rate": 1000.0,
+    "segment_points": 512,
     "use_physics_gating": False,
     "ceemdan": {
-        "trials": 2,
+        "trials": 1,
         "search_trials": 1,
         "epsilon": 0.02,
         "noise_seed": 42,
         "sifting_iterations": 2,
-        "search_cutoffs": [20],
+        "search_sifting_iterations": 2,
+        "gate_stability_sifting_iterations": 2,
+        "search_cutoffs": [20.0],
+        "search_seeds": 1,
+        "stability_seeds": [42],
+        "parallel": False,
+        "max_imf": 3,
     },
+    "maiw": {
+        "chatter_band_center": 320.0,
+        "chatter_band_spread": 60.0,
+    },
+    "wavelet": {"wavelet_name": "db2", "level": 2},
+    "features": {
+        "window_seconds": 0.25,
+        "overlap_ratio": 0.5,
+        "band_energy_ranges_hz": [
+            [0.0, 50.0],
+            [50.0, 150.0],
+            [150.0, 300.0],
+            [300.0, 490.0],
+        ],
+    },
+    "output": {"png_dpi": 72, "write_svg": False},
 }
 
 
-def _make_synthetic_mat(path: str, fs: float = 1000.0, n_samples: int = 2000) -> None:
-    """Write a synthetic two-column ``tsDS`` MAT file.
+def _config(*, use_physics: bool) -> dict:
+    value = json.loads(json.dumps(TEST_CONFIG))
+    value["use_physics_gating"] = use_physics
+    return value
 
-    Columns are [time, signal] with a chatter-like sinusoid plus broadband
-    noise so that CEEMDAN produces a meaningful set of IMFs.
-    """
+
+def _make_synthetic_mat(path: Path, fs: float = 1000.0, n_samples: int = 1000) -> None:
+    """Write a finite two-column ``tsDS`` MAT recording."""
+
     rng = np.random.default_rng(1234)
-    t = np.arange(n_samples) / fs
+    time = np.arange(n_samples) / fs
     signal = (
-        0.6 * np.sin(2 * np.pi * 40.0 * t)          # tooth-passing harmonic
-        + 0.4 * np.sin(2 * np.pi * 320.0 * t)       # chatter resonance
-        + rng.normal(0.0, 0.15, n_samples)           # broadband noise
+        0.6 * np.sin(2 * np.pi * 40.0 * time)
+        + 0.4 * np.sin(2 * np.pi * 320.0 * time)
+        + rng.normal(0.0, 0.15, n_samples)
     )
-    tsDS = np.column_stack((t, signal))
-    scipy.io.savemat(path, {"tsDS": tsDS})
+    scipy.io.savemat(path, {"tsDS": np.column_stack((time, signal))})
 
 
-@pytest.fixture()
-def cli_fixture_dir(tmp_path):
-    input_dir = tmp_path / "input"
-    output_dir = tmp_path / "output"
+def _environment() -> dict[str, str]:
+    environment = os.environ.copy()
+    existing = environment.get("PYTHONPATH", "")
+    environment["PYTHONPATH"] = str(SRC_DIR) + (os.pathsep + existing if existing else "")
+    return environment
+
+
+def _run_cli(*arguments: str, timeout: int = 600) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, "-m", "pg_amcd.cli", *arguments],
+        cwd=REPO_ROOT,
+        env=_environment(),
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        check=False,
+    )
+
+
+def _write_config(path: Path, *, use_physics: bool) -> None:
+    path.write_text(json.dumps(_config(use_physics=use_physics)), encoding="utf-8")
+
+
+def _write_metadata(path: Path, rows: list[dict[str, object]]) -> None:
+    fields = ["relative_path", "recording_id", "rpm", "tooth_count"]
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+@pytest.fixture(scope="module")
+def completed_cli_run(tmp_path_factory: pytest.TempPathFactory) -> dict[str, object]:
+    root = tmp_path_factory.mktemp("stage_1_4_cli")
+    input_dir = root / "input"
+    output_dir = root / "outputs"
     input_dir.mkdir()
+    _make_synthetic_mat(input_dir / "sample.mat")
 
-    # 1. Synthetic tsDS MAT file
-    mat_path = input_dir / "sample.mat"
-    _make_synthetic_mat(str(mat_path), fs=1000.0, n_samples=2000)
-
-    # 2. Lightweight configuration
-    config_path = tmp_path / "test_config.json"
-    with open(config_path, "w", encoding="utf-8") as f:
-        json.dump(TEST_CONFIG, f)
-
+    config_path = root / "config.json"
+    _write_config(config_path, use_physics=True)
+    metadata_path = root / "metadata.csv"
+    _write_metadata(
+        metadata_path,
+        [
+            {
+                "relative_path": "sample.mat",
+                "recording_id": "sample_recording",
+                "rpm": 600,
+                "tooth_count": 2,
+            }
+        ],
+    )
+    arguments = (
+        "run",
+        "--input-dir",
+        str(input_dir),
+        "--metadata",
+        str(metadata_path),
+        "--output-dir",
+        str(output_dir),
+        "--config",
+        str(config_path),
+        "--through-stage",
+        "4",
+    )
+    process = _run_cli(*arguments)
+    run_dirs = (
+        sorted(path for path in output_dir.iterdir() if path.is_dir())
+        if output_dir.exists()
+        else []
+    )
     return {
-        "input_dir": str(input_dir),
-        "output_dir": str(output_dir),
-        "config_path": str(config_path),
+        "process": process,
+        "arguments": arguments,
+        "run_dirs": run_dirs,
+        "output_dir": output_dir,
     }
 
 
-def _run_cli(input_dir, output_dir, config_path):
-    env = os.environ.copy()
-    existing = env.get("PYTHONPATH", "")
-    env["PYTHONPATH"] = SRC_DIR + (os.pathsep + existing if existing else "")
-    proc = subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "pg_amcd.cli",
-            "run",
-            "--input-dir",
-            input_dir,
-            "--output-dir",
-            output_dir,
-            "--config",
-            config_path,
-        ],
-        cwd=REPO_ROOT,
-        env=env,
-        capture_output=True,
-        text=True,
-        timeout=600,
-    )
-    return proc
+def test_cli_run_materialises_complete_stage_1_4_contract(completed_cli_run):
+    process = completed_cli_run["process"]
+    assert isinstance(process, subprocess.CompletedProcess)
+    assert process.returncode == 0, f"STDOUT:\n{process.stdout}\nSTDERR:\n{process.stderr}"
+
+    run_dirs = completed_cli_run["run_dirs"]
+    assert len(run_dirs) == 1
+    run_dir = run_dirs[0]
+    assert len(run_dir.name) == 64
+    int(run_dir.name, 16)
+
+    top_level_directories = {path.name for path in run_dir.iterdir() if path.is_dir()}
+    assert top_level_directories == {"Stage_1", "Stage_2", "Stage_3", "Stage_4", "report"}
+    for filename in (
+        "run_manifest.json",
+        "stage_scorecard.json",
+        "stage_scorecard.png",
+        "stage_progress.png",
+    ):
+        assert (run_dir / filename).is_file(), filename
+    assert (run_dir / "report" / "pipeline_report.md").is_file()
+    assert (run_dir / "report" / "pipeline_report.html").is_file()
+    assert (run_dir / "report" / "figures").is_dir()
+    assert not any((run_dir / f"Stage_{stage}").exists() for stage in range(5, 8))
+
+    manifest = json.loads((run_dir / "run_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["status"] == "completed"
+    assert manifest["through_stage"] == 4
+    assert manifest["success_count"] == 1
+    assert manifest["failure_count"] == 0
+    assert manifest["failures"] == []
+    assert manifest["metadata_checksum"]
+    assert manifest["input_files"][0]["relative_path"] == "sample.mat"
+    assert len(manifest["input_files"][0]["sha256"]) == 64
+    assert manifest["stage_evidence"]["Stage_4"]["tests"]["integration"] is True
+    assert manifest["selected_processing_parameters"]["sample_recording"]
+    assert manifest["output_checksums"]
+
+    for stage, filenames in PER_RECORDING_ARTIFACTS.items():
+        recording_dir = run_dir / stage / "sample_recording"
+        assert recording_dir.is_dir()
+        for filename in filenames:
+            path = recording_dir / filename
+            assert path.is_file() and path.stat().st_size > 0, str(path)
+        assert any(recording_dir.glob("*.png")), stage
+
+    aggregate = run_dir / "Stage_4" / "aggregate"
+    for filename in STAGE_4_AGGREGATE_ARTIFACTS:
+        assert (aggregate / filename).is_file(), filename
+
+    with np.load(run_dir / "Stage_1" / "sample_recording" / "decomposition.npz") as values:
+        for key in (
+            "time_segment",
+            "scaled_source_segment",
+            "physical_source_segment",
+            "imfs",
+            "residual_scaled",
+            "residual_physical",
+        ):
+            assert key in values
+            assert np.all(np.isfinite(values[key]))
+    with np.load(
+        run_dir / "Stage_2" / "sample_recording" / "weighted_reconstruction_physical.npz"
+    ) as values:
+        assert np.all(np.isfinite(values["signal"]))
+    with np.load(run_dir / "Stage_3" / "sample_recording" / "denoised_physical.npz") as values:
+        assert np.all(np.isfinite(values["signal"]))
+
+    scorecard = json.loads((run_dir / "stage_scorecard.json").read_text(encoding="utf-8"))
+    assert set(scorecard) >= {"Stage_1", "Stage_2", "Stage_3", "Stage_4"}
+    assert all(scorecard[f"Stage_{number}"]["score"] >= 90 for number in range(1, 5))
 
 
-def test_cli_run_end_to_end(cli_fixture_dir):
-    input_dir = cli_fixture_dir["input_dir"]
-    output_dir = cli_fixture_dir["output_dir"]
-    config_path = cli_fixture_dir["config_path"]
+def test_cli_reuses_only_identity_matched_completed_run(completed_cli_run):
+    run_dir = completed_cli_run["run_dirs"][0]
+    before = (run_dir / "run_manifest.json").read_bytes()
+    process = _run_cli(*completed_cli_run["arguments"])
 
-    proc = _run_cli(input_dir, output_dir, config_path)
-
-    # 5. Process exits successfully
-    assert proc.returncode == 0, (
-        f"CLI exited with code {proc.returncode}\n"
-        f"STDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
-    )
-
-    # 4. Output files and provenance exist
-    provenance_path = None
-    for _root, _dirs, _files in os.walk(output_dir):
-        if "provenance.json" in _files:
-            provenance_path = os.path.join(_root, "provenance.json")
-            break
-    assert provenance_path is not None, "provenance.json missing"
-
-    imf_files = []
-    maiw_files = []
-    clean_files = []
-    for root, _dirs, files in os.walk(output_dir):
-        for name in files:
-            full = os.path.join(root, name)
-            if name.endswith("_IMFs.npz"):
-                imf_files.append(full)
-            elif name.endswith("_Clean.mat"):
-                clean_files.append(full)
-            elif name.endswith(".mat") and not name.endswith("_Clean.mat"):
-                # MAIW output keeps the original base name (e.g. sample.mat)
-                maiw_files.append(full)
-
-    assert imf_files, "IMF output missing"
-    assert maiw_files, "MAIW output missing"
-    assert clean_files, "Clean output missing"
-
-    # 3. Provenance reports zero failures
-    with open(provenance_path, "r", encoding="utf-8") as f:
-        provenance = json.load(f)
-    assert provenance.get("failure_count", 1) == 0, (
-        f"Failures in provenance: {provenance.get('failure_count')} "
-        f"-> {provenance.get('failures')}"
-    )
-    assert provenance.get("success_count", 0) >= 1
-
-    # All arrays contain finite values
-    imf_path = imf_files[0]
-    data = np.load(imf_path)
-    for key in ("time", "original_signal", "imfs"):
-        assert np.all(np.isfinite(data[key])), f"Non-finite values in IMF {key}"
-
-    clean_path = clean_files[0]
-    clean_mat = scipy.io.loadmat(clean_path)
-    assert np.all(np.isfinite(clean_mat["tsDS"])), "Non-finite values in Clean output"
-
-    maiw_path = maiw_files[0]
-    maiw_mat = scipy.io.loadmat(maiw_path)
-    assert np.all(np.isfinite(maiw_mat["tsDS"])), "Non-finite values in MAIW output"
+    assert process.returncode == 0, process.stderr
+    assert "Reusing identity-matched completed run" in process.stdout
+    assert (run_dir / "run_manifest.json").read_bytes() == before
 
 
-def test_cli_help():
-    env = os.environ.copy()
-    existing = env.get("PYTHONPATH", "")
-    env["PYTHONPATH"] = SRC_DIR + (os.pathsep + existing if existing else "")
-    proc = subprocess.run(
-        [sys.executable, "-m", "pg_amcd.cli", "--help"],
-        cwd=REPO_ROOT,
-        env=env,
-        capture_output=True,
-        text=True,
+def test_cli_public_surface_ends_at_stage_4():
+    help_process = _run_cli("--help", timeout=120)
+    assert help_process.returncode == 0
+    assert "{run,validate,report}" in help_process.stdout
+    assert "evaluate" not in help_process.stdout
+
+    rejected = _run_cli(
+        "run",
+        "--input-dir",
+        ".",
+        "--through-stage",
+        "5",
         timeout=120,
     )
-    assert proc.returncode == 0
+    assert rejected.returncode != 0
+    assert "outside the current project scope" in rejected.stderr
 
 
-def _run_validate(input_dir, config_path, output=None):
-    env = os.environ.copy()
-    existing = env.get("PYTHONPATH", "")
-    env["PYTHONPATH"] = SRC_DIR + (os.pathsep + existing if existing else "")
-    cmd = [
-        sys.executable,
-        "-m",
-        "pg_amcd.cli",
+def test_cli_validate_accepts_a_finite_nonphysics_recording(tmp_path: Path):
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    _make_synthetic_mat(input_dir / "sample.mat")
+    config_path = tmp_path / "config.json"
+    _write_config(config_path, use_physics=False)
+    report_path = tmp_path / "validation_report.json"
+
+    process = _run_cli(
         "validate",
         "--input-dir",
-        input_dir,
+        str(input_dir),
         "--config",
-        config_path,
-    ]
-    if output is not None:
-        cmd += ["--output", output]
-    proc = subprocess.run(cmd, cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=600)
-    return proc
+        str(config_path),
+        "--output",
+        str(report_path),
+        timeout=120,
+    )
 
-
-def test_cli_validate_end_to_end(tmp_path):
-    input_dir = tmp_path / "input"
-    input_dir.mkdir()
-    _make_synthetic_mat(str(input_dir / "sample.mat"), fs=1000.0, n_samples=2000)
-    config_path = tmp_path / "test_config.json"
-    with open(config_path, "w", encoding="utf-8") as f:
-        json.dump(TEST_CONFIG, f)
-    report_path = tmp_path / "report.json"
-    proc = _run_validate(str(input_dir), str(config_path), str(report_path))
-    assert proc.returncode == 0, proc.stderr
-    report = json.loads(report_path.read_text())
-    assert report["n_files"] == 1
-    assert report["n_valid"] == 1
+    assert process.returncode == 0, process.stderr
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["status"] == "valid"
+    assert report["n_files"] == report["n_valid"] == report["n_signal_valid"] == 1
     assert report["n_invalid"] == 0
     assert report["files"][0]["valid"] is True
-    assert report["files"][0]["fs_estimated"] == pytest.approx(1000.0, rel=0.05)
+    assert report["files"][0]["estimated_sampling_rate_hz"] == pytest.approx(1000.0, rel=0.05)
+    assert report["warnings"] == [
+        "No metadata supplied; metadata-dependent Stage 4 features will be undefined"
+    ]
 
 
-def test_cli_validate_rejects_invalid(tmp_path):
+def test_cli_validate_rejects_sampling_rate_mismatch(tmp_path: Path):
     input_dir = tmp_path / "input"
     input_dir.mkdir()
-    # Time spacing implies 2000 Hz, deviating >5% from the configured 1000 Hz.
-    _make_synthetic_mat(str(input_dir / "bad.mat"), fs=2000.0, n_samples=2000)
-    config_path = tmp_path / "test_config.json"
-    with open(config_path, "w", encoding="utf-8") as f:
-        json.dump(TEST_CONFIG, f)
-    proc = _run_validate(str(input_dir), str(config_path))
-    assert proc.returncode == 1, proc.stdout
-    assert "0/1" in proc.stdout
+    _make_synthetic_mat(input_dir / "bad.mat", fs=2000.0, n_samples=2000)
+    config_path = tmp_path / "config.json"
+    _write_config(config_path, use_physics=False)
+    report_path = tmp_path / "validation_report.json"
 
-
-def test_cli_validate_help():
-    env = os.environ.copy()
-    proc = subprocess.run(
-        [sys.executable, "-m", "pg_amcd.cli", "validate", "--help"],
-        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=60,
+    process = _run_cli(
+        "validate",
+        "--input-dir",
+        str(input_dir),
+        "--config",
+        str(config_path),
+        "--output",
+        str(report_path),
+        timeout=120,
     )
-    assert proc.returncode == 0
+
+    assert process.returncode == 1
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["n_files"] == 1
+    assert report["n_valid"] == 0
+    assert report["n_invalid"] == 1
+    assert report["files"][0]["valid"] is False
+    assert any(
+        "differs from configured rate" in error.lower() for error in report["files"][0]["errors"]
+    )
 
 
-def test_cli_validate_with_metadata(tmp_path):
-    import csv
+def test_cli_validate_physics_metadata_is_strict_and_label_optional(tmp_path: Path):
     input_dir = tmp_path / "input"
     input_dir.mkdir()
-    _make_synthetic_mat(str(input_dir / "sample.mat"), fs=1000.0, n_samples=2000)
-    _make_synthetic_mat(str(input_dir / "orphan.mat"), fs=1000.0, n_samples=2000)
-    config_path = tmp_path / "test_config.json"
-    with open(config_path, "w", encoding="utf-8") as f:
-        json.dump(TEST_CONFIG, f)
-        
-    # A. Incorrect metadata -> should fail (returncode == 1)
-    meta_path = tmp_path / "meta.csv"
-    with open(meta_path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["file_path", "label", "rpm", "tooth_count"])
-        w.writeheader()
-        w.writerow({"file_path": "sample.mat", "label": "chatter", "rpm": "1200", "tooth_count": "4"})
-        w.writerow({"file_path": "sample.mat", "label": "stable", "rpm": "1200", "tooth_count": "4"})  # duplicate entry
-        w.writerow({"file_path": "other.mat", "label": "", "rpm": "1200", "tooth_count": "4"})        # missing label
-    report_path = tmp_path / "report.json"
-    env = os.environ.copy()
-    existing = env.get("PYTHONPATH", "")
-    env["PYTHONPATH"] = SRC_DIR + (os.pathsep + existing if existing else "")
-    proc = subprocess.run(
-        [sys.executable, "-m", "pg_amcd.cli", "validate",
-         "--input-dir", str(input_dir), "--config", str(config_path),
-         "--metadata", str(meta_path), "--output", str(report_path)],
-        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
+    _make_synthetic_mat(input_dir / "sample.mat")
+    _make_synthetic_mat(input_dir / "orphan.mat")
+    config_path = tmp_path / "config.json"
+    _write_config(config_path, use_physics=True)
+    metadata_path = tmp_path / "metadata.csv"
+    report_path = tmp_path / "validation_report.json"
+
+    _write_metadata(
+        metadata_path,
+        [
+            {
+                "relative_path": "sample.mat",
+                "recording_id": "sample",
+                "rpm": 1200,
+                "tooth_count": "",
+            }
+        ],
     )
-    assert proc.returncode == 1
-    report = json.loads(report_path.read_text())
+    invalid = _run_cli(
+        "validate",
+        "--input-dir",
+        str(input_dir),
+        "--metadata",
+        str(metadata_path),
+        "--config",
+        str(config_path),
+        "--output",
+        str(report_path),
+        timeout=120,
+    )
+    assert invalid.returncode == 1
+    report = json.loads(report_path.read_text(encoding="utf-8"))
     assert report["n_files"] == 2
-    meta = report["metadata"]
-    assert meta["missing_metadata"] == 1
-    assert meta["duplicate_metadata_entries"] == 1
-    assert meta["missing_chatter_label"] == 1
-    assert "Metadata validation" in proc.stdout
+    assert report["n_valid"] == 0
+    assert report["metadata"]["missing_recordings"] == ["orphan.mat"]
+    assert report["metadata"]["missing_tooth_count"] == ["sample.mat"]
+    errors_by_path = {entry["path"]: entry["errors"] for entry in report["files"]}
+    assert any("tooth_count" in error for error in errors_by_path["sample.mat"])
+    assert any("No metadata row" in error for error in errors_by_path["orphan.mat"])
 
-    # B. Correct metadata -> should succeed (returncode == 0)
-    meta_ok_path = tmp_path / "meta_ok.csv"
-    with open(meta_ok_path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["file_path", "label", "rpm", "tooth_count"])
-        w.writeheader()
-        w.writerow({"file_path": "sample.mat", "label": "chatter", "rpm": "1200", "tooth_count": "4"})
-        w.writerow({"file_path": "orphan.mat", "label": "stable", "rpm": "1200", "tooth_count": "4"})
-        
-    proc_ok = subprocess.run(
-        [sys.executable, "-m", "pg_amcd.cli", "validate",
-         "--input-dir", str(input_dir), "--config", str(config_path),
-         "--metadata", str(meta_ok_path), "--output", str(report_path)],
-        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
+    _write_metadata(
+        metadata_path,
+        [
+            {
+                "relative_path": relative,
+                "recording_id": Path(relative).stem,
+                "rpm": 1200,
+                "tooth_count": 4,
+            }
+            for relative in ("sample.mat", "orphan.mat")
+        ],
     )
-    assert proc_ok.returncode == 0, proc_ok.stderr
-    report_ok = json.loads(report_path.read_text())
-    assert report_ok["n_files"] == 2
-    meta_ok = report_ok["metadata"]
-    assert meta_ok["missing_metadata"] == 0
-    assert meta_ok["duplicate_metadata_entries"] == 0
-    assert meta_ok["missing_chatter_label"] == 0
+    valid = _run_cli(
+        "validate",
+        "--input-dir",
+        str(input_dir),
+        "--metadata",
+        str(metadata_path),
+        "--config",
+        str(config_path),
+        "--output",
+        str(report_path),
+        timeout=120,
+    )
+    assert valid.returncode == 0, valid.stderr
+    valid_report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert valid_report["n_valid"] == 2
+    assert valid_report["metadata"]["missing_recordings"] == []
+    assert valid_report["metadata"]["missing_tooth_count"] == []
+    assert all(entry["metadata"]["label"] is None for entry in valid_report["files"])
 
 
-def test_cli_run_metadata_wiring(tmp_path):
-    import csv
-    import json
+def test_cli_run_physics_mode_refuses_missing_metadata_before_processing(tmp_path: Path):
     input_dir = tmp_path / "input"
     input_dir.mkdir()
-    _make_synthetic_mat(str(input_dir / "sample.mat"), fs=1000.0, n_samples=2000)
-    output_dir = tmp_path / "output"
-    
-    # 1. Physics gating enabled + metadata missing -> should fail
-    config_path = tmp_path / "config_physics.json"
-    with open(config_path, "w", encoding="utf-8") as f:
-        json.dump({
-            "sampling_rate": 1000.0,
-            "use_physics_gating": True,
-            "segment_points": 1000,
-            "ceemdan": {
-                "search_cutoffs": [100.0],
-                "search_trials": 2,
-                "trials": 2,
-                "epsilon": 0.2,
-                "noise_seed": 42
-            },
-            "maiw": {
-                "chatter_band_center": 300.0,
-                "chatter_band_spread": 100.0
-            },
-            "wavelet": {
-                "wavelet_name": "db2",
-                "level": 2
-            }
-        }, f)
-        
-    env = os.environ.copy()
-    existing = env.get("PYTHONPATH", "")
-    env["PYTHONPATH"] = SRC_DIR + (os.pathsep + existing if existing else "")
-    
-    proc = subprocess.run(
-        [sys.executable, "-m", "pg_amcd.cli", "run",
-         "--input-dir", str(input_dir), "--output-dir", str(output_dir),
-         "--config", str(config_path)],
-        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=60,
-    )
-    assert proc.returncode != 0
-    assert "Error: Physics gating is enabled" in proc.stdout or "Error: Physics gating is enabled" in proc.stderr
+    _make_synthetic_mat(input_dir / "sample.mat")
+    config_path = tmp_path / "config.json"
+    _write_config(config_path, use_physics=True)
 
-    # 2. Physics gating enabled + metadata present -> should succeed
-    meta_path = tmp_path / "meta.csv"
-    with open(meta_path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["file_path", "rpm", "tooth_count", "label"])
-        w.writeheader()
-        w.writerow({"file_path": "sample.mat", "rpm": "1200", "tooth_count": "4", "label": "chatter"})
-        
-    proc = subprocess.run(
-        [sys.executable, "-m", "pg_amcd.cli", "run",
-         "--input-dir", str(input_dir), "--output-dir", str(output_dir),
-         "--config", str(config_path), "--metadata", str(meta_path)],
-        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
+    process = _run_cli(
+        "run",
+        "--input-dir",
+        str(input_dir),
+        "--output-dir",
+        str(tmp_path / "outputs"),
+        "--config",
+        str(config_path),
+        timeout=120,
     )
-    assert proc.returncode == 0, proc.stderr
-    
-    # 3. Physics gating disabled + metadata missing -> should succeed
-    config_no_physics_path = tmp_path / "config_no_physics.json"
-    with open(config_no_physics_path, "w", encoding="utf-8") as f:
-        json.dump({
-            "sampling_rate": 1000.0,
-            "use_physics_gating": False,
-            "segment_points": 1000,
-            "ceemdan": {
-                "search_cutoffs": [100.0],
-                "search_trials": 2,
-                "trials": 2,
-                "epsilon": 0.2,
-                "noise_seed": 42
-            },
-            "maiw": {
-                "chatter_band_center": 300.0,
-                "chatter_band_spread": 100.0
-            },
-            "wavelet": {
-                "wavelet_name": "db2",
-                "level": 2
-            }
-        }, f)
-        
-    proc = subprocess.run(
-        [sys.executable, "-m", "pg_amcd.cli", "run",
-         "--input-dir", str(input_dir), "--output-dir", str(output_dir / "no_physics"),
-         "--config", str(config_no_physics_path)],
-        cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=120,
-    )
-    assert proc.returncode == 0, proc.stderr
 
+    assert process.returncode == 2
+    assert "requires --metadata" in process.stdout
+    assert "tooth_count" in process.stdout
+    assert not (tmp_path / "outputs").exists()
+
+
+def test_cli_rejects_ambiguous_duplicate_metadata_before_processing(tmp_path: Path):
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    _make_synthetic_mat(input_dir / "sample.mat")
+    config_path = tmp_path / "config.json"
+    _write_config(config_path, use_physics=True)
+    metadata_path = tmp_path / "metadata.csv"
+    duplicate_rows = [
+        {
+            "relative_path": "sample.mat",
+            "recording_id": recording_id,
+            "rpm": rpm,
+            "tooth_count": 2,
+        }
+        for recording_id, rpm in (("first", 600), ("second", 900))
+    ]
+    _write_metadata(metadata_path, duplicate_rows)
+    validation_report = tmp_path / "validation.json"
+
+    validation = _run_cli(
+        "validate",
+        "--input-dir",
+        str(input_dir),
+        "--metadata",
+        str(metadata_path),
+        "--config",
+        str(config_path),
+        "--output",
+        str(validation_report),
+    )
+    assert validation.returncode == 1
+    report = json.loads(validation_report.read_text(encoding="utf-8"))
+    assert report["status"] == "invalid"
+    assert report["metadata"]["ambiguous_rows"] == 1
+    assert any("ambiguous" in failure.lower() for failure in report["failures"])
+
+    output_dir = tmp_path / "outputs"
+    run = _run_cli(
+        "run",
+        "--input-dir",
+        str(input_dir),
+        "--metadata",
+        str(metadata_path),
+        "--output-dir",
+        str(output_dir),
+        "--config",
+        str(config_path),
+    )
+    assert run.returncode == 2
+    assert "Metadata is ambiguous" in run.stdout
+    assert not output_dir.exists()

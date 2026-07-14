@@ -1,6 +1,8 @@
 import os
 import re
 import glob
+from copy import deepcopy
+import math
 from typing import List, Dict, Any
 # Goal 6.1 canonical metadata schema. A metadata workbook must provide these
 # columns (matched case-insensitively; a few accept the aliases the parser
@@ -26,6 +28,92 @@ _REQUIRED_ALIASES = {
     "state": {"state", "chatter/nochatter", "status"},
     "label": {"label", "state", "chatter/nochatter", "status"},
 }
+
+
+def _align_finite_feature_rows(
+    rows: List[Dict[str, Any]],
+) -> tuple[List[str], Any, Dict[str, Any]]:
+    """Align heterogeneous exploratory features without inventing values.
+
+    Per-IMF feature names are dynamic because valid recordings can decompose
+    into different IMF counts.  Experimental evaluators therefore use the
+    intersection of keys that are present and finite in every row.  Union-based
+    zero filling would give an absent centre frequency or bandwidth a fabricated
+    physical meaning.
+    """
+
+    import numpy as np
+
+    if not rows:
+        raise ValueError("At least one feature row is required for alignment.")
+    mappings: List[Dict[str, Any]] = []
+    for row in rows:
+        features = row.get("features")
+        if not isinstance(features, dict):
+            raise ValueError("Every evaluation row must contain a feature mapping.")
+        mappings.append(dict(features))
+    candidate_keys = set().union(*(mapping.keys() for mapping in mappings))
+    common_keys = set(mappings[0]).intersection(*(mapping.keys() for mapping in mappings[1:]))
+    feature_keys: List[str] = []
+    for key in sorted(common_keys):
+        try:
+            values = [float(mapping[key]) for mapping in mappings]
+        except (TypeError, ValueError):
+            continue
+        if all(math.isfinite(value) for value in values):
+            feature_keys.append(key)
+    if not feature_keys:
+        raise ValueError("No common finite features are available across evaluation rows.")
+
+    matrix = np.asarray(
+        [[float(mapping[key]) for key in feature_keys] for mapping in mappings],
+        dtype=float,
+    )
+    if matrix.ndim != 2 or matrix.shape != (len(rows), len(feature_keys)):
+        raise RuntimeError("Aligned feature matrix has an unexpected shape.")
+    if not np.all(np.isfinite(matrix)):
+        raise RuntimeError("Aligned feature matrix contains non-finite values.")
+    dropped = sorted(candidate_keys.difference(feature_keys))
+    evidence = {
+        "strategy": "intersection_of_present_finite_features",
+        "candidate_feature_count": len(candidate_keys),
+        "aligned_feature_count": len(feature_keys),
+        "dropped_feature_count": len(dropped),
+        "dropped_features": dropped,
+        "missing_feature_policy": "drop_from_experimental_matrix; never zero-fill",
+    }
+    return feature_keys, matrix, evidence
+
+
+def _exploratory_segment_config(
+    config: Dict[str, Any], sample_count: int
+) -> tuple[Dict[str, Any], Dict[str, Any]]:
+    """Copy config and make its duration contract explicit for one eval slice."""
+
+    if sample_count < 3:
+        raise ValueError("Exploratory evaluation segments require at least three samples.")
+    local_config = deepcopy(config)
+    sampling_rate = float(local_config.get("sampling_rate", 0.0))
+    if not math.isfinite(sampling_rate) or sampling_rate <= 0.0:
+        raise ValueError("sampling_rate must be a finite positive number.")
+    raw_validation = local_config.get("validation", {})
+    if not isinstance(raw_validation, dict):
+        raise ValueError("validation must be a mapping.")
+    validation = dict(raw_validation)
+    source_minimum = float(validation.get("minimum_duration_seconds", 0.0))
+    if not math.isfinite(source_minimum) or source_minimum < 0.0:
+        raise ValueError("validation.minimum_duration_seconds must be non-negative and finite.")
+    segment_duration = sample_count / sampling_rate
+    effective_minimum = min(source_minimum, segment_duration)
+    validation["minimum_duration_seconds"] = effective_minimum
+    local_config["validation"] = validation
+    return local_config, {
+        "source_minimum_duration_seconds": source_minimum,
+        "effective_minimum_duration_seconds": effective_minimum,
+        "segment_duration_seconds": segment_duration,
+        "adjusted": effective_minimum != source_minimum,
+        "scope": "experimental_evaluation_segment_only",
+    }
 
 def build_dataset_index(
     input_dir: str, 
@@ -309,7 +397,7 @@ def evaluate_directory(
 def evaluate_real_dataset(
     mat_dir: str,
     config: Dict[str, Any],
-    label_filter: tuple = ("c", "s"),
+    label_filter: tuple = ("c", "i", "s"),
     random_state: int = 42,
 ) -> Dict[str, Any]:
     """Evaluate chatter detection on a directory of raw ``*.mat`` recordings.
@@ -317,7 +405,7 @@ def evaluate_real_dataset(
     Filename convention ``<label>_<rpm>_<feed>.mat`` (label in ``c/s/i/u``)
     inside a stickout subdirectory (e.g. ``2p5inch_stickout``). Each signal is
     processed through the full PG-AMCD pipeline and window features are
-    extracted. A binary chatter task (``c``=1, ``s``=0) is evaluated with
+    extracted. A binary chatter task (``c``/``i``=1 [chatter & intermittent chatter], ``s``=0 [stable]) is evaluated with
     grouped cross-validation so windows from one recording never leak across
     train/test (Goal 6.4):
 
@@ -372,7 +460,7 @@ def evaluate_real_dataset(
         for wr in res.window_results:
             rows.append({
                 "features": wr.features,
-                "label": 1 if label_code == "c" else 0,
+                "label": 1 if label_code in ("c", "i") else 0,
                 "recording_id": os.path.relpath(f, mat_dir),
                 "stickout": stickout,
                 "rpm": rpm,
@@ -382,12 +470,7 @@ def evaluate_real_dataset(
     if not rows:
         raise ValueError(f"No usable recordings found in {mat_dir}")
 
-    features_first: Dict[str, float] = rows[0]["features"]
-    feature_keys = sorted(features_first.keys())
-    X = np.array(
-        [[float(r["features"][k]) for k in feature_keys] for r in rows],
-        dtype=float,
-    )
+    feature_keys, X, feature_alignment = _align_finite_feature_rows(rows)
     y = np.array([r["label"] for r in rows], dtype=int)
     rec_id = np.array([r["recording_id"] for r in rows])
     stickout = np.array([r["stickout"] for r in rows])
@@ -477,6 +560,7 @@ def evaluate_real_dataset(
             "stable": int(counts.get(0, 0)),
         },
         "feature_keys": feature_keys,
+        "feature_alignment": feature_alignment,
         "leave_one_recording_out": loi,
         "leave_one_stickout_out": los,
         "leave_one_rpm_out": lor,
@@ -498,7 +582,7 @@ def evaluate_real_dataset(
 def evaluate_real_dataset_temporal(
     mat_dir: str,
     config: Dict[str, Any],
-    label_filter: tuple = ("c", "s"),
+    label_filter: tuple = ("c", "i", "s"),
     n_windows: int = 5,
     window_points: int = 2048,
     random_state: int = 42,
@@ -525,7 +609,6 @@ def evaluate_real_dataset_temporal(
         predict_window_probabilities,
         evaluate_detector,
         temporal_smooth_probabilities,
-        fit_probability_calibrator,
     )
 
     def _segment_indices(n: int):
@@ -537,6 +620,7 @@ def evaluate_real_dataset_temporal(
     files = sorted(glob.glob(os.path.join(mat_dir, "**", "*.mat"), recursive=True))
     rows: List[Dict[str, Any]] = []
     skips = []
+    exploratory_config_adjustments: List[Dict[str, Any]] = []
     for f in files:
         base = os.path.basename(f)[:-4]
         parts = base.split("_")
@@ -559,15 +643,19 @@ def evaluate_real_dataset_temporal(
         n = len(sig)
         rec_id = os.path.relpath(f, mat_dir)
         for wi, (s, e) in enumerate(_segment_indices(n)):
+            segment_config, adjustment = _exploratory_segment_config(config, e - s)
+            exploratory_config_adjustments.append(
+                {"recording_id": rec_id, "window_index": wi, **adjustment}
+            )
             res = process_recording(
-                t_arr[s:e], sig[s:e], config,
+                t_arr[s:e], sig[s:e], segment_config,
                 metadata={"rpm": rpm, "tooth_count": 1},
                 mode="exploratory",
             )
             for wr in res.window_results:
                 rows.append({
                     "features": wr.features,
-                    "label": 1 if label_code == "c" else 0,
+                    "label": 1 if label_code in ("c", "i") else 0,
                     "recording_id": rec_id,
                     "stickout": stickout,
                     "rpm": rpm,
@@ -578,15 +666,10 @@ def evaluate_real_dataset_temporal(
     if not rows:
         raise ValueError(f"No usable recordings found in {mat_dir}")
 
-    feature_keys = sorted(rows[0]["features"].keys())
-    X = np.array(
-        [[float(r["features"][k]) for k in feature_keys] for r in rows],
-        dtype=float,
-    )
+    feature_keys, X, feature_alignment = _align_finite_feature_rows(rows)
     y = np.array([r["label"] for r in rows], dtype=int)
     rec_id = np.array([r["recording_id"] for r in rows])
     stickout = np.array([r["stickout"] for r in rows])
-    rpm_a = np.array([r["rpm"] for r in rows])
 
     def grouped_eval(group_values, Xmat):
         from sklearn.preprocessing import StandardScaler
@@ -677,6 +760,8 @@ def evaluate_real_dataset_temporal(
             "stable": int(counts.get(0, 0)),
         },
         "feature_keys": feature_keys,
+        "feature_alignment": feature_alignment,
+        "exploratory_config_adjustments": exploratory_config_adjustments,
         "best_model": best,
         "per_window_metrics": loi,
         "smoothed_metrics": smoothed_metrics,

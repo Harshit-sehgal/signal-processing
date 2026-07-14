@@ -1,0 +1,752 @@
+{
+  "cli_command": "/tmp/pg-amcd-venv-MHOAt0/bin/pg-amcd run --input-dir /tmp/pg-amcd-final-acceptance-1ngounpt/input --metadata /tmp/pg-amcd-final-acceptance-1ngounpt/metadata.csv --output-dir /tmp/pg-amcd-final-acceptance-1ngounpt/final-wheel-outputs --config /tmp/pg-amcd-final-acceptance-1ngounpt/config.json --through-stage 4",
+  "dependency_versions": {
+    "EMD-signal": "1.10.0",
+    "PyWavelets": "1.9.0",
+    "matplotlib": "3.11.0",
+    "numpy": "2.5.1",
+    "openpyxl": "3.1.5",
+    "pandas": "3.0.3",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.18.0"
+  },
+  "end_timestamp": "2026-07-14T01:32:00.302596+00:00",
+  "failure_count": 0,
+  "failures": [],
+  "feature_schema_version": "1.0.0",
+  "git_commit": "f920df6c8701442a8a3eda5d81478fc4ea636b6b",
+  "git_dirty": true,
+  "git_worktree_sha256": "e5eae1855e4e1bf5f125d44e94c075e02ef32dba0ac7fafcfb3fadb9a0441390",
+  "input_files": [
+    {
+      "relative_path": "sample.mat",
+      "sha256": "400a08dcd83bea812289de30584d200f597896763d54ef6c4077ef4e62cc5eda"
+    }
+  ],
+  "input_validation": {
+    "n_files": 1,
+    "n_invalid": 0,
+    "n_valid": 1
+  },
+  "limitations": [
+    "The production workflow intentionally ends after Stage 4 feature extraction.",
+    "Real-signal SNR improvement is not reported without a known clean reference."
+  ],
+  "metadata_checksum": "69b3fbf1b4b3637ce0120ae8834fafcfa045d163eb3254e73008c3c9b5c0fd1d",
+  "metadata_diagnostics": {
+    "ambiguous_rows": 0,
+    "duplicate_basenames": [],
+    "duplicate_recording_ids": [],
+    "legacy_condition_rows": 0,
+    "matched_recordings": 1,
+    "metadata_rows": 1,
+    "missing_recordings": [],
+    "missing_tooth_count": [],
+    "unmappable_rows": 0
+  },
+  "metadata_file": "/tmp/pg-amcd-final-acceptance-1ngounpt/metadata.csv",
+  "operating_system": "Linux-7.0.11-76070011-generic-x86_64-with-glibc2.39",
+  "output_checksums": {
+    "Stage_1/acceptance_sample/01_raw_signal.png": "634f84ffe66e631e6fe23ad7e9a7aaf49ef3f44b38efe099ad9672895a252e81",
+    "Stage_1/acceptance_sample/01_raw_signal.svg": "3a2167e0f282e0472e4147d12ae404f467ad878b2571b1cb3967aa2e09c57736",
+    "Stage_1/acceptance_sample/02_selected_segment.png": "a77cffbc6ba3021065f2393934a69529da210a35fadbb7d8dc1425e9cb02be72",
+    "Stage_1/acceptance_sample/02_selected_segment.svg": "589da43c948f5a9408248763896bf01055cfd0de2807b78671cab75c6accaf1e",
+    "Stage_1/acceptance_sample/03_preprocessing_comparison.png": "761c7214968df7287e4f91848ae9e30e77de18e68cde033b7d6acd7cb613d242",
+    "Stage_1/acceptance_sample/03_preprocessing_comparison.svg": "bbd5e667451464d6e7229ac4dab6dbb35fa6425c901bc82b2d84b8d8985185a0",
+    "Stage_1/acceptance_sample/04_psd_comparison.png": "e1f4224754b02df98123e50e705d88c8e0dd00d86efe0d7308462dc3e2fb3d2f",
+    "Stage_1/acceptance_sample/04_psd_comparison.svg": "774d44eb7eba437244ee37b67776d45fa08516ff39113ccbd04498dd223ce0bc",
+    "Stage_1/acceptance_sample/05_cutoff_search.png": "8789da129ac09db37613365177db7be9ce07414d767856f518454f5cc01e5138",
+    "Stage_1/acceptance_sample/05_cutoff_search.svg": "f22cd173d534c685299c591d2f41300bef559cf7ff591ca6405c938efecb192f",
+    "Stage_1/acceptance_sample/06_ceemdan_decomposition.png": "a555f423998bf98c16537b724641fc7d5eb4a6d2c387e46880da276011e9d052",
+    "Stage_1/acceptance_sample/06_ceemdan_decomposition.svg": "01635a8cc88a24f472444b62885f6c412f29b63574d420cb803689df7b236704",
+    "Stage_1/acceptance_sample/07_individual_imfs.png": "5473bb5ffa9e14128d88f270fa69ab71f2dabc42bef73e6c968f6a9fbb01d42a",
+    "Stage_1/acceptance_sample/07_individual_imfs.svg": "78ae9a1345eddd9a39edbbbb0dbabe07cfae1a17f3d52e5a33b04d3e4f225725",
+    "Stage_1/acceptance_sample/08_residual.png": "d75ef9d610ad7d94fa7c056fb0ed0656bfd65145189f878274246a1e4a688348",
+    "Stage_1/acceptance_sample/08_residual.svg": "7013aa66d39744c34222859542438d9b9802139ac060e4cbf89b2b55f4376e0a",
+    "Stage_1/acceptance_sample/09_imf_energy_distribution.png": "d1060559612fb5499da5f1cfa12381df5a1f6921ce46908e07ff609d4b4116d4",
+    "Stage_1/acceptance_sample/09_imf_energy_distribution.svg": "68cb6ba1b7c20195ac31699e718a113304d59fa905caea06d36ff760cd887b67",
+    "Stage_1/acceptance_sample/10_imf_frequency_ordering.png": "cb1904d5aaff7ba7de93701f1c82f1340c81a7e5d1f6e76223c4a8d11abe0fe4",
+    "Stage_1/acceptance_sample/10_imf_frequency_ordering.svg": "f1273681534ed9dbed27d9c833d2356f2d5de7c543ce61c70b12212171c0c225",
+    "Stage_1/acceptance_sample/11_imf_bandwidth.png": "6fcf3c3637e7e2fef831f507888650988e6cdd058e07553a9c2a8dc036c7298d",
+    "Stage_1/acceptance_sample/11_imf_bandwidth.svg": "60b85fcfa0a7030c7e4b0bbc453d99619d67f9d2e8bc72e66c628c4a5bbea947",
+    "Stage_1/acceptance_sample/12_adjacent_imf_correlation.png": "e04ff6e68bfc6c055e5ac26914467c0f95285eafca896c77a1f44666cd3a06be",
+    "Stage_1/acceptance_sample/12_adjacent_imf_correlation.svg": "78821652f29050b401ca310a3abdb18d904dbcf014cefa38d4d3eda76f72fd0f",
+    "Stage_1/acceptance_sample/13_seed_stability.png": "5503a60adc39aee0d4f3014bd8fe72e4bc23a1ca9c2538bafb4f702b92ab46eb",
+    "Stage_1/acceptance_sample/13_seed_stability.svg": "a56e774b21aeb729d3c4e2961a1d513be445424e1f495b2130532ed4fe0f7021",
+    "Stage_1/acceptance_sample/14_reconstruction_error.png": "3a58f385ccb1d07a67c9ebc2b974d4f106a0e88bdba55a57fd40d3db4ddda3fd",
+    "Stage_1/acceptance_sample/14_reconstruction_error.svg": "fc3a5a051ef1fdc119a28e36765cdab4115030c0bc49639ffd56fe35d3c8bf12",
+    "Stage_1/acceptance_sample/15_time_frequency.png": "678b66b24f4facf85d1bd2c108b94ebd91a78b44856ac8769acdda0d6b90aeea",
+    "Stage_1/acceptance_sample/15_time_frequency.svg": "5c6ec2b362fb7e6b279ef5cabb5e2e5df60d3f72a92fff8abbcd837f02b08dd7",
+    "Stage_1/acceptance_sample/cutoff_search.csv": "9a40ac2ba09d9786d8a54791536c1c48488c27fac8d8961dc30db7509f08774b",
+    "Stage_1/acceptance_sample/decomposition.npz": "12cf9f282fe907dcf04ae5e3dffe2552022abb8369a58adb8291b8d461010fc2",
+    "Stage_1/acceptance_sample/imf_metrics.csv": "b284244137b273bfab6f516d2e4064d1bcf8f25b4637cf96708daa82f71927e1",
+    "Stage_1/acceptance_sample/preprocessed_physical.npz": "2e92f1bce082e0df7d8b4ae1d8c669a230e25217ce2c4dec6e3b16c491dc0a87",
+    "Stage_1/acceptance_sample/preprocessed_scaled.npz": "b67420d1114f6f85c4fea1cf166909feb7486aff008d79345d69f50064c0b96d",
+    "Stage_1/acceptance_sample/stage_1_config.json": "23582141ddc4ec8e96007522fc7c46496b8cd1d1eb9c1bc003d048d9f32dff2f",
+    "Stage_1/acceptance_sample/stage_1_metrics.json": "ad231eb53b6ed2e158ce5c235a0dccc527a7f25e43c2b32d3b5c435c15c4a6ed",
+    "Stage_1/acceptance_sample/stage_1_summary.md": "fd367064a259090c0c742d70e2548b31c693dae512482f084ae614e0c7587cdf",
+    "Stage_2/acceptance_sample/01_imf_gate_values.png": "2ff8be2a8807f94b487f40c17c78c8bdfaa0ee468aea6149f510770a05874bc2",
+    "Stage_2/acceptance_sample/01_imf_gate_values.svg": "d7882d20072c7bf2eab08e49524f30d0d7737605a001cea15ea4538316abb8b4",
+    "Stage_2/acceptance_sample/02_imf_indicator_comparison.png": "a403c2c2f68880f7eb901d0176609a17107c6d4738c4cfaf6867288dafba0972",
+    "Stage_2/acceptance_sample/02_imf_indicator_comparison.svg": "adf7fc144c219361a866ba4cab48f84aa288411e8b2e5f0bcb62fa19a8c33640",
+    "Stage_2/acceptance_sample/03_frequency_vs_gate.png": "e0016026e44e7f56f7c80876c0a2fbe41a9bb3e4c9aec55dc2b790e3f753f092",
+    "Stage_2/acceptance_sample/03_frequency_vs_gate.svg": "a00fbc4c0080775aa27801e5421ad574a9d4614ca36e817c3b0f19ce9093f27b",
+    "Stage_2/acceptance_sample/04_energy_vs_gate.png": "a464e3120ae03ad9559440b5019cff41bedb97bae90b37fb0df4dd14809a2b5f",
+    "Stage_2/acceptance_sample/04_energy_vs_gate.svg": "6f818786d0a70f659776c4ab20bbc8902b80f881b73333f668a0e3c5251d8286",
+    "Stage_2/acceptance_sample/05_chatter_energy_vs_gate.png": "8fd4146c4873727199a10e4cafec710e7ed447a638798ab4cb5b3bd73a90cbe4",
+    "Stage_2/acceptance_sample/05_chatter_energy_vs_gate.svg": "e286ddbc7b6afb22bfd9cd0c146fc10c117cef18bb39aaae01593be0372c69a9",
+    "Stage_2/acceptance_sample/06_forced_harmonics_vs_gate.png": "44f2e0c9856444f6cb5073a68f05a4bf2c3d8f5bc9ec39888bb03175c0ab0714",
+    "Stage_2/acceptance_sample/06_forced_harmonics_vs_gate.svg": "7593367bad9066a83d3fa95abe4abed8aa9a39ce4ab854514d86e869bdb83906",
+    "Stage_2/acceptance_sample/07_weighted_reconstruction.png": "9465ccf23a6b74d3fd470482ba2d05600370e2eabac12e7dfdc56aa5f6b0d9b0",
+    "Stage_2/acceptance_sample/07_weighted_reconstruction.svg": "e63e28654fe99f3cfb2be4d429f0e3a2b12c1a0d84b5c78ebe5a2dcaa5ff5692",
+    "Stage_2/acceptance_sample/08_weighted_psd_comparison.png": "9e86e7c9796c1f01e1b33375580680458840467c38b11c9c7f628a780311c241",
+    "Stage_2/acceptance_sample/08_weighted_psd_comparison.svg": "88faa43a4e46cc839269e9d22a6317ff031affd29e85c1e5e073724bff3d65f4",
+    "Stage_2/acceptance_sample/09_retained_suppressed_imfs.png": "13fc23cc2ba52b33bbdde9423da2467b13043db5e0c7951c6e5db614c10ce362",
+    "Stage_2/acceptance_sample/09_retained_suppressed_imfs.svg": "bbdced58cdf5197c2fd641afe7f781bd67939948a8be0fbd1eb7ab0e9663a957",
+    "Stage_2/acceptance_sample/10_gate_stability.png": "ccd921e40f24d3da33eaededc01044035f838722538ff20820cbc6605b01b7c3",
+    "Stage_2/acceptance_sample/10_gate_stability.svg": "2d38db8ba8c76224345828eb189baaf2c8c6a5f85a939cfc669364f44e50bc93",
+    "Stage_2/acceptance_sample/11_harmonic_markers.png": "4f428031351e10d4de14749baa45437c369cbdff70baaa1f54271b4792ef4cf5",
+    "Stage_2/acceptance_sample/11_harmonic_markers.svg": "1732d760f401526f15cc3fa27a5a456ddecceb6560df29c659b517561bc5d548",
+    "Stage_2/acceptance_sample/12_chatter_band_psd.png": "4e5fedf847558d52e9036c72e24ef82db97f79ed3d42d7b9ef479f5b8914df0b",
+    "Stage_2/acceptance_sample/12_chatter_band_psd.svg": "dcb6ac99cc9c3f5f088d7f65e74afb60e0d541256bd0249a8c400671b23a6f67",
+    "Stage_2/acceptance_sample/imf_gates.csv": "7f7e724716b3d088fa533c36abc46b05bf62392c546eb36c130d2f3609a72d93",
+    "Stage_2/acceptance_sample/imf_indicators.csv": "c66d51f3474060e2b14a7d80482b7c9b5d95f411704a3e476cd3ddfb370df3db",
+    "Stage_2/acceptance_sample/stage_2_config.json": "5816db18348d5f0d92457af019f6e0bc8477edee5a33c657dcaaa1f3c2028d76",
+    "Stage_2/acceptance_sample/stage_2_metrics.json": "ccdee9818ea4b25659b5204be4bc6bd4030b786a7ca36aedd4c29dba8cdd2c81",
+    "Stage_2/acceptance_sample/stage_2_summary.md": "a0a6525552b87c75f2deac060e57e06e857a9bdacffb96f88c9d29411f75577d",
+    "Stage_2/acceptance_sample/weighted_reconstruction_physical.npz": "7f197ecd37bbeae1749e2768c274576d80b3f8c454e5b335dd715156278f8216",
+    "Stage_2/acceptance_sample/weighted_reconstruction_scaled.npz": "9258c0115ff4c08c466fb867c0758b3b44c65d7107e1226a6bd4ea2773dd5cfa",
+    "Stage_3/acceptance_sample/01_weighted_vs_denoised.png": "269138b83e7fcc9921371ba5ab13c59b883e26e04e551f3289c5958651436a87",
+    "Stage_3/acceptance_sample/01_weighted_vs_denoised.svg": "89b822f5bbb525c0f66a5205e086b0f65dc076d321e10215b6c4e8482793251e",
+    "Stage_3/acceptance_sample/02_all_signal_stages.png": "21de1177a8c7f330c4c693a7beee11c72e4cdad52e8af8cae661245c7ee7b622",
+    "Stage_3/acceptance_sample/02_all_signal_stages.svg": "a9482fb3949f98f96fa0bb1a247466df93004ff8f5af2416a3d748ecf14ca18e",
+    "Stage_3/acceptance_sample/03_psd_before_after.png": "4d7f1ec1d9e58078564a093be5a72d84c0076ac89842940d4d8939248bdab70a",
+    "Stage_3/acceptance_sample/03_psd_before_after.svg": "530297540d579574d2597351b759c7e2f11fae29eb1e1cb74e6b24f848977570",
+    "Stage_3/acceptance_sample/04_wavelet_level_energies.png": "7d7fc6d7b555bf9321e095b98814dc1a08ccb08e51c7e015fbebc840dd3af731",
+    "Stage_3/acceptance_sample/04_wavelet_level_energies.svg": "50af4513fb9fe0b74c442b17d2451ba88f924cc7d4cdd6d30eba528dcbee9b4b",
+    "Stage_3/acceptance_sample/05_wavelet_thresholds.png": "7d7b9024ffc236be7db173743440686ec780393c7df0cdf0bba3bcf041ec20a5",
+    "Stage_3/acceptance_sample/05_wavelet_thresholds.svg": "b6ec5a8832b79c6d007a28d466f37555d7e02cfd97ce02cabc788d3a650ed4ea",
+    "Stage_3/acceptance_sample/06_wavelet_subbands.png": "045cad4c9ef09b9df75e9ce6772dab7a27057075d2627c6b1e3866718f808c2c",
+    "Stage_3/acceptance_sample/06_wavelet_subbands.svg": "89b8f75ffedec289e91fd3748afff39c34fc0cefafc6a9512999493a4e09125f",
+    "Stage_3/acceptance_sample/07_chatter_band_overlap.png": "a6ef954dc8c95335b97cd4dadeda3f390d4e05414494398241c49b319f3618d0",
+    "Stage_3/acceptance_sample/07_chatter_band_overlap.svg": "c5b3b9f2a0b58491e5c77bf5494601838843da99f8e9778a9d754e0bd79ce860",
+    "Stage_3/acceptance_sample/08_spectrogram_comparison.png": "1b4f415b48345d8b7e5012cf4e6bf3345e8cf9118ca81eec2871062783694370",
+    "Stage_3/acceptance_sample/08_spectrogram_comparison.svg": "6b3a731ec78e1db9b1ac49b694055097eb5ecb9d2b9c57ec034336b1c5eb0a1d",
+    "Stage_3/acceptance_sample/09_synthetic_recovery.png": "25beae1271bba82c4498987a16c9e62727d1fa17ae777f225e66fb52480a4472",
+    "Stage_3/acceptance_sample/09_synthetic_recovery.svg": "50f25b14d3c1d1cf8170ba74a0d67dd851c664ea360bbb1c1bbce140b2e9eef5",
+    "Stage_3/acceptance_sample/10_residual_noise.png": "eec23ff514abd62c30ede2638390283965843ee7aa2a90403313362fc26c30fd",
+    "Stage_3/acceptance_sample/10_residual_noise.svg": "8c3f3d41297ea95ef41ca4882271efa362bfd4fd037ec7ed89a8e1122bcd56ae",
+    "Stage_3/acceptance_sample/11_residual_noise_psd.png": "56e4cfbc2462564cd827acde8f8ece8effb95edabd7479a1e112dbcad4907025",
+    "Stage_3/acceptance_sample/11_residual_noise_psd.svg": "e75f7f5c4fed913bf9aa69db93aacff2808b370950dd1283c6309fce4719eae5",
+    "Stage_3/acceptance_sample/12_time_frequency_energy.png": "ebd4be1e8a18c4f3b046050ae3deb043e05979726633bf94f769ef1f5205850d",
+    "Stage_3/acceptance_sample/12_time_frequency_energy.svg": "baac8f4d718a9c338c7604f50d2add96f0da64f92bbadb9746070fa58ad137e9",
+    "Stage_3/acceptance_sample/denoised_physical.npz": "da037c21dafb3b4b727276fd191d10dbab15cbed1729b5cb3a116dfac48e0c31",
+    "Stage_3/acceptance_sample/denoised_scaled.npz": "dc1904b7904e4c36108b391c3fed03da128e7d9574b5b71ca0cdc0c3682193d0",
+    "Stage_3/acceptance_sample/stage_3_config.json": "427df576d4b9bb42af97a824aba5b359a4732c4dad587ac0b94fb153b4d5ebac",
+    "Stage_3/acceptance_sample/stage_3_metrics.json": "cd5afb91ef8f555d72401612eab36e9baa7a7efe01f5d121908d09415125f83d",
+    "Stage_3/acceptance_sample/stage_3_summary.md": "682da06ca477f6dd3cbbba4fed9e15dbab6b736da5b4182cdbbbe6e651d27ac4",
+    "Stage_3/acceptance_sample/wavelet_coefficients.npz": "6de15f783ba8eb547bdd61c4bd07af8a030c6320b04ed490be53a1bc30c029b6",
+    "Stage_3/acceptance_sample/wavelet_thresholds.csv": "aec5181f8a51d892afc7f877db050c396024a4cdcfb49f6bad2a13297007669a",
+    "Stage_4/acceptance_sample/01_rms_timeline.png": "4f51d8b630f24d6bb2c1f2afb724a29986b8604c1f21f00bc1ea237bf4a2c9f9",
+    "Stage_4/acceptance_sample/01_rms_timeline.svg": "325df30ddfaad3cdc4009910102532a23fed66b33b070e72c486512a8ca52ec8",
+    "Stage_4/acceptance_sample/02_kurtosis_timeline.png": "8c3511fd61bfb8061afb53998dc1caf9c24d07f9fa28919f31b52b0135b8189f",
+    "Stage_4/acceptance_sample/02_kurtosis_timeline.svg": "ff0eb7a228549f5302e41ff2f9cac99bc6173df91925f2f5fc63548290f49218",
+    "Stage_4/acceptance_sample/03_spectral_entropy_timeline.png": "25cf56538cd469d4fe0b95f2503b11821b71ca54f9bba39aa179a80b98916e9d",
+    "Stage_4/acceptance_sample/03_spectral_entropy_timeline.svg": "ef284b6ec860fc7e9059323e81bbb475722688f14b9db34285fdcc344fff9dc2",
+    "Stage_4/acceptance_sample/04_chatter_energy_timeline.png": "f3bddfdf1f4de1f9c7a2dbfc81461b959c5550f7d54c2b0198061571f4f71021",
+    "Stage_4/acceptance_sample/04_chatter_energy_timeline.svg": "e15d7c227760e79d7e8ba4c0b7ac1086c518d92834313be3555622376216146d",
+    "Stage_4/acceptance_sample/05_harmonic_energy_timeline.png": "01bab2c4c1a4daafaec75daf2c3825322658a5d2f20420062f0d26f04796c091",
+    "Stage_4/acceptance_sample/05_harmonic_energy_timeline.svg": "67e33e10c086ca7e6105f4655a1c3af0558389135f8f84006df4875eaf7c4dae",
+    "Stage_4/acceptance_sample/06_hegr_timeline.png": "cc86115bb3d908cec51e9c6f37608fce76be802cace6dc18f2eb42ec430ddb13",
+    "Stage_4/acceptance_sample/06_hegr_timeline.svg": "ed219a5c9e82f9e98b23ba9c0b3beba4a818c5912489439faf25e1051f4cabb5",
+    "Stage_4/acceptance_sample/07_instantaneous_energy_timeline.png": "a182fc994aad760db2a947bc966ea6db4bfa885671d2dc6117ee88ea9dd1f535",
+    "Stage_4/acceptance_sample/07_instantaneous_energy_timeline.svg": "d0c467e64496a468a19dad025f95093bdc22aac44ea9b223b609652a326c3f3e",
+    "Stage_4/acceptance_sample/08_imf_gate_values.png": "8b87d97f44809f242f21ab864dadee210f45c29ffeb910fedd07fcf0ddf90fab",
+    "Stage_4/acceptance_sample/08_imf_gate_values.svg": "f39fae36d3675a01eec059b75cdceecb2d937a0992139993ccc921fe06e09843",
+    "Stage_4/acceptance_sample/09_wavelet_energy_ratios.png": "c30e79867e45a55c901dfed540f30158d2563cf6de78ef945eb42db9138b7460",
+    "Stage_4/acceptance_sample/09_wavelet_energy_ratios.svg": "4bf3b877ca4153a1f2c07dfcba9d9bd0ff45bca7fb5e8a07f9d3c3393b361f3b",
+    "Stage_4/acceptance_sample/10_feature_family_summary.png": "2a3df7d74dc41f6f0b002892c061f5cdc0824f7fc69c2aa594fe71cc9b8b3b29",
+    "Stage_4/acceptance_sample/10_feature_family_summary.svg": "1d5687a1dcf6d1de398e3cff84bab3a4e0bea491df2e55004bc94556344ee0db",
+    "Stage_4/acceptance_sample/feature_quality.json": "bc9e9774ed69b68d57f4c66df0b368ab5ee8213b0a11313821142f54b185f74b",
+    "Stage_4/acceptance_sample/feature_schema.json": "3218523dc88f49ca308957c0c54584a2fe2a5152c7c180208f05431658362e7c",
+    "Stage_4/acceptance_sample/stage_4_config.json": "7681a6851e630fbff5378552522eb436eca9dfd550b7678a672df505e3b3fc83",
+    "Stage_4/acceptance_sample/stage_4_metrics.json": "7493f477493e57bd834c1f3d2544d58fad68b6aac4a68f746c46be8438b3846d",
+    "Stage_4/acceptance_sample/stage_4_summary.md": "5122c44d4d2e1cba85ba43bde0f7c573817112c2cc548e2b38275a411779f40a",
+    "Stage_4/acceptance_sample/window_features.csv": "2fb250b92492a5117c631dace2491475f89402f93e6266a23fa69fd27c65e035",
+    "Stage_4/acceptance_sample/window_features.json": "4410c1f39253a9689aa3b0f74cbd312a98740f7c8d692188902b816ea8fd2610",
+    "Stage_4/aggregate/aggregate_feature_correlation_heatmap.png": "59473e65fbb666be997a1b43b258c02210b8919848013c5afe67501f2e79c8de",
+    "Stage_4/aggregate/aggregate_feature_correlation_heatmap.svg": "a46632470852043469c4f6a13d3cd47484f49109d577bff28d268465d3ca302a",
+    "Stage_4/aggregate/aggregate_feature_distributions.png": "b5d01b99c5c0f4489b8090e0678dbb4aae7db743049dd13d19af41ead5e9df01",
+    "Stage_4/aggregate/aggregate_feature_distributions.svg": "277c86786980f1f4b8282e12d4f0ae08873140a3c676231cdc91b0e76950ce3d",
+    "Stage_4/aggregate/aggregate_feature_missingness.png": "55a39367fb1ec4ab4568a9581f11615556994e62d11d3a390ebe47154b45d577",
+    "Stage_4/aggregate/aggregate_feature_missingness.svg": "6d6a8157db674107116bf396252525b36be86c8be5002c820ef9631fe3b32e66",
+    "Stage_4/aggregate/aggregate_feature_stability.png": "d6a91285a72454a180a9ddb6cbebba843fcd3a44fd98da5d1a1e99a9f512f023",
+    "Stage_4/aggregate/aggregate_feature_stability.svg": "86ad77248c69476c7b89c3259abae245969f9a6309da526ad22ec769f56ca8e4",
+    "Stage_4/aggregate/aggregate_feature_values_by_depth_of_cut.png": "41a5bf5583f458de96b32a8c815aea551161f8c3241c904d5bd2f4c73d303ded",
+    "Stage_4/aggregate/aggregate_feature_values_by_depth_of_cut.svg": "8e3fb57fea1d1d5e19f0e1a3d281708f9bbfa06d6ab25428101345bccba00cc4",
+    "Stage_4/aggregate/aggregate_feature_values_by_recording.png": "c98bdf2d220c2a2a03bd311134da9833ce78a9403c076bc3ec2bd0fd19128191",
+    "Stage_4/aggregate/aggregate_feature_values_by_recording.svg": "13fb97d4ae7027c940458be2a27847b51d81677b26b050ef668eaae425c26c2d",
+    "Stage_4/aggregate/aggregate_feature_values_by_rpm.png": "3ef2a7bfcc64a3878fbc93e42a7124b57ba85f7b7645fc1a9f7a00d0e00df28c",
+    "Stage_4/aggregate/aggregate_feature_values_by_rpm.svg": "b7dbaf66fd34ace4d053a9d9654ef99e51880d980402b36a9a49adbc1807d14b",
+    "Stage_4/aggregate/aggregate_feature_values_by_stickout.png": "bb5447db26515d80c366cef8f86e454de27bdb948d9cd7d36aeea704a70214a0",
+    "Stage_4/aggregate/aggregate_feature_values_by_stickout.svg": "ec8cdbf4875fd850b94398e05c3fb8419e0f20d775c8a1cc1a00be06c7c50f62",
+    "Stage_4/aggregate/aggregate_feature_variance.png": "e5a47d65c8dbabb0113c6d4597eacf877af636d721aaa4ad70cb4841e359bc32",
+    "Stage_4/aggregate/aggregate_feature_variance.svg": "6e9aca5ec165c0615c92cdd9923722758bb3cbc1be1ca6a2ff0cb9895ee189ff",
+    "Stage_4/aggregate/aggregate_features_grouped_by_label.png": "0fcdc01fba6905e845443858d91a57bfe0ef16aad6e818d32076c28b098868a1",
+    "Stage_4/aggregate/aggregate_features_grouped_by_label.svg": "be36f7756aaf2df2315d8f2324686c08438544115a7b499acc5ea9d0b4649c65",
+    "Stage_4/aggregate/all_recording_features.csv": "6f326b33bb93e30c28ebd14e3d4342ddc70d23c4553edaf5ee6dbe31d1d5f67a",
+    "Stage_4/aggregate/feature_correlations.csv": "36df0e8c4f79dec5cd7717a765462fc2c8f3831dabf9fa3cad46c33884ac3f88",
+    "Stage_4/aggregate/feature_missingness.csv": "02bbb2f41e401a44d8dd852d67b27f6ae8881ff5a8a505ed0e0fa4fee8dc3b11",
+    "Stage_4/aggregate/feature_repeatability.csv": "a6f22ee7d15ea615cb5311fe1006b7983708a0852f45e43c7ffdf79ca7cedffa",
+    "Stage_4/aggregate/feature_schema.json": "3218523dc88f49ca308957c0c54584a2fe2a5152c7c180208f05431658362e7c",
+    "Stage_4/aggregate/feature_summary.csv": "483ff1c7f1279dbe25e91857eac8b5481176e957918cd8361122e398e42a2abe",
+    "report/figures/Stage_1__acceptance_sample__01_raw_signal.png": "634f84ffe66e631e6fe23ad7e9a7aaf49ef3f44b38efe099ad9672895a252e81",
+    "report/figures/Stage_1__acceptance_sample__01_raw_signal.svg": "3a2167e0f282e0472e4147d12ae404f467ad878b2571b1cb3967aa2e09c57736",
+    "report/figures/Stage_1__acceptance_sample__02_selected_segment.png": "a77cffbc6ba3021065f2393934a69529da210a35fadbb7d8dc1425e9cb02be72",
+    "report/figures/Stage_1__acceptance_sample__02_selected_segment.svg": "589da43c948f5a9408248763896bf01055cfd0de2807b78671cab75c6accaf1e",
+    "report/figures/Stage_1__acceptance_sample__03_preprocessing_comparison.png": "761c7214968df7287e4f91848ae9e30e77de18e68cde033b7d6acd7cb613d242",
+    "report/figures/Stage_1__acceptance_sample__03_preprocessing_comparison.svg": "bbd5e667451464d6e7229ac4dab6dbb35fa6425c901bc82b2d84b8d8985185a0",
+    "report/figures/Stage_1__acceptance_sample__04_psd_comparison.png": "e1f4224754b02df98123e50e705d88c8e0dd00d86efe0d7308462dc3e2fb3d2f",
+    "report/figures/Stage_1__acceptance_sample__04_psd_comparison.svg": "774d44eb7eba437244ee37b67776d45fa08516ff39113ccbd04498dd223ce0bc",
+    "report/figures/Stage_1__acceptance_sample__05_cutoff_search.png": "8789da129ac09db37613365177db7be9ce07414d767856f518454f5cc01e5138",
+    "report/figures/Stage_1__acceptance_sample__05_cutoff_search.svg": "f22cd173d534c685299c591d2f41300bef559cf7ff591ca6405c938efecb192f",
+    "report/figures/Stage_1__acceptance_sample__06_ceemdan_decomposition.png": "a555f423998bf98c16537b724641fc7d5eb4a6d2c387e46880da276011e9d052",
+    "report/figures/Stage_1__acceptance_sample__06_ceemdan_decomposition.svg": "01635a8cc88a24f472444b62885f6c412f29b63574d420cb803689df7b236704",
+    "report/figures/Stage_1__acceptance_sample__07_individual_imfs.png": "5473bb5ffa9e14128d88f270fa69ab71f2dabc42bef73e6c968f6a9fbb01d42a",
+    "report/figures/Stage_1__acceptance_sample__07_individual_imfs.svg": "78ae9a1345eddd9a39edbbbb0dbabe07cfae1a17f3d52e5a33b04d3e4f225725",
+    "report/figures/Stage_1__acceptance_sample__08_residual.png": "d75ef9d610ad7d94fa7c056fb0ed0656bfd65145189f878274246a1e4a688348",
+    "report/figures/Stage_1__acceptance_sample__08_residual.svg": "7013aa66d39744c34222859542438d9b9802139ac060e4cbf89b2b55f4376e0a",
+    "report/figures/Stage_1__acceptance_sample__09_imf_energy_distribution.png": "d1060559612fb5499da5f1cfa12381df5a1f6921ce46908e07ff609d4b4116d4",
+    "report/figures/Stage_1__acceptance_sample__09_imf_energy_distribution.svg": "68cb6ba1b7c20195ac31699e718a113304d59fa905caea06d36ff760cd887b67",
+    "report/figures/Stage_1__acceptance_sample__10_imf_frequency_ordering.png": "cb1904d5aaff7ba7de93701f1c82f1340c81a7e5d1f6e76223c4a8d11abe0fe4",
+    "report/figures/Stage_1__acceptance_sample__10_imf_frequency_ordering.svg": "f1273681534ed9dbed27d9c833d2356f2d5de7c543ce61c70b12212171c0c225",
+    "report/figures/Stage_1__acceptance_sample__11_imf_bandwidth.png": "6fcf3c3637e7e2fef831f507888650988e6cdd058e07553a9c2a8dc036c7298d",
+    "report/figures/Stage_1__acceptance_sample__11_imf_bandwidth.svg": "60b85fcfa0a7030c7e4b0bbc453d99619d67f9d2e8bc72e66c628c4a5bbea947",
+    "report/figures/Stage_1__acceptance_sample__12_adjacent_imf_correlation.png": "e04ff6e68bfc6c055e5ac26914467c0f95285eafca896c77a1f44666cd3a06be",
+    "report/figures/Stage_1__acceptance_sample__12_adjacent_imf_correlation.svg": "78821652f29050b401ca310a3abdb18d904dbcf014cefa38d4d3eda76f72fd0f",
+    "report/figures/Stage_1__acceptance_sample__13_seed_stability.png": "5503a60adc39aee0d4f3014bd8fe72e4bc23a1ca9c2538bafb4f702b92ab46eb",
+    "report/figures/Stage_1__acceptance_sample__13_seed_stability.svg": "a56e774b21aeb729d3c4e2961a1d513be445424e1f495b2130532ed4fe0f7021",
+    "report/figures/Stage_1__acceptance_sample__14_reconstruction_error.png": "3a58f385ccb1d07a67c9ebc2b974d4f106a0e88bdba55a57fd40d3db4ddda3fd",
+    "report/figures/Stage_1__acceptance_sample__14_reconstruction_error.svg": "fc3a5a051ef1fdc119a28e36765cdab4115030c0bc49639ffd56fe35d3c8bf12",
+    "report/figures/Stage_1__acceptance_sample__15_time_frequency.png": "678b66b24f4facf85d1bd2c108b94ebd91a78b44856ac8769acdda0d6b90aeea",
+    "report/figures/Stage_1__acceptance_sample__15_time_frequency.svg": "5c6ec2b362fb7e6b279ef5cabb5e2e5df60d3f72a92fff8abbcd837f02b08dd7",
+    "report/figures/Stage_2__acceptance_sample__01_imf_gate_values.png": "2ff8be2a8807f94b487f40c17c78c8bdfaa0ee468aea6149f510770a05874bc2",
+    "report/figures/Stage_2__acceptance_sample__01_imf_gate_values.svg": "d7882d20072c7bf2eab08e49524f30d0d7737605a001cea15ea4538316abb8b4",
+    "report/figures/Stage_2__acceptance_sample__02_imf_indicator_comparison.png": "a403c2c2f68880f7eb901d0176609a17107c6d4738c4cfaf6867288dafba0972",
+    "report/figures/Stage_2__acceptance_sample__02_imf_indicator_comparison.svg": "adf7fc144c219361a866ba4cab48f84aa288411e8b2e5f0bcb62fa19a8c33640",
+    "report/figures/Stage_2__acceptance_sample__03_frequency_vs_gate.png": "e0016026e44e7f56f7c80876c0a2fbe41a9bb3e4c9aec55dc2b790e3f753f092",
+    "report/figures/Stage_2__acceptance_sample__03_frequency_vs_gate.svg": "a00fbc4c0080775aa27801e5421ad574a9d4614ca36e817c3b0f19ce9093f27b",
+    "report/figures/Stage_2__acceptance_sample__04_energy_vs_gate.png": "a464e3120ae03ad9559440b5019cff41bedb97bae90b37fb0df4dd14809a2b5f",
+    "report/figures/Stage_2__acceptance_sample__04_energy_vs_gate.svg": "6f818786d0a70f659776c4ab20bbc8902b80f881b73333f668a0e3c5251d8286",
+    "report/figures/Stage_2__acceptance_sample__05_chatter_energy_vs_gate.png": "8fd4146c4873727199a10e4cafec710e7ed447a638798ab4cb5b3bd73a90cbe4",
+    "report/figures/Stage_2__acceptance_sample__05_chatter_energy_vs_gate.svg": "e286ddbc7b6afb22bfd9cd0c146fc10c117cef18bb39aaae01593be0372c69a9",
+    "report/figures/Stage_2__acceptance_sample__06_forced_harmonics_vs_gate.png": "44f2e0c9856444f6cb5073a68f05a4bf2c3d8f5bc9ec39888bb03175c0ab0714",
+    "report/figures/Stage_2__acceptance_sample__06_forced_harmonics_vs_gate.svg": "7593367bad9066a83d3fa95abe4abed8aa9a39ce4ab854514d86e869bdb83906",
+    "report/figures/Stage_2__acceptance_sample__07_weighted_reconstruction.png": "9465ccf23a6b74d3fd470482ba2d05600370e2eabac12e7dfdc56aa5f6b0d9b0",
+    "report/figures/Stage_2__acceptance_sample__07_weighted_reconstruction.svg": "e63e28654fe99f3cfb2be4d429f0e3a2b12c1a0d84b5c78ebe5a2dcaa5ff5692",
+    "report/figures/Stage_2__acceptance_sample__08_weighted_psd_comparison.png": "9e86e7c9796c1f01e1b33375580680458840467c38b11c9c7f628a780311c241",
+    "report/figures/Stage_2__acceptance_sample__08_weighted_psd_comparison.svg": "88faa43a4e46cc839269e9d22a6317ff031affd29e85c1e5e073724bff3d65f4",
+    "report/figures/Stage_2__acceptance_sample__09_retained_suppressed_imfs.png": "13fc23cc2ba52b33bbdde9423da2467b13043db5e0c7951c6e5db614c10ce362",
+    "report/figures/Stage_2__acceptance_sample__09_retained_suppressed_imfs.svg": "bbdced58cdf5197c2fd641afe7f781bd67939948a8be0fbd1eb7ab0e9663a957",
+    "report/figures/Stage_2__acceptance_sample__10_gate_stability.png": "ccd921e40f24d3da33eaededc01044035f838722538ff20820cbc6605b01b7c3",
+    "report/figures/Stage_2__acceptance_sample__10_gate_stability.svg": "2d38db8ba8c76224345828eb189baaf2c8c6a5f85a939cfc669364f44e50bc93",
+    "report/figures/Stage_2__acceptance_sample__11_harmonic_markers.png": "4f428031351e10d4de14749baa45437c369cbdff70baaa1f54271b4792ef4cf5",
+    "report/figures/Stage_2__acceptance_sample__11_harmonic_markers.svg": "1732d760f401526f15cc3fa27a5a456ddecceb6560df29c659b517561bc5d548",
+    "report/figures/Stage_2__acceptance_sample__12_chatter_band_psd.png": "4e5fedf847558d52e9036c72e24ef82db97f79ed3d42d7b9ef479f5b8914df0b",
+    "report/figures/Stage_2__acceptance_sample__12_chatter_band_psd.svg": "dcb6ac99cc9c3f5f088d7f65e74afb60e0d541256bd0249a8c400671b23a6f67",
+    "report/figures/Stage_3__acceptance_sample__01_weighted_vs_denoised.png": "269138b83e7fcc9921371ba5ab13c59b883e26e04e551f3289c5958651436a87",
+    "report/figures/Stage_3__acceptance_sample__01_weighted_vs_denoised.svg": "89b822f5bbb525c0f66a5205e086b0f65dc076d321e10215b6c4e8482793251e",
+    "report/figures/Stage_3__acceptance_sample__02_all_signal_stages.png": "21de1177a8c7f330c4c693a7beee11c72e4cdad52e8af8cae661245c7ee7b622",
+    "report/figures/Stage_3__acceptance_sample__02_all_signal_stages.svg": "a9482fb3949f98f96fa0bb1a247466df93004ff8f5af2416a3d748ecf14ca18e",
+    "report/figures/Stage_3__acceptance_sample__03_psd_before_after.png": "4d7f1ec1d9e58078564a093be5a72d84c0076ac89842940d4d8939248bdab70a",
+    "report/figures/Stage_3__acceptance_sample__03_psd_before_after.svg": "530297540d579574d2597351b759c7e2f11fae29eb1e1cb74e6b24f848977570",
+    "report/figures/Stage_3__acceptance_sample__04_wavelet_level_energies.png": "7d7fc6d7b555bf9321e095b98814dc1a08ccb08e51c7e015fbebc840dd3af731",
+    "report/figures/Stage_3__acceptance_sample__04_wavelet_level_energies.svg": "50af4513fb9fe0b74c442b17d2451ba88f924cc7d4cdd6d30eba528dcbee9b4b",
+    "report/figures/Stage_3__acceptance_sample__05_wavelet_thresholds.png": "7d7b9024ffc236be7db173743440686ec780393c7df0cdf0bba3bcf041ec20a5",
+    "report/figures/Stage_3__acceptance_sample__05_wavelet_thresholds.svg": "b6ec5a8832b79c6d007a28d466f37555d7e02cfd97ce02cabc788d3a650ed4ea",
+    "report/figures/Stage_3__acceptance_sample__06_wavelet_subbands.png": "045cad4c9ef09b9df75e9ce6772dab7a27057075d2627c6b1e3866718f808c2c",
+    "report/figures/Stage_3__acceptance_sample__06_wavelet_subbands.svg": "89b8f75ffedec289e91fd3748afff39c34fc0cefafc6a9512999493a4e09125f",
+    "report/figures/Stage_3__acceptance_sample__07_chatter_band_overlap.png": "a6ef954dc8c95335b97cd4dadeda3f390d4e05414494398241c49b319f3618d0",
+    "report/figures/Stage_3__acceptance_sample__07_chatter_band_overlap.svg": "c5b3b9f2a0b58491e5c77bf5494601838843da99f8e9778a9d754e0bd79ce860",
+    "report/figures/Stage_3__acceptance_sample__08_spectrogram_comparison.png": "1b4f415b48345d8b7e5012cf4e6bf3345e8cf9118ca81eec2871062783694370",
+    "report/figures/Stage_3__acceptance_sample__08_spectrogram_comparison.svg": "6b3a731ec78e1db9b1ac49b694055097eb5ecb9d2b9c57ec034336b1c5eb0a1d",
+    "report/figures/Stage_3__acceptance_sample__09_synthetic_recovery.png": "25beae1271bba82c4498987a16c9e62727d1fa17ae777f225e66fb52480a4472",
+    "report/figures/Stage_3__acceptance_sample__09_synthetic_recovery.svg": "50f25b14d3c1d1cf8170ba74a0d67dd851c664ea360bbb1c1bbce140b2e9eef5",
+    "report/figures/Stage_3__acceptance_sample__10_residual_noise.png": "eec23ff514abd62c30ede2638390283965843ee7aa2a90403313362fc26c30fd",
+    "report/figures/Stage_3__acceptance_sample__10_residual_noise.svg": "8c3f3d41297ea95ef41ca4882271efa362bfd4fd037ec7ed89a8e1122bcd56ae",
+    "report/figures/Stage_3__acceptance_sample__11_residual_noise_psd.png": "56e4cfbc2462564cd827acde8f8ece8effb95edabd7479a1e112dbcad4907025",
+    "report/figures/Stage_3__acceptance_sample__11_residual_noise_psd.svg": "e75f7f5c4fed913bf9aa69db93aacff2808b370950dd1283c6309fce4719eae5",
+    "report/figures/Stage_3__acceptance_sample__12_time_frequency_energy.png": "ebd4be1e8a18c4f3b046050ae3deb043e05979726633bf94f769ef1f5205850d",
+    "report/figures/Stage_3__acceptance_sample__12_time_frequency_energy.svg": "baac8f4d718a9c338c7604f50d2add96f0da64f92bbadb9746070fa58ad137e9",
+    "report/figures/Stage_4__acceptance_sample__01_rms_timeline.png": "4f51d8b630f24d6bb2c1f2afb724a29986b8604c1f21f00bc1ea237bf4a2c9f9",
+    "report/figures/Stage_4__acceptance_sample__01_rms_timeline.svg": "325df30ddfaad3cdc4009910102532a23fed66b33b070e72c486512a8ca52ec8",
+    "report/figures/Stage_4__acceptance_sample__02_kurtosis_timeline.png": "8c3511fd61bfb8061afb53998dc1caf9c24d07f9fa28919f31b52b0135b8189f",
+    "report/figures/Stage_4__acceptance_sample__02_kurtosis_timeline.svg": "ff0eb7a228549f5302e41ff2f9cac99bc6173df91925f2f5fc63548290f49218",
+    "report/figures/Stage_4__acceptance_sample__03_spectral_entropy_timeline.png": "25cf56538cd469d4fe0b95f2503b11821b71ca54f9bba39aa179a80b98916e9d",
+    "report/figures/Stage_4__acceptance_sample__03_spectral_entropy_timeline.svg": "ef284b6ec860fc7e9059323e81bbb475722688f14b9db34285fdcc344fff9dc2",
+    "report/figures/Stage_4__acceptance_sample__04_chatter_energy_timeline.png": "f3bddfdf1f4de1f9c7a2dbfc81461b959c5550f7d54c2b0198061571f4f71021",
+    "report/figures/Stage_4__acceptance_sample__04_chatter_energy_timeline.svg": "e15d7c227760e79d7e8ba4c0b7ac1086c518d92834313be3555622376216146d",
+    "report/figures/Stage_4__acceptance_sample__05_harmonic_energy_timeline.png": "01bab2c4c1a4daafaec75daf2c3825322658a5d2f20420062f0d26f04796c091",
+    "report/figures/Stage_4__acceptance_sample__05_harmonic_energy_timeline.svg": "67e33e10c086ca7e6105f4655a1c3af0558389135f8f84006df4875eaf7c4dae",
+    "report/figures/Stage_4__acceptance_sample__06_hegr_timeline.png": "cc86115bb3d908cec51e9c6f37608fce76be802cace6dc18f2eb42ec430ddb13",
+    "report/figures/Stage_4__acceptance_sample__06_hegr_timeline.svg": "ed219a5c9e82f9e98b23ba9c0b3beba4a818c5912489439faf25e1051f4cabb5",
+    "report/figures/Stage_4__acceptance_sample__07_instantaneous_energy_timeline.png": "a182fc994aad760db2a947bc966ea6db4bfa885671d2dc6117ee88ea9dd1f535",
+    "report/figures/Stage_4__acceptance_sample__07_instantaneous_energy_timeline.svg": "d0c467e64496a468a19dad025f95093bdc22aac44ea9b223b609652a326c3f3e",
+    "report/figures/Stage_4__acceptance_sample__08_imf_gate_values.png": "8b87d97f44809f242f21ab864dadee210f45c29ffeb910fedd07fcf0ddf90fab",
+    "report/figures/Stage_4__acceptance_sample__08_imf_gate_values.svg": "f39fae36d3675a01eec059b75cdceecb2d937a0992139993ccc921fe06e09843",
+    "report/figures/Stage_4__acceptance_sample__09_wavelet_energy_ratios.png": "c30e79867e45a55c901dfed540f30158d2563cf6de78ef945eb42db9138b7460",
+    "report/figures/Stage_4__acceptance_sample__09_wavelet_energy_ratios.svg": "4bf3b877ca4153a1f2c07dfcba9d9bd0ff45bca7fb5e8a07f9d3c3393b361f3b",
+    "report/figures/Stage_4__acceptance_sample__10_feature_family_summary.png": "2a3df7d74dc41f6f0b002892c061f5cdc0824f7fc69c2aa594fe71cc9b8b3b29",
+    "report/figures/Stage_4__acceptance_sample__10_feature_family_summary.svg": "1d5687a1dcf6d1de398e3cff84bab3a4e0bea491df2e55004bc94556344ee0db",
+    "report/figures/Stage_4__aggregate__aggregate_feature_correlation_heatmap.png": "59473e65fbb666be997a1b43b258c02210b8919848013c5afe67501f2e79c8de",
+    "report/figures/Stage_4__aggregate__aggregate_feature_correlation_heatmap.svg": "a46632470852043469c4f6a13d3cd47484f49109d577bff28d268465d3ca302a",
+    "report/figures/Stage_4__aggregate__aggregate_feature_distributions.png": "b5d01b99c5c0f4489b8090e0678dbb4aae7db743049dd13d19af41ead5e9df01",
+    "report/figures/Stage_4__aggregate__aggregate_feature_distributions.svg": "277c86786980f1f4b8282e12d4f0ae08873140a3c676231cdc91b0e76950ce3d",
+    "report/figures/Stage_4__aggregate__aggregate_feature_missingness.png": "55a39367fb1ec4ab4568a9581f11615556994e62d11d3a390ebe47154b45d577",
+    "report/figures/Stage_4__aggregate__aggregate_feature_missingness.svg": "6d6a8157db674107116bf396252525b36be86c8be5002c820ef9631fe3b32e66",
+    "report/figures/Stage_4__aggregate__aggregate_feature_stability.png": "d6a91285a72454a180a9ddb6cbebba843fcd3a44fd98da5d1a1e99a9f512f023",
+    "report/figures/Stage_4__aggregate__aggregate_feature_stability.svg": "86ad77248c69476c7b89c3259abae245969f9a6309da526ad22ec769f56ca8e4",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_depth_of_cut.png": "41a5bf5583f458de96b32a8c815aea551161f8c3241c904d5bd2f4c73d303ded",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_depth_of_cut.svg": "8e3fb57fea1d1d5e19f0e1a3d281708f9bbfa06d6ab25428101345bccba00cc4",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_recording.png": "c98bdf2d220c2a2a03bd311134da9833ce78a9403c076bc3ec2bd0fd19128191",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_recording.svg": "13fb97d4ae7027c940458be2a27847b51d81677b26b050ef668eaae425c26c2d",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_rpm.png": "3ef2a7bfcc64a3878fbc93e42a7124b57ba85f7b7645fc1a9f7a00d0e00df28c",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_rpm.svg": "b7dbaf66fd34ace4d053a9d9654ef99e51880d980402b36a9a49adbc1807d14b",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_stickout.png": "bb5447db26515d80c366cef8f86e454de27bdb948d9cd7d36aeea704a70214a0",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_stickout.svg": "ec8cdbf4875fd850b94398e05c3fb8419e0f20d775c8a1cc1a00be06c7c50f62",
+    "report/figures/Stage_4__aggregate__aggregate_feature_variance.png": "e5a47d65c8dbabb0113c6d4597eacf877af636d721aaa4ad70cb4841e359bc32",
+    "report/figures/Stage_4__aggregate__aggregate_feature_variance.svg": "6e9aca5ec165c0615c92cdd9923722758bb3cbc1be1ca6a2ff0cb9895ee189ff",
+    "report/figures/Stage_4__aggregate__aggregate_features_grouped_by_label.png": "0fcdc01fba6905e845443858d91a57bfe0ef16aad6e818d32076c28b098868a1",
+    "report/figures/Stage_4__aggregate__aggregate_features_grouped_by_label.svg": "be36f7756aaf2df2315d8f2324686c08438544115a7b499acc5ea9d0b4649c65",
+    "report/figures/stage_progress.png": "71db4fbc4f83e6205095fe8f99260ccb4cf04f007c0434100b733d2f9d0fb631",
+    "report/figures/stage_scorecard.png": "5050ca1a410419497acb6797388d3dfa7182a4555f04b72301cedb90270092bb",
+    "report/pipeline_report.html": "8b88ed4f108b7a3796fa782c2cf3c861e3d612ba9a42789b6632ea0970776093",
+    "report/pipeline_report.md": "d53deae01e934a5bea21b546409a2965c41ce793436cfad8aebd79f0a9aefb03",
+    "stage_progress.png": "71db4fbc4f83e6205095fe8f99260ccb4cf04f007c0434100b733d2f9d0fb631",
+    "stage_scorecard.json": "fa72d68ed241c764e973acfe858eb89aba091960ecd8c3c845ccb100bae1af11",
+    "stage_scorecard.png": "5050ca1a410419497acb6797388d3dfa7182a4555f04b72301cedb90270092bb"
+  },
+  "per_recording_runtime": {
+    "sample.mat": 7.475303167011589
+  },
+  "per_stage_runtime": {
+    "Stage_1": 0.05412197194527835,
+    "Stage_2": 0.026202661101706326,
+    "Stage_3": 0.0016606610734015703,
+    "Stage_4": 0.2591438419185579
+  },
+  "pipeline_version": "4.0.0",
+  "python_version": "3.12.3",
+  "recordings": [
+    {
+      "input_sha256": "400a08dcd83bea812289de30584d200f597896763d54ef6c4077ef4e62cc5eda",
+      "metadata": {
+        "depth_of_cut": 0.015,
+        "feed_rate": null,
+        "label": "synthetic_reference",
+        "recording_id": "acceptance_sample",
+        "relative_path": "sample.mat",
+        "rpm": 600.0,
+        "stickout": 2.5,
+        "tool_identifier": null,
+        "tooth_count": 2
+      },
+      "recording_id": "acceptance_sample",
+      "relative_path": "sample.mat",
+      "runtime_seconds": 7.475303167011589,
+      "sampling_rate_estimated_hz": 999.9999999999991,
+      "status": "completed"
+    }
+  ],
+  "report_files": {
+    "figures_dir": "/tmp/pg-amcd-final-acceptance-1ngounpt/final-wheel-outputs/af81a2c706b53d0411f52a53188ffc3bbcdad15030b3e31011683df11b2a8d93/report/figures",
+    "html": "/tmp/pg-amcd-final-acceptance-1ngounpt/final-wheel-outputs/af81a2c706b53d0411f52a53188ffc3bbcdad15030b3e31011683df11b2a8d93/report/pipeline_report.html",
+    "markdown": "/tmp/pg-amcd-final-acceptance-1ngounpt/final-wheel-outputs/af81a2c706b53d0411f52a53188ffc3bbcdad15030b3e31011683df11b2a8d93/report/pipeline_report.md",
+    "scorecard_json": "/tmp/pg-amcd-final-acceptance-1ngounpt/final-wheel-outputs/af81a2c706b53d0411f52a53188ffc3bbcdad15030b3e31011683df11b2a8d93/stage_scorecard.json",
+    "scorecard_progress_png": "/tmp/pg-amcd-final-acceptance-1ngounpt/final-wheel-outputs/af81a2c706b53d0411f52a53188ffc3bbcdad15030b3e31011683df11b2a8d93/stage_progress.png",
+    "scorecard_scorecard_png": "/tmp/pg-amcd-final-acceptance-1ngounpt/final-wheel-outputs/af81a2c706b53d0411f52a53188ffc3bbcdad15030b3e31011683df11b2a8d93/stage_scorecard.png"
+  },
+  "resolved_config": {
+    "ceemdan": {
+      "epsilon": 0.02,
+      "gate_stability_sifting_iterations": 2,
+      "max_imf": 3,
+      "noise_seed": 42,
+      "parallel": false,
+      "search_cutoffs": [
+        20.0
+      ],
+      "search_seeds": 1,
+      "search_sifting_iterations": 2,
+      "search_trials": 1,
+      "sifting_iterations": 2,
+      "stability_seeds": [
+        42,
+        43
+      ],
+      "trials": 2
+    },
+    "feature_schema_version": "1.0.0",
+    "features": {
+      "band_energy_ranges_hz": [
+        [
+          0.0,
+          50.0
+        ],
+        [
+          50.0,
+          150.0
+        ],
+        [
+          150.0,
+          300.0
+        ],
+        [
+          300.0,
+          490.0
+        ]
+      ],
+      "harmonic_count": 5,
+      "harmonic_tolerance_hz": 15.0,
+      "overlap_ratio": 0.5,
+      "sideband_tolerance_hz": 10.0,
+      "window_seconds": 0.25
+    },
+    "maiw": {
+      "alpha": 0.25,
+      "beta": 0.25,
+      "chatter_band_center": 320.0,
+      "chatter_band_spread": 60.0,
+      "delta": 0.25,
+      "gamma": 0.25
+    },
+    "output": {
+      "png_dpi": 100,
+      "write_svg": true
+    },
+    "physics_gating": {
+      "chatter_energy_weight": 4.0,
+      "correlation_weight": 2.0,
+      "frequency_proximity_weight": 1.0,
+      "harmonic_count": 5,
+      "harmonic_penalty": 5.0,
+      "harmonic_tolerance_hz": 15.0,
+      "include_residual": false,
+      "kurtosis_scale": 10.0,
+      "kurtosis_weight": 1.0,
+      "offset": 1.5,
+      "selection_threshold": 0.5
+    },
+    "pipeline_version": "4.0.0",
+    "preprocessing": {
+      "filter_order": 3,
+      "low_pass_cutoff_hz": null,
+      "scale_percentile": 99.5
+    },
+    "sampling_rate": 1000.0,
+    "segment_points": 512,
+    "through_stage": 4,
+    "use_physics_gating": true,
+    "validation": {
+      "minimum_duration_seconds": 1.0,
+      "sampling_rate_tolerance": 0.05,
+      "signal_column": 1,
+      "timestamp_jitter_tolerance": 0.05
+    },
+    "wavelet": {
+      "band_aware": true,
+      "chatter_threshold_scale": 0.5,
+      "level": 2,
+      "minimum_noise_sigma": 1e-12,
+      "noise_threshold_scale": 1.4,
+      "threshold_mode": "soft",
+      "wavelet_name": "db2"
+    }
+  },
+  "run_id": "af81a2c706b53d0411f52a53188ffc3bbcdad15030b3e31011683df11b2a8d93",
+  "selected_processing_parameters": {
+    "acceptance_sample": {
+      "ceemdan_epsilon": 0.02,
+      "ceemdan_noise_seed": 42,
+      "ceemdan_trials": 2,
+      "cutoff_frequency": 20.0,
+      "cutoff_search": [
+        {
+          "absolute_orthogonality_index": 0.33650051632118316,
+          "ceemdan_seeds": [
+            42,
+            43
+          ],
+          "chatter_band_distortion": 4.741279258091424e-09,
+          "cutoff": 20.0,
+          "filter_order": 3,
+          "final_score": 0.1562194695246148,
+          "frequency_ordering_penalty": 0.0,
+          "frequency_ordering_score": 1.0,
+          "high_pass_cutoff_hz": 20.0,
+          "highpass_cutoff_hz": 20.0,
+          "low_pass_cutoff_hz": 490.0,
+          "lowpass_cutoff_hz": 490.0,
+          "maximum_adjacent_correlation": 0.260591466278742,
+          "mean_reconstruction_nrmse": 1.3151742703873196e-16,
+          "objective": 0.1562194695246148,
+          "objective_weights": {
+            "absolute_orthogonality": 0.15,
+            "chatter_band_distortion": 0.15,
+            "frequency_ordering_penalty": 0.15,
+            "maximum_adjacent_correlation": 0.15,
+            "seed_instability": 0.2,
+            "spectral_overlap": 0.2
+          },
+          "scale_factor": 1.2492577441709931,
+          "seed_instability": 0.06327861912197637,
+          "seed_stability": {
+            "centre_frequency_instability": 0.07002966142737954,
+            "centre_frequency_log_ratio_mean": 0.07260258735139516,
+            "energy_distribution_l1": 0.010263100764187391,
+            "imf_count_mismatch_fraction": 0.0,
+            "imf_count_range": 0,
+            "imf_count_standard_deviation": 0.0,
+            "imf_counts": [
+              3,
+              3
+            ],
+            "instability_score": 0.06327861912197637,
+            "matched_imf_correlation_mean": 0.7925187789237061,
+            "matched_imf_correlation_minimum": 0.5924298735929224,
+            "n_seeds": 2,
+            "pairwise_comparisons": [
+              {
+                "centre_frequency_instability": 0.07002966142737954,
+                "centre_frequency_log_ratio_mean": 0.07260258735139516,
+                "energy_distribution_l1": 0.010263100764187391,
+                "first_imf_count": 3,
+                "first_seed": 42,
+                "imf_count_mismatch_fraction": 0.0,
+                "matched_imf_correlation_mean": 0.7925187789237061,
+                "matched_imf_correlation_minimum": 0.5924298735929224,
+                "matched_pairs": [
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    2,
+                    2
+                  ],
+                  [
+                    3,
+                    3
+                  ]
+                ],
+                "second_imf_count": 3,
+                "second_seed": 43
+              }
+            ],
+            "per_seed": [
+              {
+                "centre_frequencies_hz": [
+                  310.8789932577131,
+                  35.53833729205541,
+                  28.637446559681635
+                ],
+                "energy_percentages": [
+                  27.85346324633172,
+                  47.36746635028284,
+                  24.779070403385433
+                ],
+                "number_of_imfs": 3,
+                "seed": 42,
+                "spectral_overlap": 0.2986188503372153
+              },
+              {
+                "centre_frequencies_hz": [
+                  310.9904366233748,
+                  39.7796141762471,
+                  31.798591385979094
+                ],
+                "energy_percentages": [
+                  28.879773322750463,
+                  47.03221147950197,
+                  24.088015197747566
+                ],
+                "number_of_imfs": 3,
+                "seed": 43,
+                "spectral_overlap": 0.24138062565317328
+              }
+            ],
+            "seeds": [
+              42,
+              43
+            ],
+            "spectral_overlap_mean": 0.2699997379951943,
+            "spectral_overlap_standard_deviation": 0.02861911234202101,
+            "structural_components": {
+              "centre_frequency": 0.07002966142737954,
+              "energy_distribution": 0.010263100764187391,
+              "imf_count_variation": 0.0,
+              "matched_imf_correlation": 0.20748122107629385,
+              "spectral_overlap_variation": 0.02861911234202101
+            }
+          },
+          "signed_orthogonality_index": -0.33650051632118316,
+          "source_segment_samples": 512,
+          "source_segment_sha256": "10bc666c3aaef29407fdcf36a29ea3f5ab441bb1f813c5a71a49aab531181d62",
+          "spectral_overlap": 0.2699997379951943
+        }
+      ],
+      "detection_status": "not_evaluated",
+      "highpass_cutoff_hz": 20.0,
+      "lowpass_cutoff_hz": 490.0,
+      "lowpass_resolution": "automatic min(4000 Hz, Nyquist - 10 Hz)",
+      "sifting_iterations": 2,
+      "stage_2_method": "physics_guided_independent_gates",
+      "through_stage": 4,
+      "use_physics_gating": true,
+      "wavelet_level": 2,
+      "wavelet_name": "db2"
+    }
+  },
+  "self_checks": {
+    "Stage_1": {
+      "synthetic": {
+        "details": {
+          "number_of_imfs": 5,
+          "reconstruction_nrmse": 1.6633113975195718e-16,
+          "residual_verified": true
+        },
+        "passed": true
+      },
+      "unit": {
+        "details": {
+          "frequency_ordering_score": 1.0,
+          "reconstruction_nrmse": 0.0
+        },
+        "passed": true
+      }
+    },
+    "Stage_2": {
+      "synthetic": {
+        "details": {
+          "chatter_gate_exceeds_forced_gate": true,
+          "gates": [
+            0.9926547210817318,
+            0.006098017391973435,
+            0.2160202278352731
+          ],
+          "independent_gate_sum": 1.2147729663089784
+        },
+        "passed": true
+      },
+      "unit": {
+        "details": {
+          "chatter_gate_exceeds_forced_gate": true,
+          "gates": [
+            0.9926547210817318,
+            0.006098017391973435,
+            0.2160202278352731
+          ],
+          "independent_gate_sum": 1.2147729663089784
+        },
+        "passed": true
+      }
+    },
+    "Stage_3": {
+      "synthetic": {
+        "details": {
+          "output_length": 1000,
+          "synthetic_reference_rmse": 0.11327707098401257,
+          "synthetic_reference_snr_db": 15.906859825416376,
+          "threshold_count": 4
+        },
+        "passed": true
+      },
+      "unit": {
+        "details": {
+          "output_length": 1000,
+          "synthetic_reference_rmse": 0.11327707098401257,
+          "synthetic_reference_snr_db": 15.906859825416376,
+          "threshold_count": 4
+        },
+        "passed": true
+      }
+    },
+    "Stage_4": {
+      "synthetic": {
+        "details": {
+          "early_hegr": 1.363369578402835,
+          "feature_count": 79,
+          "schema_version": "1.0.0",
+          "undefined_count": 0
+        },
+        "passed": true
+      },
+      "unit": {
+        "details": {
+          "early_hegr": 1.363369578402835,
+          "feature_count": 79,
+          "schema_version": "1.0.0",
+          "undefined_count": 0
+        },
+        "passed": true
+      }
+    }
+  },
+  "stage_evidence": {
+    "Stage_1": {
+      "fabricated_metrics": false,
+      "input_validation_passed": true,
+      "known_p0_issue": false,
+      "multiple_active_implementations": false,
+      "status": "completed",
+      "tests": {
+        "integration": true,
+        "synthetic": true,
+        "unit": true
+      }
+    },
+    "Stage_2": {
+      "fabricated_metrics": false,
+      "input_validation_passed": true,
+      "known_p0_issue": false,
+      "multiple_active_implementations": false,
+      "status": "completed",
+      "tests": {
+        "integration": true,
+        "synthetic": true,
+        "unit": true
+      }
+    },
+    "Stage_3": {
+      "fabricated_metrics": false,
+      "input_validation_passed": true,
+      "known_p0_issue": false,
+      "multiple_active_implementations": false,
+      "status": "completed",
+      "tests": {
+        "integration": true,
+        "synthetic": true,
+        "unit": true
+      }
+    },
+    "Stage_4": {
+      "fabricated_metrics": false,
+      "input_validation_passed": true,
+      "known_p0_issue": false,
+      "labels_available": true,
+      "multiple_active_implementations": false,
+      "status": "completed",
+      "tests": {
+        "integration": true,
+        "synthetic": true,
+        "unit": true
+      }
+    }
+  },
+  "start_timestamp": "2026-07-14T01:31:45.832654+00:00",
+  "status": "completed",
+  "success_count": 1,
+  "through_stage": 4,
+  "total_runtime_seconds": 14.469942284980789,
+  "warnings": []
+}

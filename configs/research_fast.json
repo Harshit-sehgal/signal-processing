@@ -1,13 +1,15 @@
 {
   "sampling_rate": 10000.0,
   "segment_points": 10000,
+  "use_physics_gating": false,
   "ceemdan": {
     "trials": 2,
     "search_trials": 1,
     "epsilon": 0.02,
     "noise_seed": 42,
     "sifting_iterations": 2,
-    "search_cutoffs": [100]
+    "search_cutoffs": [100],
+    "parallel": false
   },
   "maiw": {
     "alpha": 0.25,

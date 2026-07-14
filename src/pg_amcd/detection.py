@@ -34,6 +34,7 @@ try:  # scikit-learn is an optional heavy dependency
     )
     from sklearn.calibration import CalibratedClassifierCV
     from sklearn.base import clone
+
     _HAVE_SKLEARN = True
 except Exception:  # pragma: no cover - exercised only without sklearn
     _HAVE_SKLEARN = False
@@ -108,9 +109,7 @@ def temporal_smooth_probabilities(
 # --------------------------------------------------------------------------- #
 def _default_models(random_state: int) -> Dict[str, Any]:
     return {
-        "logistic_regression": LogisticRegression(
-            max_iter=2000, class_weight="balanced"
-        ),
+        "logistic_regression": LogisticRegression(max_iter=2000, class_weight="balanced"),
         "random_forest": RandomForestClassifier(
             n_estimators=100, class_weight="balanced", random_state=random_state
         ),
@@ -122,15 +121,31 @@ def _default_models(random_state: int) -> Dict[str, Any]:
     }
 
 
+def _adapt_internal_calibration_cv(estimator: Any, labels: np.ndarray) -> Any:
+    """Bound calibrated-classifier CV by the available minority-class count."""
+
+    if not isinstance(estimator, CalibratedClassifierCV):
+        return estimator
+    _, counts = np.unique(labels, return_counts=True)
+    minimum_class_count = int(np.min(counts)) if counts.size else 0
+    if minimum_class_count < 2:
+        raise ValueError("Calibration requires at least two samples in every class.")
+    estimator.set_params(cv=min(5, minimum_class_count))
+    return estimator
+
+
 def _score_fold(y_true, y_pred, y_proba) -> Dict[str, float]:
     # Always evaluate against the binary chatter/stable label space so
     # single-class folds produce well-shaped metrics instead of warnings.
     labels = [0, 1]
-    # balanced_accuracy_score warns on single-class folds; suppress it locally
-    # because the value is still meaningful (it equals accuracy in that case).
-    import warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", UserWarning)
+    # balanced_accuracy_score warns on single-class or mismatched-class folds.
+    # Compute it manually in those cases to keep the output warning-free and
+    # still meaningful (for a single-class y_true it equals accuracy).
+    y_true_u = np.unique(y_true)
+    y_pred_u = np.unique(y_pred)
+    if len(y_true_u) < 2 or not set(y_pred_u).issubset(set(y_true_u)):
+        bal_acc = float(accuracy_score(y_true, y_pred))
+    else:
         bal_acc = float(balanced_accuracy_score(y_true, y_pred))
     out = {
         "accuracy": float(accuracy_score(y_true, y_pred)),
@@ -170,8 +185,7 @@ def train_baseline_classifiers(
     """
     if not _HAVE_SKLEARN:
         raise RuntimeError(
-            "scikit-learn is required for classifier training "
-            "(pip install scikit-learn)."
+            "scikit-learn is required for classifier training (pip install scikit-learn)."
         )
     X = np.asarray(X, dtype=float)
     y = np.asarray(y)
@@ -200,7 +214,7 @@ def train_baseline_classifiers(
             if len(np.unique(y[tr])) < 2:
                 continue
             try:
-                est = clone(clf)
+                est = _adapt_internal_calibration_cv(clone(clf), y[tr])
                 est.fit(X[tr], y[tr])
                 pred = est.predict(X[te])
                 if hasattr(est, "predict_proba"):
@@ -217,7 +231,7 @@ def train_baseline_classifiers(
                 # cannot fit this fold; skip it rather than aborting all CV.
                 continue
         try:
-            final = clone(clf)
+            final = _adapt_internal_calibration_cv(clone(clf), y)
             final.fit(X, y)
         except Exception:
             # The classifier (or its internal CV) cannot fit even on the full
@@ -229,16 +243,27 @@ def train_baseline_classifiers(
                 "mean_metrics": (
                     _mean_of_metrics(fold_metrics)
                     if fold_metrics
-                    else {k: float("nan") for k in ("accuracy", "balanced_accuracy",
-                                                   "precision", "recall", "f1", "roc_auc")}
+                    else {
+                        k: float("nan")
+                        for k in (
+                            "accuracy",
+                            "balanced_accuracy",
+                            "precision",
+                            "recall",
+                            "f1",
+                            "roc_auc",
+                        )
+                    }
                 ),
             }
             continue
         mean_metrics = (
             _mean_of_metrics(fold_metrics)
             if fold_metrics
-            else {k: float("nan") for k in ("accuracy", "balanced_accuracy",
-                                           "precision", "recall", "f1", "roc_auc")}
+            else {
+                k: float("nan")
+                for k in ("accuracy", "balanced_accuracy", "precision", "recall", "f1", "roc_auc")
+            }
         )
         results[name] = {
             "model": final,
@@ -248,9 +273,7 @@ def train_baseline_classifiers(
     return results
 
 
-def predict_window_probabilities(
-    X: Sequence[Sequence[float]], model: Any
-) -> np.ndarray:
+def predict_window_probabilities(X: Sequence[Sequence[float]], model: Any) -> np.ndarray:
     """Return per-window chatter probabilities from a fitted classifier."""
     X = np.asarray(X, dtype=float)
     if not hasattr(model, "predict_proba"):
@@ -290,8 +313,7 @@ def fit_probability_calibrator(
     y_proba = np.asarray(y_proba, dtype=float).ravel()
     if y_true.shape[0] != y_proba.shape[0]:
         raise ValueError(
-            f"y_true ({y_true.shape[0]}) and y_proba ({y_proba.shape[0]}) "
-            "length mismatch"
+            f"y_true ({y_true.shape[0]}) and y_proba ({y_proba.shape[0]}) length mismatch"
         )
     if method == "isotonic":
         from sklearn.isotonic import IsotonicRegression
@@ -304,6 +326,4 @@ def fit_probability_calibrator(
 
     lr = LogisticRegression(C=1e6)
     lr.fit(y_proba.reshape(-1, 1), y_true)
-    return lambda p: lr.predict_proba(
-        np.asarray(p, dtype=float).ravel().reshape(-1, 1)
-    )[:, 1]
+    return lambda p: lr.predict_proba(np.asarray(p, dtype=float).ravel().reshape(-1, 1))[:, 1]

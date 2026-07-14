@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pg_amcd"
-version = "2.0.0"
-description = "Physics-Guided Adaptive Multi-Stage Chatter Detection"
+version = "4.0.0"
+description = "Physics-guided machining-signal processing through Stage 4 feature extraction"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -20,7 +20,7 @@ dependencies = [
     "numpy>=1.25.0",
     "scipy>=1.11.0",
     "matplotlib>=3.7.0",
-    "PyEMD>=1.4.0",
+    "EMD-signal>=1.4.0",
     "PyWavelets>=1.4.0",
     "openpyxl>=3.1.0",
     "pyyaml>=6.0.0",
@@ -43,11 +43,18 @@ pg-amcd = "pg_amcd.cli:main"
 where = ["src"]
 include = ["pg_amcd*"]
 
+[tool.setuptools.package-data]
+pg_amcd = ["configs/*.json"]
+
 [tool.mypy]
 ignore_missing_imports = true
-disable_error_code = ["assignment", "attr-defined", "operator", "arg-type", "index", "var-annotated", "call-overload"]
+exclude = [
+    "src/pg_amcd/(baselines|detection|evaluation|reporting|tracking|visualization)\\.py$",
+    "src/pg_amcd/cli/evaluate\\.py$",
+]
 
 [tool.pytest.ini_options]
+testpaths = ["tests"]
 norecursedirs = ["Python/venv", "venv", ".venv", "build", "dist"]
 
 [tool.ruff]
@@ -57,3 +64,20 @@ target-version = "py310"
 [tool.ruff.lint]
 # Scripts intentionally insert src/ on sys.path before importing pg_amcd.
 per-file-ignores = { "scripts/*" = ["E402"] }
+
+[tool.coverage.run]
+branch = true
+patch = ["subprocess"]
+omit = [
+    "src/pg_amcd/baselines.py",
+    "src/pg_amcd/detection.py",
+    "src/pg_amcd/evaluation.py",
+    "src/pg_amcd/reporting.py",
+    "src/pg_amcd/tracking.py",
+    "src/pg_amcd/visualization.py",
+    "src/pg_amcd/cli/evaluate.py",
+]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true

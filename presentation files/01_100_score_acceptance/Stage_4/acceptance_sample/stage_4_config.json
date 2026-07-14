@@ -1,0 +1,29 @@
+{
+  "band_energy_ranges_hz": [
+    [
+      0.0,
+      50.0
+    ],
+    [
+      50.0,
+      150.0
+    ],
+    [
+      150.0,
+      300.0
+    ],
+    [
+      300.0,
+      490.0
+    ]
+  ],
+  "harmonic_count": 5,
+  "harmonic_tolerance_hz": 15.0,
+  "mode": "exploratory",
+  "overlap_ratio": 0.5,
+  "requested_window_seconds": 0.25,
+  "residual_handling": "explicit_last_row_excluded_from_physical_imf_features",
+  "selected_gate_threshold": 0.5,
+  "sideband_tolerance_hz": 10.0,
+  "window_seconds": 0.25
+}

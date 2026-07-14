@@ -1,0 +1,17 @@
+{
+  "applied_level": 2,
+  "band_aware": true,
+  "chatter_band_center": 320.0,
+  "chatter_band_spread": 60.0,
+  "chatter_band_threshold_multiplier": 0.5,
+  "chatter_center": 320.0,
+  "chatter_spread": 60.0,
+  "chatter_threshold_scale": 0.5,
+  "level": 2,
+  "minimum_noise_sigma": 1e-12,
+  "noise_band_threshold_multiplier": 1.4,
+  "noise_threshold_scale": 1.4,
+  "threshold_mode": "soft",
+  "thresholding_mode": "soft",
+  "wavelet_name": "db2"
+}

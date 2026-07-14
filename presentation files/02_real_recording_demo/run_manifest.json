@@ -1,0 +1,912 @@
+{
+  "cli_command": "Python/.venv/bin/pg-amcd run --input-dir /tmp/pg-amcd-real-run-ntkrJa/input --output-dir /tmp/pg-amcd-real-run-ntkrJa/outputs --config configs/research_fast.json --through-stage 4",
+  "dependency_versions": {
+    "EMD-signal": "1.9.0",
+    "PyWavelets": "1.9.0",
+    "matplotlib": "3.10.8",
+    "numpy": "2.4.2",
+    "openpyxl": "3.1.5",
+    "pandas": "3.0.3",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.17.1"
+  },
+  "end_timestamp": "2026-07-14T01:21:33.614329+00:00",
+  "failure_count": 0,
+  "failures": [],
+  "feature_schema_version": "1.0.0",
+  "git_commit": "f920df6c8701442a8a3eda5d81478fc4ea636b6b",
+  "git_dirty": true,
+  "git_worktree_sha256": "c6f19698f47f903e82850c93cedb30fa0c4ab1c35a17d28ada24d66266e4dd72",
+  "input_files": [
+    {
+      "relative_path": "u_570_005.mat",
+      "sha256": "1cddbd54fb93a320699db8dc1774e36c03c3127f50c4432edf4c5b620f00c78d"
+    }
+  ],
+  "input_validation": {
+    "n_files": 1,
+    "n_invalid": 0,
+    "n_valid": 1
+  },
+  "limitations": [
+    "The production workflow intentionally ends after Stage 4 feature extraction.",
+    "Real-signal SNR improvement is not reported without a known clean reference."
+  ],
+  "metadata_checksum": "",
+  "metadata_diagnostics": {
+    "matched_recordings": 0,
+    "metadata_rows": 0,
+    "missing_recordings": [],
+    "missing_tooth_count": []
+  },
+  "metadata_file": null,
+  "operating_system": "Linux-7.0.11-76070011-generic-x86_64-with-glibc2.39",
+  "output_checksums": {
+    "Stage_1/u_570_005/01_raw_signal.png": "1465b4df0cb481a4a8a3f1176d0a5d33014c3216f9ee3f2b86516e7fdf72afa5",
+    "Stage_1/u_570_005/01_raw_signal.svg": "20051700b15184f120cfe3957684c9cb41320f2a6ec3d3f7ca11c67e8069fcbd",
+    "Stage_1/u_570_005/02_selected_segment.png": "4ecc6b2e6e5e1d70b400215ffb6f46e2f9de9cbad2011e7b00337e4321093a92",
+    "Stage_1/u_570_005/02_selected_segment.svg": "0ce47954a77c7748f822facdf579adfc07735760c37708251139bd66ce6ccfd3",
+    "Stage_1/u_570_005/03_preprocessing_comparison.png": "de0d1149b045583241bef68d6e04fa263bcc9089e2008e35ebfc8012baaaf03e",
+    "Stage_1/u_570_005/03_preprocessing_comparison.svg": "83d71cfea8900994bca7d216fd3f2ccaaf6a64b5ab631deefd28c9776c7e49c4",
+    "Stage_1/u_570_005/04_psd_comparison.png": "89e7914b3f312c040b1f8682a028f85c0c044cf18ccfcba252569fac3db86729",
+    "Stage_1/u_570_005/04_psd_comparison.svg": "536de34db2de91e45bad584f5e36129f639665b74aa7cb57ff7d0f4e687ab3b3",
+    "Stage_1/u_570_005/05_cutoff_search.png": "6e96324f916f98df484e83d1b240319097aadc8b52194307634354f5f8d91f18",
+    "Stage_1/u_570_005/05_cutoff_search.svg": "4f942970051a2fbecb3eaeeac81c1e2e5fb699cebcb3c2e37f01cb7ca10018e5",
+    "Stage_1/u_570_005/06_ceemdan_decomposition.png": "3b0ee7dbdf9511f87e19643cd3bfe5da0d1e12f24fed795a3af0beaf73e55294",
+    "Stage_1/u_570_005/06_ceemdan_decomposition.svg": "4cb6548a6b0ded6e7e5d5566f4ac7ba65b5ee2bbbf09c0f93d4c9f0eee5e9d88",
+    "Stage_1/u_570_005/07_individual_imfs.png": "3ddf91031c74effcbdd76ff2a77ab4ed7171839c4b45ac5a18e015e8a12eafb9",
+    "Stage_1/u_570_005/07_individual_imfs.svg": "66c5c86daf589d83b411ad1044583c7a2ddd4ae9eedb8ca4277f098c87bb8a5d",
+    "Stage_1/u_570_005/08_residual.png": "01331cc6b61e3e414774d97e5bacdc3d8b90c5182692456b29b03086935df1c0",
+    "Stage_1/u_570_005/08_residual.svg": "90255f77213793a2f2735b9ce024904b4793d44a48c07e319daf3b02529eebeb",
+    "Stage_1/u_570_005/09_imf_energy_distribution.png": "2243b86ef719c7f171d8ef9db73de4499acbdea9ae3ef8cc3bb2b9bb6f8e8654",
+    "Stage_1/u_570_005/09_imf_energy_distribution.svg": "0b6d549aac7abfae3e645d74c2caf6447062ee11de05784db0d77a05f3650bfa",
+    "Stage_1/u_570_005/10_imf_frequency_ordering.png": "127137b1491db8066530301216de9cfe3485e2f83a3661f65fce01e0875f86bb",
+    "Stage_1/u_570_005/10_imf_frequency_ordering.svg": "f7851b036febc1ebe6915861a24d7aa7aa725fd8c0df91ce143d6fa6d2552565",
+    "Stage_1/u_570_005/11_imf_bandwidth.png": "d48d84b9100643e701de3b7a43854bdec22de12b7a1a3508458b708c3619760b",
+    "Stage_1/u_570_005/11_imf_bandwidth.svg": "574e30d658ed87f3033a25b9bee6bca9c8db9c6aafcc7c9b07058860272bc812",
+    "Stage_1/u_570_005/12_adjacent_imf_correlation.png": "3cc74c9ef23a153d8c253ef62f448fc8b0d6a2b464354306129a9b3248d73308",
+    "Stage_1/u_570_005/12_adjacent_imf_correlation.svg": "fa47e595addffdbe325647ad85807abf1ebd45b4b3de41f792beff68383becd1",
+    "Stage_1/u_570_005/13_seed_stability.png": "013c32832ca5a6c2e785521e170dd4d9387a2fa94023a9f745a4447aac032bb3",
+    "Stage_1/u_570_005/13_seed_stability.svg": "98d2f5b9142de9ca1b525c8e2fdf33f2bd0c1fbe475ba2ab02fe4ea2edc34d43",
+    "Stage_1/u_570_005/14_reconstruction_error.png": "0153e26a764db912c52c26d2053678901be076b78759260809821c174c1a6ff9",
+    "Stage_1/u_570_005/14_reconstruction_error.svg": "ac7f338b68426ea0e8ab2861d34c349ed55ebc409af1d85e735d58ac6d02742b",
+    "Stage_1/u_570_005/15_time_frequency.png": "7aa724e16e12836d633a11b5151891454c4bdf8161930b0d5a0a8cc056830e51",
+    "Stage_1/u_570_005/15_time_frequency.svg": "80d09ccdd5ba92047daef29d07e4203419e8e17215aa7ee24ba958baef2ac7c9",
+    "Stage_1/u_570_005/cutoff_search.csv": "36940685fa2c43e1284625d961e17032be1c815b3893cb9e80bc27789f258590",
+    "Stage_1/u_570_005/decomposition.npz": "164493183ebf3a03dc1e80893f9bd7978f1b7049f3e7bf0a07da1a4c31f93b41",
+    "Stage_1/u_570_005/imf_metrics.csv": "a250cac3e44a6ece25027c211ae956b8e63515a32660432f1b58930243236d3e",
+    "Stage_1/u_570_005/preprocessed_physical.npz": "089ba209d794ec4a24e1d22702c1d04081856f89bcb1671120adf905aafa5551",
+    "Stage_1/u_570_005/preprocessed_scaled.npz": "6b892fa56a5d48714c6259c763d5d4e517507849086b1cbdbc21ead1a4067e7c",
+    "Stage_1/u_570_005/stage_1_config.json": "8a1177d66d862b32bad5ab8351a03a4e41f222393c07dac617f94fe5a1d8d7f0",
+    "Stage_1/u_570_005/stage_1_metrics.json": "c4ca15d925ab109d3d7db5f615b78ee4deb45998ae4769bc6eb462dfa8f7d63f",
+    "Stage_1/u_570_005/stage_1_summary.md": "c4db91073b984172267163f8f088890a570ec2df083a64630c709720d950d174",
+    "Stage_2/u_570_005/01_imf_gate_values.png": "af03183cf11e69500b0280c237d0022e93543036bccf75b349690aa2899302f3",
+    "Stage_2/u_570_005/01_imf_gate_values.svg": "9d1dd7ed873101d3d0ed1efdc190b7a117c60662583d0e08d5a27b04e67e0a7c",
+    "Stage_2/u_570_005/02_imf_indicator_comparison.png": "ff30fe367b31694f888a48e31abb2f42f31ab9bcb6d9a3715fbeed05ab9b0c50",
+    "Stage_2/u_570_005/02_imf_indicator_comparison.svg": "b47319dee9461e1c1f33f09bc1193b72d43125f744498cfa4826860f206f0156",
+    "Stage_2/u_570_005/03_frequency_vs_gate.png": "b0634ec1ab8758f1a730917814c15de3b5f5a842440e1430b39260a9293735c3",
+    "Stage_2/u_570_005/03_frequency_vs_gate.svg": "c8c8d5eb6b07a3d5145ec8e36a5da8d5819cc8e688858edd503ebfa1cf4c1918",
+    "Stage_2/u_570_005/04_energy_vs_gate.png": "aa5a59e7860474f7e8ca7158e54e6df4c4ef2a9b67557b88342782c2dd7678ae",
+    "Stage_2/u_570_005/04_energy_vs_gate.svg": "20622b6f655abb830800e9808b835362ec18c7390849056082bcb5a5ba941e2e",
+    "Stage_2/u_570_005/05_chatter_energy_vs_gate.png": "d3e2ea8ef7884797980c7807cd6fe54de64cd9ad0947a4de577a043407282738",
+    "Stage_2/u_570_005/05_chatter_energy_vs_gate.svg": "020c2dcd2b41162829e05ff308c128e9dde92289b4f844b3bf898f4910fc5c5f",
+    "Stage_2/u_570_005/06_forced_harmonics_vs_gate.png": "706d69cfaee00c69cfa0ae1123c1e068b0c3c25819e60664a19b604f1d99dcb4",
+    "Stage_2/u_570_005/06_forced_harmonics_vs_gate.svg": "be3c6e4b6d10b8064a0a3b8099860408435daa52993d2b65cf22a7efbb319a6d",
+    "Stage_2/u_570_005/07_weighted_reconstruction.png": "231fff1a9f185e3aa1b6b71e0b6afbb1647e6b1f177a969f1dcaaceeed3d1f1b",
+    "Stage_2/u_570_005/07_weighted_reconstruction.svg": "7391e39aef864928edc48dbc023ef20f3358d37ea95e32067c5d8a0d39e5d0e9",
+    "Stage_2/u_570_005/08_weighted_psd_comparison.png": "797c938b45ae2ec030d8c7d6be201a586789216ae34d83ae2113216a26f9a3d0",
+    "Stage_2/u_570_005/08_weighted_psd_comparison.svg": "7ccdf0c4076fbd580c7cc454b14b840d41fee3c2a2fb09055918b3ccbacd4d8a",
+    "Stage_2/u_570_005/09_retained_suppressed_imfs.png": "2306bc2946e1814dadb919c7e12710aa249b69c04c4ea8082f70ce2083c8507b",
+    "Stage_2/u_570_005/09_retained_suppressed_imfs.svg": "bbe583821496c1958128cf3a1dd7622b9e6985cb3b52109fc21cb99789d9ad5e",
+    "Stage_2/u_570_005/10_gate_stability.png": "3cd0530d847efa3e15f8315e3bf1a52e22a3e2bc2f5282b11664cccd5a7e5a9f",
+    "Stage_2/u_570_005/10_gate_stability.svg": "58457e8bc3b468d9c2082a57b31b3ca48e9b3df30abf5350e6ae7744c0d41532",
+    "Stage_2/u_570_005/11_harmonic_markers.png": "0475fdf79b63731630730ed606967319b39f13e747c96400bf4f6ef89680fa62",
+    "Stage_2/u_570_005/11_harmonic_markers.svg": "79b8d73f4a706b7da151ef70e6743e8e85d0fc720f426215c78a5e9c4e0574de",
+    "Stage_2/u_570_005/12_chatter_band_psd.png": "77fda2d400a271a0c779c309654f2e7a3414fc9ca402d58b4f608a025ee38817",
+    "Stage_2/u_570_005/12_chatter_band_psd.svg": "3544f2123d0b621d7e1714ea624be02699c28218b30d21b892a9cd20d8d30534",
+    "Stage_2/u_570_005/imf_gates.csv": "f63f034724d68b515b9143c08a5a55fcf81b03b800d875386ad49db0e54a859b",
+    "Stage_2/u_570_005/imf_indicators.csv": "f8df4839ac09fb749d4b142bd5987c75784a3e93e882dc919d8d37fd60dc080f",
+    "Stage_2/u_570_005/stage_2_config.json": "44efd554f026edfa79a9690d724b58a605291ebdb7d750c9a4cbf373cd311b87",
+    "Stage_2/u_570_005/stage_2_metrics.json": "82305ea80baa2b2286dfcb7a5a267d69aa6822efc7fd4c772144817434f454de",
+    "Stage_2/u_570_005/stage_2_summary.md": "8b212a6bc234fede531af6a44d778d077975f900afcdd3ccd2adc390bdc07aba",
+    "Stage_2/u_570_005/weighted_reconstruction_physical.npz": "30b30a4c76c4e8db04cae9924a77fa090ac81d205a907eb725f7f235db11af21",
+    "Stage_2/u_570_005/weighted_reconstruction_scaled.npz": "acfe2ad0a34f487419d274137e8a2e225052763c7afe31a78fb8a54c90802c21",
+    "Stage_3/u_570_005/01_weighted_vs_denoised.png": "907267d0430112c1ac4a290ecdb73903483dd094fe2f94672e2baaf45b4a7eea",
+    "Stage_3/u_570_005/01_weighted_vs_denoised.svg": "65e8e88e49ca02767da2e742a41aeb67ebbf439b8d6dc2ef93ed427b3124d3c9",
+    "Stage_3/u_570_005/02_all_signal_stages.png": "ba2ac0c60225a4309da79d087e29ab24d138992a69af8c922b250319fb2ad64e",
+    "Stage_3/u_570_005/02_all_signal_stages.svg": "459de16043bd01bee3aa507071882f232dc1361475b89b9c8efd3c28c50d0d12",
+    "Stage_3/u_570_005/03_psd_before_after.png": "f262eda23375fffc6eef6cfd2281e51ad9b83f54b9c19fdcbfd512ccb3c35b7e",
+    "Stage_3/u_570_005/03_psd_before_after.svg": "d2862b0aea6b48a9b5742c1f36f24ac0344427a2205132c92daca3691fe0629c",
+    "Stage_3/u_570_005/04_wavelet_level_energies.png": "684679832295d42a852c39886797bae5f24db870e6c96721aa2d77e67e9315bf",
+    "Stage_3/u_570_005/04_wavelet_level_energies.svg": "5d3be1d943b7abe510357c161684cadd4e9dc93b8bc8d2a63baf320dbbff20f2",
+    "Stage_3/u_570_005/05_wavelet_thresholds.png": "afec8e0a033b84432e4ac5fbd5418a242e1be9345ae5d6075f931b6dba657c6f",
+    "Stage_3/u_570_005/05_wavelet_thresholds.svg": "da38b71e3ec9aeaa4b7cee41b0746560b7e5db1dad9919dcc423f1a3bb782609",
+    "Stage_3/u_570_005/06_wavelet_subbands.png": "6feca3ab765226c59011f93accc56b2bab4dc3640c41d6e26369e91465055ac8",
+    "Stage_3/u_570_005/06_wavelet_subbands.svg": "3ff78a28f2a2b7399c5ff3e27841d19aa51344d82b758b638471937eb742fdfd",
+    "Stage_3/u_570_005/07_chatter_band_overlap.png": "3656c38df46bf868250296f1c43c3111934a325e0487f8b7846790d169851185",
+    "Stage_3/u_570_005/07_chatter_band_overlap.svg": "678ccf73efe7672cff2ee5e88b5abf62cba3da9572a71a94e900767ac570b7e9",
+    "Stage_3/u_570_005/08_spectrogram_comparison.png": "0f6813ad4f3ac248cbe61d4652e0fcc3c4a12cb1b63331c2d40ef2b9d1c35b03",
+    "Stage_3/u_570_005/08_spectrogram_comparison.svg": "4f79e14b5f29c42cfecbd38cb472d1936edd5a75c92d605c39f8981ddb7f9039",
+    "Stage_3/u_570_005/09_synthetic_recovery.png": "04d9678a00be805c0d244a8395f212f384c107cb80e64c3893a3a0073ad1efb1",
+    "Stage_3/u_570_005/09_synthetic_recovery.svg": "ea3e00cef5595b04b0fc99b3a19ca90de3e7e0d7479b8ca597a87956d1972754",
+    "Stage_3/u_570_005/10_residual_noise.png": "f8b766ebca1eac98d513acea45479730f676b01331bd9bf5a3ace2d8b8fa3ec5",
+    "Stage_3/u_570_005/10_residual_noise.svg": "8bf41b7c42f86bf4ac5e0aa069efdf031e75d547a182954a74c0a0625928e52e",
+    "Stage_3/u_570_005/11_residual_noise_psd.png": "5c7637a256df0dc7ee54630b9461238d394c566618f6b69e17cbda1a390908ae",
+    "Stage_3/u_570_005/11_residual_noise_psd.svg": "de14c4d661521d6d350b34fc844fe2238d1ebfb6a7ca4f38673c29cd3797007a",
+    "Stage_3/u_570_005/12_time_frequency_energy.png": "9c5b1487cd45b4b28f8e1270d8bec36df1040d2fbb947a134f0fa616c8f1a4af",
+    "Stage_3/u_570_005/12_time_frequency_energy.svg": "979fc805458f2878ae5514561e14b611440616e79e73d3423ae6a0f50969eef9",
+    "Stage_3/u_570_005/denoised_physical.npz": "8cbe0f027c29a2a04c6c594dbbdb050f8455c140c9729a773c2b360b3f4bd316",
+    "Stage_3/u_570_005/denoised_scaled.npz": "161cc87749a3a68359924da2f8f4eb152f5d2fcf8d77b92f82d9259a354a38f9",
+    "Stage_3/u_570_005/stage_3_config.json": "7f59f734e1b95b4b5decdc523ae2483b55bd8ce625a3a455cc63bdc532b71f80",
+    "Stage_3/u_570_005/stage_3_metrics.json": "eeb8cbbd410980efb59a9f1479fdf8186b9166def1e448fe7cdc45cd60aa87ec",
+    "Stage_3/u_570_005/stage_3_summary.md": "3635f3f88f571c4dddf5261b766c292260361fd592b5fdf833f51d0c2f86db46",
+    "Stage_3/u_570_005/wavelet_coefficients.npz": "a13627a5ed560a419dced856c522525063ae4610584c970f8eda4986e62e33b7",
+    "Stage_3/u_570_005/wavelet_thresholds.csv": "28d58ab20dcad39ed57783d06637dbe22ef16d2375844ed1363771e088255617",
+    "Stage_4/aggregate/aggregate_feature_correlation_heatmap.png": "b0101dc2464fb7ee8d0b725ca98a312c49f2493bc2c9e6d4f52bf53db21f6b38",
+    "Stage_4/aggregate/aggregate_feature_correlation_heatmap.svg": "c8eb2e0c7de074d45121ab00b88767f6e298d98a75eb54818c33a137ec9ffeba",
+    "Stage_4/aggregate/aggregate_feature_distributions.png": "b465179b1cfd5c2df72063770ffef379cb38d6546bc0f1a3393d6ba5619809a3",
+    "Stage_4/aggregate/aggregate_feature_distributions.svg": "8ae22151ea31592f0783cb15dc8f08c4cac6f03df8f68281fcfae7e5686bf3d2",
+    "Stage_4/aggregate/aggregate_feature_missingness.png": "3dd91a750cd837d5ad369675aca28f614a8d2ef370b5309c1ed052037e7dc2fb",
+    "Stage_4/aggregate/aggregate_feature_missingness.svg": "a343a944dfd3d7b200207d000ba772b9a888ce04e2db48f052a14617c0f9d921",
+    "Stage_4/aggregate/aggregate_feature_stability.png": "7b7afc7f60d23693eb1ecea81d1323bdac2d21c47f3d11233a64c236cbbb807d",
+    "Stage_4/aggregate/aggregate_feature_stability.svg": "f136c6828dc0b93349fb95d9d5378428467796ac1b0577ed7e28f12b3645010b",
+    "Stage_4/aggregate/aggregate_feature_values_by_depth_of_cut.png": "dab56aa0d7c3df89be290464258dfb5aea6a088dfcee71456edb97eccda42345",
+    "Stage_4/aggregate/aggregate_feature_values_by_depth_of_cut.svg": "75572bfc60ca47c11130099fbc83b17f720a5d649c7815aba9cda778416be383",
+    "Stage_4/aggregate/aggregate_feature_values_by_recording.png": "c5126d3df0673ae21c29e4faac14351891228c42e7ec2aa0385fb3bf1df4502f",
+    "Stage_4/aggregate/aggregate_feature_values_by_recording.svg": "0369a2b11f1a6766b836c6184c2c0bd475e88ef94e9e9bce1ce3f1b6a749b2d0",
+    "Stage_4/aggregate/aggregate_feature_values_by_rpm.png": "d5118978b265eafbc040cdd1462f676262fd3062782f2b7d5a6b674f4d511126",
+    "Stage_4/aggregate/aggregate_feature_values_by_rpm.svg": "5894751eee18dce9c44772e1e19d600604cacd40f6a8679090db0d26a6e3249a",
+    "Stage_4/aggregate/aggregate_feature_values_by_stickout.png": "d37663129b0f568dfecd353b10050d0b62eb08c194a9c9b8df4b03291c899b77",
+    "Stage_4/aggregate/aggregate_feature_values_by_stickout.svg": "5441e2eb532489ca7ff3b8944ab1a0aa66398f4dd8dc08a94b2944774db76bb2",
+    "Stage_4/aggregate/aggregate_feature_variance.png": "3abffe8240ebbd047af4fc6a0e802b72ad292a0d9cfccd9662141207c97044d2",
+    "Stage_4/aggregate/aggregate_feature_variance.svg": "38ff709a998938cb4b003c89fe8929266cd8803813acfd6a4d4cbc500654ab22",
+    "Stage_4/aggregate/all_recording_features.csv": "67d276ffcd73b2b58644597adf4971927d15da4c5fea4db99756c1cf0fcfb744",
+    "Stage_4/aggregate/feature_correlations.csv": "7417b4a3151b610bc3ae3969f6df28006b50d19c36a48d84547d0d4dd38eba62",
+    "Stage_4/aggregate/feature_missingness.csv": "618c346f3b6d6e478a32c2b84dbad6919a9df2872ba4eb1ec1fb2b9d7b1c09f0",
+    "Stage_4/aggregate/feature_repeatability.csv": "90da48dfaf1a1e5db50e2384f1603c8929f83b1aa2542a70f4bb2152ad251ed8",
+    "Stage_4/aggregate/feature_schema.json": "375910da3e302b97d9657eb7fdc9bd5168a11c5255d17d5a874c3d1d0a069962",
+    "Stage_4/aggregate/feature_summary.csv": "b9973788d74c3b0e889fa65c86d38540489df22e2910849eb1402626c8fc8caa",
+    "Stage_4/u_570_005/01_rms_timeline.png": "301fb7837e065786ff0d4fa643cb9a087d3d136cc05726d5f607bbacdb35da8d",
+    "Stage_4/u_570_005/01_rms_timeline.svg": "4d8484dfbf50926d2b0b32a40e90319030e4416b19056f35ee79779d090bfcd1",
+    "Stage_4/u_570_005/02_kurtosis_timeline.png": "4306a60bc09a2debf772daf93625e9df331534e5c722b3405862b36fd6ab4743",
+    "Stage_4/u_570_005/02_kurtosis_timeline.svg": "2882ff40fe489371787d72e9bdd970b52ca1edf3ef39dd71bb88bcb551b11328",
+    "Stage_4/u_570_005/03_spectral_entropy_timeline.png": "b68bd0037f1d4be5c2b4069bf2928d4a1f3a81c9d0c78e5ae7781bcf996b6199",
+    "Stage_4/u_570_005/03_spectral_entropy_timeline.svg": "d449df11841871969aae5c17dc73b263a76afaf822c31f15f9355f5bf5f12955",
+    "Stage_4/u_570_005/04_chatter_energy_timeline.png": "2123a13a544d125b88063122485bbe965184df92f4a4b0fbe3afef7756119931",
+    "Stage_4/u_570_005/04_chatter_energy_timeline.svg": "cbfa8a74b855b0a6c36982d9e7131de65dfb37073e41c8b596cd00dc7d816f5b",
+    "Stage_4/u_570_005/05_harmonic_energy_timeline.png": "768f2faeaa528693581edd163b7bf1c8c1db95fb03b66d8bda24d9644f8ea224",
+    "Stage_4/u_570_005/05_harmonic_energy_timeline.svg": "816769fa5a80ee4a76805d10ee95813fde19b39ee13bd2e037ca760bd5eec3e1",
+    "Stage_4/u_570_005/06_hegr_timeline.png": "67c063c468d325ecc1975f035e2556b223fce70d5a80fe2e4e69d3a75f1cc8c1",
+    "Stage_4/u_570_005/06_hegr_timeline.svg": "7a33663f0a5e8d8314951ee8d42655038771287fd130d2742a2506c5f8b5530e",
+    "Stage_4/u_570_005/07_instantaneous_energy_timeline.png": "ac03ba3ad8e2c2ed526eb2de7cf5d36f1eb2f7eb0c9ee3ae20dc838f41e67c36",
+    "Stage_4/u_570_005/07_instantaneous_energy_timeline.svg": "15da0bd14aefb4b7277a67aab4d063f8beaad8b90fcef9376ef307de5fc1d152",
+    "Stage_4/u_570_005/08_imf_gate_values.png": "83defe8929da5e504161c00ea0f31f4170bbaf181c70b4c6a581e0336c3e8044",
+    "Stage_4/u_570_005/08_imf_gate_values.svg": "26d3796ddac330b8f03ea95e6d5849c0c247848b87b3f62639c6ec816c2d0005",
+    "Stage_4/u_570_005/09_wavelet_energy_ratios.png": "62a54d1a724978c1729a1f09b63bd0eacc1e63153320d664365b1165f02d0cf8",
+    "Stage_4/u_570_005/09_wavelet_energy_ratios.svg": "49c41d4f5749a58b5f899de0ace60da2cc92e6cd4fdda4d7b5cdef123c99aeb5",
+    "Stage_4/u_570_005/10_feature_family_summary.png": "1f8a76273cdefd887ca3f1cd694b691e7c61f4172778161e82a3b8690727471f",
+    "Stage_4/u_570_005/10_feature_family_summary.svg": "c9a0a1b02f9e8e162491ca4b1de68f511a113b41cd0d11e42e533ad90a2f136f",
+    "Stage_4/u_570_005/feature_quality.json": "16354adfa9b7bd7f7fcdba6f97b2a822546b692c75237a51cbace10724c05ca0",
+    "Stage_4/u_570_005/feature_schema.json": "375910da3e302b97d9657eb7fdc9bd5168a11c5255d17d5a874c3d1d0a069962",
+    "Stage_4/u_570_005/stage_4_config.json": "bef61b4b6bb3179ec74ea2bee028c9cb65e780f3ca9a9dbd3f633444fddf5eda",
+    "Stage_4/u_570_005/stage_4_metrics.json": "ce5c2f19df74bc26e26fb5190489be59a79d9e541529937f100e90e62ddc09bd",
+    "Stage_4/u_570_005/stage_4_summary.md": "1ff5f7708b259ca2dddd2a94bcb7002867b8d29d1d44795f3fcb3841660f247c",
+    "Stage_4/u_570_005/window_features.csv": "465c7f7a9c61ed600218528bda0ce01df83610ec243906e913c8217f73b13cc0",
+    "Stage_4/u_570_005/window_features.json": "e5ecdd65dd53eaa4f1f5b382d8d49c1b4a0216a62cb486b367f74a17bb91a5eb",
+    "report/figures/Stage_1__u_570_005__01_raw_signal.png": "1465b4df0cb481a4a8a3f1176d0a5d33014c3216f9ee3f2b86516e7fdf72afa5",
+    "report/figures/Stage_1__u_570_005__01_raw_signal.svg": "20051700b15184f120cfe3957684c9cb41320f2a6ec3d3f7ca11c67e8069fcbd",
+    "report/figures/Stage_1__u_570_005__02_selected_segment.png": "4ecc6b2e6e5e1d70b400215ffb6f46e2f9de9cbad2011e7b00337e4321093a92",
+    "report/figures/Stage_1__u_570_005__02_selected_segment.svg": "0ce47954a77c7748f822facdf579adfc07735760c37708251139bd66ce6ccfd3",
+    "report/figures/Stage_1__u_570_005__03_preprocessing_comparison.png": "de0d1149b045583241bef68d6e04fa263bcc9089e2008e35ebfc8012baaaf03e",
+    "report/figures/Stage_1__u_570_005__03_preprocessing_comparison.svg": "83d71cfea8900994bca7d216fd3f2ccaaf6a64b5ab631deefd28c9776c7e49c4",
+    "report/figures/Stage_1__u_570_005__04_psd_comparison.png": "89e7914b3f312c040b1f8682a028f85c0c044cf18ccfcba252569fac3db86729",
+    "report/figures/Stage_1__u_570_005__04_psd_comparison.svg": "536de34db2de91e45bad584f5e36129f639665b74aa7cb57ff7d0f4e687ab3b3",
+    "report/figures/Stage_1__u_570_005__05_cutoff_search.png": "6e96324f916f98df484e83d1b240319097aadc8b52194307634354f5f8d91f18",
+    "report/figures/Stage_1__u_570_005__05_cutoff_search.svg": "4f942970051a2fbecb3eaeeac81c1e2e5fb699cebcb3c2e37f01cb7ca10018e5",
+    "report/figures/Stage_1__u_570_005__06_ceemdan_decomposition.png": "3b0ee7dbdf9511f87e19643cd3bfe5da0d1e12f24fed795a3af0beaf73e55294",
+    "report/figures/Stage_1__u_570_005__06_ceemdan_decomposition.svg": "4cb6548a6b0ded6e7e5d5566f4ac7ba65b5ee2bbbf09c0f93d4c9f0eee5e9d88",
+    "report/figures/Stage_1__u_570_005__07_individual_imfs.png": "3ddf91031c74effcbdd76ff2a77ab4ed7171839c4b45ac5a18e015e8a12eafb9",
+    "report/figures/Stage_1__u_570_005__07_individual_imfs.svg": "66c5c86daf589d83b411ad1044583c7a2ddd4ae9eedb8ca4277f098c87bb8a5d",
+    "report/figures/Stage_1__u_570_005__08_residual.png": "01331cc6b61e3e414774d97e5bacdc3d8b90c5182692456b29b03086935df1c0",
+    "report/figures/Stage_1__u_570_005__08_residual.svg": "90255f77213793a2f2735b9ce024904b4793d44a48c07e319daf3b02529eebeb",
+    "report/figures/Stage_1__u_570_005__09_imf_energy_distribution.png": "2243b86ef719c7f171d8ef9db73de4499acbdea9ae3ef8cc3bb2b9bb6f8e8654",
+    "report/figures/Stage_1__u_570_005__09_imf_energy_distribution.svg": "0b6d549aac7abfae3e645d74c2caf6447062ee11de05784db0d77a05f3650bfa",
+    "report/figures/Stage_1__u_570_005__10_imf_frequency_ordering.png": "127137b1491db8066530301216de9cfe3485e2f83a3661f65fce01e0875f86bb",
+    "report/figures/Stage_1__u_570_005__10_imf_frequency_ordering.svg": "f7851b036febc1ebe6915861a24d7aa7aa725fd8c0df91ce143d6fa6d2552565",
+    "report/figures/Stage_1__u_570_005__11_imf_bandwidth.png": "d48d84b9100643e701de3b7a43854bdec22de12b7a1a3508458b708c3619760b",
+    "report/figures/Stage_1__u_570_005__11_imf_bandwidth.svg": "574e30d658ed87f3033a25b9bee6bca9c8db9c6aafcc7c9b07058860272bc812",
+    "report/figures/Stage_1__u_570_005__12_adjacent_imf_correlation.png": "3cc74c9ef23a153d8c253ef62f448fc8b0d6a2b464354306129a9b3248d73308",
+    "report/figures/Stage_1__u_570_005__12_adjacent_imf_correlation.svg": "fa47e595addffdbe325647ad85807abf1ebd45b4b3de41f792beff68383becd1",
+    "report/figures/Stage_1__u_570_005__13_seed_stability.png": "013c32832ca5a6c2e785521e170dd4d9387a2fa94023a9f745a4447aac032bb3",
+    "report/figures/Stage_1__u_570_005__13_seed_stability.svg": "98d2f5b9142de9ca1b525c8e2fdf33f2bd0c1fbe475ba2ab02fe4ea2edc34d43",
+    "report/figures/Stage_1__u_570_005__14_reconstruction_error.png": "0153e26a764db912c52c26d2053678901be076b78759260809821c174c1a6ff9",
+    "report/figures/Stage_1__u_570_005__14_reconstruction_error.svg": "ac7f338b68426ea0e8ab2861d34c349ed55ebc409af1d85e735d58ac6d02742b",
+    "report/figures/Stage_1__u_570_005__15_time_frequency.png": "7aa724e16e12836d633a11b5151891454c4bdf8161930b0d5a0a8cc056830e51",
+    "report/figures/Stage_1__u_570_005__15_time_frequency.svg": "80d09ccdd5ba92047daef29d07e4203419e8e17215aa7ee24ba958baef2ac7c9",
+    "report/figures/Stage_2__u_570_005__01_imf_gate_values.png": "af03183cf11e69500b0280c237d0022e93543036bccf75b349690aa2899302f3",
+    "report/figures/Stage_2__u_570_005__01_imf_gate_values.svg": "9d1dd7ed873101d3d0ed1efdc190b7a117c60662583d0e08d5a27b04e67e0a7c",
+    "report/figures/Stage_2__u_570_005__02_imf_indicator_comparison.png": "ff30fe367b31694f888a48e31abb2f42f31ab9bcb6d9a3715fbeed05ab9b0c50",
+    "report/figures/Stage_2__u_570_005__02_imf_indicator_comparison.svg": "b47319dee9461e1c1f33f09bc1193b72d43125f744498cfa4826860f206f0156",
+    "report/figures/Stage_2__u_570_005__03_frequency_vs_gate.png": "b0634ec1ab8758f1a730917814c15de3b5f5a842440e1430b39260a9293735c3",
+    "report/figures/Stage_2__u_570_005__03_frequency_vs_gate.svg": "c8c8d5eb6b07a3d5145ec8e36a5da8d5819cc8e688858edd503ebfa1cf4c1918",
+    "report/figures/Stage_2__u_570_005__04_energy_vs_gate.png": "aa5a59e7860474f7e8ca7158e54e6df4c4ef2a9b67557b88342782c2dd7678ae",
+    "report/figures/Stage_2__u_570_005__04_energy_vs_gate.svg": "20622b6f655abb830800e9808b835362ec18c7390849056082bcb5a5ba941e2e",
+    "report/figures/Stage_2__u_570_005__05_chatter_energy_vs_gate.png": "d3e2ea8ef7884797980c7807cd6fe54de64cd9ad0947a4de577a043407282738",
+    "report/figures/Stage_2__u_570_005__05_chatter_energy_vs_gate.svg": "020c2dcd2b41162829e05ff308c128e9dde92289b4f844b3bf898f4910fc5c5f",
+    "report/figures/Stage_2__u_570_005__06_forced_harmonics_vs_gate.png": "706d69cfaee00c69cfa0ae1123c1e068b0c3c25819e60664a19b604f1d99dcb4",
+    "report/figures/Stage_2__u_570_005__06_forced_harmonics_vs_gate.svg": "be3c6e4b6d10b8064a0a3b8099860408435daa52993d2b65cf22a7efbb319a6d",
+    "report/figures/Stage_2__u_570_005__07_weighted_reconstruction.png": "231fff1a9f185e3aa1b6b71e0b6afbb1647e6b1f177a969f1dcaaceeed3d1f1b",
+    "report/figures/Stage_2__u_570_005__07_weighted_reconstruction.svg": "7391e39aef864928edc48dbc023ef20f3358d37ea95e32067c5d8a0d39e5d0e9",
+    "report/figures/Stage_2__u_570_005__08_weighted_psd_comparison.png": "797c938b45ae2ec030d8c7d6be201a586789216ae34d83ae2113216a26f9a3d0",
+    "report/figures/Stage_2__u_570_005__08_weighted_psd_comparison.svg": "7ccdf0c4076fbd580c7cc454b14b840d41fee3c2a2fb09055918b3ccbacd4d8a",
+    "report/figures/Stage_2__u_570_005__09_retained_suppressed_imfs.png": "2306bc2946e1814dadb919c7e12710aa249b69c04c4ea8082f70ce2083c8507b",
+    "report/figures/Stage_2__u_570_005__09_retained_suppressed_imfs.svg": "bbe583821496c1958128cf3a1dd7622b9e6985cb3b52109fc21cb99789d9ad5e",
+    "report/figures/Stage_2__u_570_005__10_gate_stability.png": "3cd0530d847efa3e15f8315e3bf1a52e22a3e2bc2f5282b11664cccd5a7e5a9f",
+    "report/figures/Stage_2__u_570_005__10_gate_stability.svg": "58457e8bc3b468d9c2082a57b31b3ca48e9b3df30abf5350e6ae7744c0d41532",
+    "report/figures/Stage_2__u_570_005__11_harmonic_markers.png": "0475fdf79b63731630730ed606967319b39f13e747c96400bf4f6ef89680fa62",
+    "report/figures/Stage_2__u_570_005__11_harmonic_markers.svg": "79b8d73f4a706b7da151ef70e6743e8e85d0fc720f426215c78a5e9c4e0574de",
+    "report/figures/Stage_2__u_570_005__12_chatter_band_psd.png": "77fda2d400a271a0c779c309654f2e7a3414fc9ca402d58b4f608a025ee38817",
+    "report/figures/Stage_2__u_570_005__12_chatter_band_psd.svg": "3544f2123d0b621d7e1714ea624be02699c28218b30d21b892a9cd20d8d30534",
+    "report/figures/Stage_3__u_570_005__01_weighted_vs_denoised.png": "907267d0430112c1ac4a290ecdb73903483dd094fe2f94672e2baaf45b4a7eea",
+    "report/figures/Stage_3__u_570_005__01_weighted_vs_denoised.svg": "65e8e88e49ca02767da2e742a41aeb67ebbf439b8d6dc2ef93ed427b3124d3c9",
+    "report/figures/Stage_3__u_570_005__02_all_signal_stages.png": "ba2ac0c60225a4309da79d087e29ab24d138992a69af8c922b250319fb2ad64e",
+    "report/figures/Stage_3__u_570_005__02_all_signal_stages.svg": "459de16043bd01bee3aa507071882f232dc1361475b89b9c8efd3c28c50d0d12",
+    "report/figures/Stage_3__u_570_005__03_psd_before_after.png": "f262eda23375fffc6eef6cfd2281e51ad9b83f54b9c19fdcbfd512ccb3c35b7e",
+    "report/figures/Stage_3__u_570_005__03_psd_before_after.svg": "d2862b0aea6b48a9b5742c1f36f24ac0344427a2205132c92daca3691fe0629c",
+    "report/figures/Stage_3__u_570_005__04_wavelet_level_energies.png": "684679832295d42a852c39886797bae5f24db870e6c96721aa2d77e67e9315bf",
+    "report/figures/Stage_3__u_570_005__04_wavelet_level_energies.svg": "5d3be1d943b7abe510357c161684cadd4e9dc93b8bc8d2a63baf320dbbff20f2",
+    "report/figures/Stage_3__u_570_005__05_wavelet_thresholds.png": "afec8e0a033b84432e4ac5fbd5418a242e1be9345ae5d6075f931b6dba657c6f",
+    "report/figures/Stage_3__u_570_005__05_wavelet_thresholds.svg": "da38b71e3ec9aeaa4b7cee41b0746560b7e5db1dad9919dcc423f1a3bb782609",
+    "report/figures/Stage_3__u_570_005__06_wavelet_subbands.png": "6feca3ab765226c59011f93accc56b2bab4dc3640c41d6e26369e91465055ac8",
+    "report/figures/Stage_3__u_570_005__06_wavelet_subbands.svg": "3ff78a28f2a2b7399c5ff3e27841d19aa51344d82b758b638471937eb742fdfd",
+    "report/figures/Stage_3__u_570_005__07_chatter_band_overlap.png": "3656c38df46bf868250296f1c43c3111934a325e0487f8b7846790d169851185",
+    "report/figures/Stage_3__u_570_005__07_chatter_band_overlap.svg": "678ccf73efe7672cff2ee5e88b5abf62cba3da9572a71a94e900767ac570b7e9",
+    "report/figures/Stage_3__u_570_005__08_spectrogram_comparison.png": "0f6813ad4f3ac248cbe61d4652e0fcc3c4a12cb1b63331c2d40ef2b9d1c35b03",
+    "report/figures/Stage_3__u_570_005__08_spectrogram_comparison.svg": "4f79e14b5f29c42cfecbd38cb472d1936edd5a75c92d605c39f8981ddb7f9039",
+    "report/figures/Stage_3__u_570_005__09_synthetic_recovery.png": "04d9678a00be805c0d244a8395f212f384c107cb80e64c3893a3a0073ad1efb1",
+    "report/figures/Stage_3__u_570_005__09_synthetic_recovery.svg": "ea3e00cef5595b04b0fc99b3a19ca90de3e7e0d7479b8ca597a87956d1972754",
+    "report/figures/Stage_3__u_570_005__10_residual_noise.png": "f8b766ebca1eac98d513acea45479730f676b01331bd9bf5a3ace2d8b8fa3ec5",
+    "report/figures/Stage_3__u_570_005__10_residual_noise.svg": "8bf41b7c42f86bf4ac5e0aa069efdf031e75d547a182954a74c0a0625928e52e",
+    "report/figures/Stage_3__u_570_005__11_residual_noise_psd.png": "5c7637a256df0dc7ee54630b9461238d394c566618f6b69e17cbda1a390908ae",
+    "report/figures/Stage_3__u_570_005__11_residual_noise_psd.svg": "de14c4d661521d6d350b34fc844fe2238d1ebfb6a7ca4f38673c29cd3797007a",
+    "report/figures/Stage_3__u_570_005__12_time_frequency_energy.png": "9c5b1487cd45b4b28f8e1270d8bec36df1040d2fbb947a134f0fa616c8f1a4af",
+    "report/figures/Stage_3__u_570_005__12_time_frequency_energy.svg": "979fc805458f2878ae5514561e14b611440616e79e73d3423ae6a0f50969eef9",
+    "report/figures/Stage_4__aggregate__aggregate_feature_correlation_heatmap.png": "b0101dc2464fb7ee8d0b725ca98a312c49f2493bc2c9e6d4f52bf53db21f6b38",
+    "report/figures/Stage_4__aggregate__aggregate_feature_correlation_heatmap.svg": "c8eb2e0c7de074d45121ab00b88767f6e298d98a75eb54818c33a137ec9ffeba",
+    "report/figures/Stage_4__aggregate__aggregate_feature_distributions.png": "b465179b1cfd5c2df72063770ffef379cb38d6546bc0f1a3393d6ba5619809a3",
+    "report/figures/Stage_4__aggregate__aggregate_feature_distributions.svg": "8ae22151ea31592f0783cb15dc8f08c4cac6f03df8f68281fcfae7e5686bf3d2",
+    "report/figures/Stage_4__aggregate__aggregate_feature_missingness.png": "3dd91a750cd837d5ad369675aca28f614a8d2ef370b5309c1ed052037e7dc2fb",
+    "report/figures/Stage_4__aggregate__aggregate_feature_missingness.svg": "a343a944dfd3d7b200207d000ba772b9a888ce04e2db48f052a14617c0f9d921",
+    "report/figures/Stage_4__aggregate__aggregate_feature_stability.png": "7b7afc7f60d23693eb1ecea81d1323bdac2d21c47f3d11233a64c236cbbb807d",
+    "report/figures/Stage_4__aggregate__aggregate_feature_stability.svg": "f136c6828dc0b93349fb95d9d5378428467796ac1b0577ed7e28f12b3645010b",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_depth_of_cut.png": "dab56aa0d7c3df89be290464258dfb5aea6a088dfcee71456edb97eccda42345",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_depth_of_cut.svg": "75572bfc60ca47c11130099fbc83b17f720a5d649c7815aba9cda778416be383",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_recording.png": "c5126d3df0673ae21c29e4faac14351891228c42e7ec2aa0385fb3bf1df4502f",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_recording.svg": "0369a2b11f1a6766b836c6184c2c0bd475e88ef94e9e9bce1ce3f1b6a749b2d0",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_rpm.png": "d5118978b265eafbc040cdd1462f676262fd3062782f2b7d5a6b674f4d511126",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_rpm.svg": "5894751eee18dce9c44772e1e19d600604cacd40f6a8679090db0d26a6e3249a",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_stickout.png": "d37663129b0f568dfecd353b10050d0b62eb08c194a9c9b8df4b03291c899b77",
+    "report/figures/Stage_4__aggregate__aggregate_feature_values_by_stickout.svg": "5441e2eb532489ca7ff3b8944ab1a0aa66398f4dd8dc08a94b2944774db76bb2",
+    "report/figures/Stage_4__aggregate__aggregate_feature_variance.png": "3abffe8240ebbd047af4fc6a0e802b72ad292a0d9cfccd9662141207c97044d2",
+    "report/figures/Stage_4__aggregate__aggregate_feature_variance.svg": "38ff709a998938cb4b003c89fe8929266cd8803813acfd6a4d4cbc500654ab22",
+    "report/figures/Stage_4__u_570_005__01_rms_timeline.png": "301fb7837e065786ff0d4fa643cb9a087d3d136cc05726d5f607bbacdb35da8d",
+    "report/figures/Stage_4__u_570_005__01_rms_timeline.svg": "4d8484dfbf50926d2b0b32a40e90319030e4416b19056f35ee79779d090bfcd1",
+    "report/figures/Stage_4__u_570_005__02_kurtosis_timeline.png": "4306a60bc09a2debf772daf93625e9df331534e5c722b3405862b36fd6ab4743",
+    "report/figures/Stage_4__u_570_005__02_kurtosis_timeline.svg": "2882ff40fe489371787d72e9bdd970b52ca1edf3ef39dd71bb88bcb551b11328",
+    "report/figures/Stage_4__u_570_005__03_spectral_entropy_timeline.png": "b68bd0037f1d4be5c2b4069bf2928d4a1f3a81c9d0c78e5ae7781bcf996b6199",
+    "report/figures/Stage_4__u_570_005__03_spectral_entropy_timeline.svg": "d449df11841871969aae5c17dc73b263a76afaf822c31f15f9355f5bf5f12955",
+    "report/figures/Stage_4__u_570_005__04_chatter_energy_timeline.png": "2123a13a544d125b88063122485bbe965184df92f4a4b0fbe3afef7756119931",
+    "report/figures/Stage_4__u_570_005__04_chatter_energy_timeline.svg": "cbfa8a74b855b0a6c36982d9e7131de65dfb37073e41c8b596cd00dc7d816f5b",
+    "report/figures/Stage_4__u_570_005__05_harmonic_energy_timeline.png": "768f2faeaa528693581edd163b7bf1c8c1db95fb03b66d8bda24d9644f8ea224",
+    "report/figures/Stage_4__u_570_005__05_harmonic_energy_timeline.svg": "816769fa5a80ee4a76805d10ee95813fde19b39ee13bd2e037ca760bd5eec3e1",
+    "report/figures/Stage_4__u_570_005__06_hegr_timeline.png": "67c063c468d325ecc1975f035e2556b223fce70d5a80fe2e4e69d3a75f1cc8c1",
+    "report/figures/Stage_4__u_570_005__06_hegr_timeline.svg": "7a33663f0a5e8d8314951ee8d42655038771287fd130d2742a2506c5f8b5530e",
+    "report/figures/Stage_4__u_570_005__07_instantaneous_energy_timeline.png": "ac03ba3ad8e2c2ed526eb2de7cf5d36f1eb2f7eb0c9ee3ae20dc838f41e67c36",
+    "report/figures/Stage_4__u_570_005__07_instantaneous_energy_timeline.svg": "15da0bd14aefb4b7277a67aab4d063f8beaad8b90fcef9376ef307de5fc1d152",
+    "report/figures/Stage_4__u_570_005__08_imf_gate_values.png": "83defe8929da5e504161c00ea0f31f4170bbaf181c70b4c6a581e0336c3e8044",
+    "report/figures/Stage_4__u_570_005__08_imf_gate_values.svg": "26d3796ddac330b8f03ea95e6d5849c0c247848b87b3f62639c6ec816c2d0005",
+    "report/figures/Stage_4__u_570_005__09_wavelet_energy_ratios.png": "62a54d1a724978c1729a1f09b63bd0eacc1e63153320d664365b1165f02d0cf8",
+    "report/figures/Stage_4__u_570_005__09_wavelet_energy_ratios.svg": "49c41d4f5749a58b5f899de0ace60da2cc92e6cd4fdda4d7b5cdef123c99aeb5",
+    "report/figures/Stage_4__u_570_005__10_feature_family_summary.png": "1f8a76273cdefd887ca3f1cd694b691e7c61f4172778161e82a3b8690727471f",
+    "report/figures/Stage_4__u_570_005__10_feature_family_summary.svg": "c9a0a1b02f9e8e162491ca4b1de68f511a113b41cd0d11e42e533ad90a2f136f",
+    "report/figures/stage_progress.png": "c47a907ed459114effdd4a397e871dbb6479e2aa2120f39e40b9b7809b88c2ee",
+    "report/figures/stage_scorecard.png": "09ebfc511c95708168ad4834b7d8bc67ba704cb3a2b70a2b561ee191f39658f5",
+    "report/pipeline_report.html": "a82069bee798a782fabc2c8ca53b3b5d4cee065b045d2c2359c4ae903650fd82",
+    "report/pipeline_report.md": "2adff1b8b5d73fcf28416d59cd7f736e88a498f39050ddee586dc42857bc1dbf",
+    "stage_progress.png": "c47a907ed459114effdd4a397e871dbb6479e2aa2120f39e40b9b7809b88c2ee",
+    "stage_scorecard.json": "b8477f5c8c5b74b990e9c71119151b77ea7fb33e221f0918c2ab69898173828f",
+    "stage_scorecard.png": "09ebfc511c95708168ad4834b7d8bc67ba704cb3a2b70a2b561ee191f39658f5"
+  },
+  "per_recording_runtime": {
+    "u_570_005.mat": 11.337871099007316
+  },
+  "per_stage_runtime": {
+    "Stage_1": 0.9206949709914625,
+    "Stage_2": 0.5574027409311384,
+    "Stage_3": 0.0036773710744455457,
+    "Stage_4": 0.03465120098553598
+  },
+  "pipeline_version": "4.0.0",
+  "python_version": "3.12.3",
+  "recordings": [
+    {
+      "input_sha256": "1cddbd54fb93a320699db8dc1774e36c03c3127f50c4432edf4c5b620f00c78d",
+      "metadata": {},
+      "recording_id": "u_570_005",
+      "relative_path": "u_570_005.mat",
+      "runtime_seconds": 11.337871099007316,
+      "sampling_rate_estimated_hz": 10000.000000023307,
+      "status": "completed"
+    }
+  ],
+  "report_files": {
+    "figures_dir": "/tmp/pg-amcd-real-run-ntkrJa/outputs/ea3ee0528b6980082ec6b13e0a5a62873c8ee2454e276a35831e1aa7de1342f4/report/figures",
+    "html": "/tmp/pg-amcd-real-run-ntkrJa/outputs/ea3ee0528b6980082ec6b13e0a5a62873c8ee2454e276a35831e1aa7de1342f4/report/pipeline_report.html",
+    "markdown": "/tmp/pg-amcd-real-run-ntkrJa/outputs/ea3ee0528b6980082ec6b13e0a5a62873c8ee2454e276a35831e1aa7de1342f4/report/pipeline_report.md",
+    "scorecard_json": "/tmp/pg-amcd-real-run-ntkrJa/outputs/ea3ee0528b6980082ec6b13e0a5a62873c8ee2454e276a35831e1aa7de1342f4/stage_scorecard.json",
+    "scorecard_progress_png": "/tmp/pg-amcd-real-run-ntkrJa/outputs/ea3ee0528b6980082ec6b13e0a5a62873c8ee2454e276a35831e1aa7de1342f4/stage_progress.png",
+    "scorecard_scorecard_png": "/tmp/pg-amcd-real-run-ntkrJa/outputs/ea3ee0528b6980082ec6b13e0a5a62873c8ee2454e276a35831e1aa7de1342f4/stage_scorecard.png"
+  },
+  "resolved_config": {
+    "ceemdan": {
+      "epsilon": 0.02,
+      "noise_seed": 42,
+      "search_cutoffs": [
+        100
+      ],
+      "search_seeds": 3,
+      "search_trials": 1,
+      "sifting_iterations": 2,
+      "stability_seeds": [
+        42,
+        43,
+        44
+      ],
+      "trials": 2
+    },
+    "feature_schema_version": "1.0.0",
+    "features": {
+      "band_energy_ranges_hz": [
+        [
+          0.0,
+          250.0
+        ],
+        [
+          250.0,
+          750.0
+        ],
+        [
+          750.0,
+          1750.0
+        ],
+        [
+          1750.0,
+          4000.0
+        ]
+      ],
+      "harmonic_count": 5,
+      "harmonic_tolerance_hz": 15.0,
+      "overlap_ratio": 0.75,
+      "sideband_tolerance_hz": 10.0,
+      "window_seconds": 1.0
+    },
+    "maiw": {
+      "alpha": 0.25,
+      "beta": 0.25,
+      "chatter_band_center": 1250.0,
+      "chatter_band_spread": 500.0,
+      "delta": 0.25,
+      "gamma": 0.25
+    },
+    "output": {
+      "png_dpi": 140,
+      "write_svg": true
+    },
+    "physics_gating": {
+      "chatter_energy_weight": 4.0,
+      "correlation_weight": 2.0,
+      "frequency_proximity_weight": 1.0,
+      "harmonic_count": 5,
+      "harmonic_penalty": 5.0,
+      "harmonic_tolerance_hz": 15.0,
+      "include_residual": false,
+      "kurtosis_scale": 10.0,
+      "kurtosis_weight": 1.0,
+      "offset": 1.5,
+      "selection_threshold": 0.5
+    },
+    "pipeline_version": "4.0.0",
+    "preprocessing": {
+      "filter_order": 3,
+      "low_pass_cutoff_hz": null,
+      "scale_percentile": 99.5
+    },
+    "sampling_rate": 10000.0,
+    "segment_points": 10000,
+    "through_stage": 4,
+    "use_physics_gating": false,
+    "validation": {
+      "minimum_duration_seconds": 1.0,
+      "sampling_rate_tolerance": 0.05,
+      "signal_column": 1,
+      "timestamp_jitter_tolerance": 0.05
+    },
+    "wavelet": {
+      "band_aware": true,
+      "chatter_threshold_scale": 0.5,
+      "level": 4,
+      "minimum_noise_sigma": 1e-12,
+      "noise_threshold_scale": 1.4,
+      "threshold_mode": "soft",
+      "wavelet_name": "db8"
+    }
+  },
+  "run_id": "ea3ee0528b6980082ec6b13e0a5a62873c8ee2454e276a35831e1aa7de1342f4",
+  "selected_processing_parameters": {
+    "u_570_005": {
+      "ceemdan_epsilon": 0.02,
+      "ceemdan_noise_seed": 42,
+      "ceemdan_trials": 2,
+      "cutoff_frequency": 100.0,
+      "cutoff_search": [
+        {
+          "absolute_orthogonality_index": 0.024960250938880785,
+          "ceemdan_seeds": [
+            42,
+            43,
+            44
+          ],
+          "chatter_band_distortion": 9.278486896580063e-07,
+          "cutoff": 100.0,
+          "filter_order": 3,
+          "final_score": 0.1656089250314282,
+          "frequency_ordering_penalty": 0.19907407407407407,
+          "frequency_ordering_score": 0.8009259259259259,
+          "high_pass_cutoff_hz": 100.0,
+          "highpass_cutoff_hz": 100.0,
+          "low_pass_cutoff_hz": 4000.0,
+          "lowpass_cutoff_hz": 4000.0,
+          "maximum_adjacent_correlation": 0.1940467372087665,
+          "mean_reconstruction_nrmse": 2.06917924276439e-16,
+          "objective": 0.1656089250314282,
+          "objective_weights": {
+            "absolute_orthogonality": 0.15,
+            "chatter_band_distortion": 0.15,
+            "frequency_ordering_penalty": 0.15,
+            "maximum_adjacent_correlation": 0.15,
+            "seed_instability": 0.2,
+            "spectral_overlap": 0.2
+          },
+          "scale_factor": 0.007431421505607211,
+          "seed_instability": 0.12195923529351282,
+          "seed_stability": {
+            "centre_frequency_instability": 0.044376548915685175,
+            "centre_frequency_log_ratio_mean": 0.045397401456051555,
+            "energy_distribution_l1": 0.009209687745924065,
+            "imf_count_mismatch_fraction": 0.06666666666666667,
+            "imf_count_range": 1,
+            "imf_count_standard_deviation": 0.4714045207910317,
+            "imf_counts": [
+              9,
+              9,
+              10
+            ],
+            "instability_score": 0.12195923529351282,
+            "matched_imf_correlation_mean": 0.5508216970679728,
+            "matched_imf_correlation_minimum": 0.11208273468256348,
+            "n_seeds": 3,
+            "pairwise_comparisons": [
+              {
+                "centre_frequency_instability": 0.03978753270196578,
+                "centre_frequency_log_ratio_mean": 0.04060069890581692,
+                "energy_distribution_l1": 0.002482618514426456,
+                "first_imf_count": 9,
+                "first_seed": 42,
+                "imf_count_mismatch_fraction": 0.0,
+                "matched_imf_correlation_mean": 0.540101260303198,
+                "matched_imf_correlation_minimum": 0.11208273468256348,
+                "matched_pairs": [
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    2,
+                    2
+                  ],
+                  [
+                    3,
+                    3
+                  ],
+                  [
+                    4,
+                    4
+                  ],
+                  [
+                    5,
+                    5
+                  ],
+                  [
+                    6,
+                    6
+                  ],
+                  [
+                    7,
+                    7
+                  ],
+                  [
+                    8,
+                    8
+                  ],
+                  [
+                    9,
+                    9
+                  ]
+                ],
+                "second_imf_count": 9,
+                "second_seed": 43
+              },
+              {
+                "centre_frequency_instability": 0.04760863612156929,
+                "centre_frequency_log_ratio_mean": 0.048779232156834475,
+                "energy_distribution_l1": 0.012430860837644036,
+                "first_imf_count": 9,
+                "first_seed": 42,
+                "imf_count_mismatch_fraction": 0.1,
+                "matched_imf_correlation_mean": 0.5821729485754343,
+                "matched_imf_correlation_minimum": 0.247204864252036,
+                "matched_pairs": [
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    2,
+                    2
+                  ],
+                  [
+                    3,
+                    3
+                  ],
+                  [
+                    4,
+                    4
+                  ],
+                  [
+                    5,
+                    5
+                  ],
+                  [
+                    6,
+                    6
+                  ],
+                  [
+                    7,
+                    7
+                  ],
+                  [
+                    8,
+                    8
+                  ],
+                  [
+                    9,
+                    9
+                  ]
+                ],
+                "second_imf_count": 10,
+                "second_seed": 44
+              },
+              {
+                "centre_frequency_instability": 0.04573347792352045,
+                "centre_frequency_log_ratio_mean": 0.04681227330550327,
+                "energy_distribution_l1": 0.0127155838857017,
+                "first_imf_count": 9,
+                "first_seed": 43,
+                "imf_count_mismatch_fraction": 0.1,
+                "matched_imf_correlation_mean": 0.5301908823252862,
+                "matched_imf_correlation_minimum": 0.2038291083595149,
+                "matched_pairs": [
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    2,
+                    2
+                  ],
+                  [
+                    3,
+                    3
+                  ],
+                  [
+                    4,
+                    4
+                  ],
+                  [
+                    5,
+                    5
+                  ],
+                  [
+                    6,
+                    6
+                  ],
+                  [
+                    7,
+                    7
+                  ],
+                  [
+                    8,
+                    9
+                  ],
+                  [
+                    9,
+                    10
+                  ]
+                ],
+                "second_imf_count": 10,
+                "second_seed": 44
+              }
+            ],
+            "per_seed": [
+              {
+                "centre_frequencies_hz": [
+                  2398.3290880228037,
+                  825.6967899080396,
+                  271.14273812526744,
+                  119.02473092194958,
+                  57.477309722225925,
+                  23.206423321510425,
+                  9.298453888282078,
+                  9.482655572976915,
+                  10.01560366751361
+                ],
+                "energy_percentages": [
+                  66.61466658126707,
+                  9.493088351656393,
+                  4.330755506290708,
+                  18.27274869790055,
+                  0.9534241181747114,
+                  0.20195715760782745,
+                  0.10471233239105682,
+                  0.019586783967214187,
+                  0.009060470744432265
+                ],
+                "number_of_imfs": 9,
+                "seed": 42,
+                "spectral_overlap": 0.34878124425984514
+              },
+              {
+                "centre_frequencies_hz": [
+                  2394.379667997423,
+                  830.5833733368482,
+                  259.0180553250697,
+                  118.56399925234668,
+                  56.32305825077328,
+                  20.669318954304654,
+                  10.72727076425385,
+                  9.656772119569702,
+                  10.126692160472563
+                ],
+                "energy_percentages": [
+                  66.67227031843362,
+                  9.539176073511559,
+                  4.304676174519972,
+                  18.119201388835332,
+                  0.9173756006272941,
+                  0.3101630990362258,
+                  0.07705031846541743,
+                  0.0559512349597546,
+                  0.004135791610802286
+                ],
+                "number_of_imfs": 9,
+                "seed": 43,
+                "spectral_overlap": 0.3826315424093044
+              },
+              {
+                "centre_frequencies_hz": [
+                  2397.7375156493,
+                  824.9894092974841,
+                  227.1368210546799,
+                  116.05982202767649,
+                  58.43644016041686,
+                  24.095677744147604,
+                  11.052932527399301,
+                  9.55200778862335,
+                  10.028668304812756,
+                  10.15251023020107
+                ],
+                "energy_percentages": [
+                  65.76713928225779,
+                  9.451090531810946,
+                  5.371565754790931,
+                  17.96579256711454,
+                  1.0911992742150343,
+                  0.23789676366087592,
+                  0.058107498267407534,
+                  0.025451163118134976,
+                  0.0222274015601864,
+                  0.009529763204156324
+                ],
+                "number_of_imfs": 10,
+                "seed": 44,
+                "spectral_overlap": 0.4461589052633104
+              }
+            ],
+            "seeds": [
+              42,
+              43,
+              44
+            ],
+            "spectral_overlap_mean": 0.39252389731082,
+            "spectral_overlap_standard_deviation": 0.04036497020726103,
+            "structural_components": {
+              "centre_frequency": 0.044376548915685175,
+              "energy_distribution": 0.009209687745924065,
+              "imf_count_variation": 0.06666666666666667,
+              "matched_imf_correlation": 0.4491783029320272,
+              "spectral_overlap_variation": 0.04036497020726103
+            }
+          },
+          "signed_orthogonality_index": -0.024960250938880785,
+          "source_segment_samples": 10000,
+          "source_segment_sha256": "489b78197416c94ece1fdd884c8dc4907e5beace60e22ea45e915205a2073d5b",
+          "spectral_overlap": 0.39252389731082
+        }
+      ],
+      "detection_status": "not_evaluated",
+      "highpass_cutoff_hz": 100.0,
+      "lowpass_cutoff_hz": 4000.0,
+      "lowpass_resolution": "automatic min(4000 Hz, Nyquist - 10 Hz)",
+      "sifting_iterations": 2,
+      "stage_2_method": "legacy_maiw_baseline",
+      "through_stage": 4,
+      "use_physics_gating": false,
+      "wavelet_level": 4,
+      "wavelet_name": "db8"
+    }
+  },
+  "self_checks": {
+    "Stage_1": {
+      "synthetic": {
+        "details": {
+          "number_of_imfs": 5,
+          "reconstruction_nrmse": 1.6633113975195718e-16,
+          "residual_verified": true
+        },
+        "passed": true
+      },
+      "unit": {
+        "details": {
+          "frequency_ordering_score": 1.0,
+          "reconstruction_nrmse": 0.0
+        },
+        "passed": true
+      }
+    },
+    "Stage_2": {
+      "synthetic": {
+        "details": {
+          "chatter_gate_exceeds_forced_gate": true,
+          "gates": [
+            0.9926547210817318,
+            0.006098017391973435,
+            0.2160202278352731
+          ],
+          "independent_gate_sum": 1.2147729663089784
+        },
+        "passed": true
+      },
+      "unit": {
+        "details": {
+          "chatter_gate_exceeds_forced_gate": true,
+          "gates": [
+            0.9926547210817318,
+            0.006098017391973435,
+            0.2160202278352731
+          ],
+          "independent_gate_sum": 1.2147729663089784
+        },
+        "passed": true
+      }
+    },
+    "Stage_3": {
+      "synthetic": {
+        "details": {
+          "output_length": 1000,
+          "synthetic_reference_rmse": 0.11327707098401257,
+          "synthetic_reference_snr_db": 15.906859825416376,
+          "threshold_count": 4
+        },
+        "passed": true
+      },
+      "unit": {
+        "details": {
+          "output_length": 1000,
+          "synthetic_reference_rmse": 0.11327707098401257,
+          "synthetic_reference_snr_db": 15.906859825416376,
+          "threshold_count": 4
+        },
+        "passed": true
+      }
+    },
+    "Stage_4": {
+      "synthetic": {
+        "details": {
+          "early_hegr": 1.363369578402835,
+          "feature_count": 79,
+          "schema_version": "1.0.0",
+          "undefined_count": 0
+        },
+        "passed": true
+      },
+      "unit": {
+        "details": {
+          "early_hegr": 1.363369578402835,
+          "feature_count": 79,
+          "schema_version": "1.0.0",
+          "undefined_count": 0
+        },
+        "passed": true
+      }
+    }
+  },
+  "stage_evidence": {
+    "Stage_1": {
+      "fabricated_metrics": false,
+      "input_validation_passed": true,
+      "known_p0_issue": false,
+      "multiple_active_implementations": false,
+      "status": "completed",
+      "tests": {
+        "integration": true,
+        "synthetic": true,
+        "unit": true
+      }
+    },
+    "Stage_2": {
+      "fabricated_metrics": false,
+      "input_validation_passed": true,
+      "known_p0_issue": false,
+      "multiple_active_implementations": false,
+      "status": "completed",
+      "tests": {
+        "integration": true,
+        "synthetic": true,
+        "unit": true
+      }
+    },
+    "Stage_3": {
+      "fabricated_metrics": false,
+      "input_validation_passed": true,
+      "known_p0_issue": false,
+      "multiple_active_implementations": false,
+      "status": "completed",
+      "tests": {
+        "integration": true,
+        "synthetic": true,
+        "unit": true
+      }
+    },
+    "Stage_4": {
+      "fabricated_metrics": false,
+      "input_validation_passed": true,
+      "known_p0_issue": false,
+      "labels_available": false,
+      "multiple_active_implementations": false,
+      "status": "completed",
+      "tests": {
+        "integration": true,
+        "synthetic": true,
+        "unit": true
+      }
+    }
+  },
+  "start_timestamp": "2026-07-14T01:21:16.655084+00:00",
+  "status": "completed",
+  "success_count": 1,
+  "through_stage": 4,
+  "total_runtime_seconds": 16.959246873972006,
+  "warnings": [
+    "Physics-guided gating is disabled; Stage 2 uses the configured MAIW baseline and metadata-dependent features may be undefined."
+  ]
+}

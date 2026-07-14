@@ -1,0 +1,159 @@
+{
+  "absolute_orthogonality_index": 0.2451754475659596,
+  "adjacent_imf_correlations": [
+    0.14700431444448778,
+    0.18330153435735774
+  ],
+  "adjacent_spectral_overlaps": [
+    0.03777521846217289,
+    0.3104133534961004
+  ],
+  "ceemdan_runtime_seconds": 0.016780971898697317,
+  "controlled_segment_end_index": 605,
+  "controlled_segment_samples": 512,
+  "controlled_segment_start_index": 93,
+  "frequency_ordering_score": 1.0,
+  "imf_metrics": [
+    {
+      "bandwidth_hz": 57.96697788150637,
+      "centre_frequency_hz": 310.8277847410352,
+      "energy_percentage": 32.51223539210586,
+      "imf_index": 1,
+      "rms": 0.29007479464023556,
+      "spectral_entropy": 0.30496500950135286
+    },
+    {
+      "bandwidth_hz": 17.61248499455742,
+      "centre_frequency_hz": 38.442283364858184,
+      "energy_percentage": 57.60837175454344,
+      "imf_index": 2,
+      "rms": 0.38612629546931615,
+      "spectral_entropy": 0.33954762732000277
+    },
+    {
+      "bandwidth_hz": 11.478759168790708,
+      "centre_frequency_hz": 22.64254593135059,
+      "energy_percentage": 9.879392853350698,
+      "imf_index": 3,
+      "rms": 0.15990119370351208,
+      "spectral_entropy": 0.5318084859405885
+    }
+  ],
+  "maximum_adjacent_imf_correlation": 0.18330153435735774,
+  "maximum_adjacent_spectral_overlap": 0.3104133534961004,
+  "mean_adjacent_imf_correlation": 0.16515292440092277,
+  "number_of_imfs": 3,
+  "pairwise_absolute_orthogonality_index": 0.2451754475659596,
+  "preprocessing_parameters": {
+    "detrend_before_filter": false,
+    "detrend_type": "linear",
+    "filter_order": 3,
+    "high_pass_cutoff_hz": 20.0,
+    "highpass_cutoff_hz": 20.0,
+    "low_pass_cutoff_hz": 490.0,
+    "lowpass_cutoff_hz": 490.0,
+    "padlen": null,
+    "padtype": "odd",
+    "sampling_rate_hz": 1000.0,
+    "scale_percentile": 99.5
+  },
+  "reconstruction_nrmse": 1.3246851922349308e-16,
+  "residual_energy_percentage_of_source": 1.3437331852206096,
+  "residual_source": "final PyEMD CEEMDAN component, verified against input - sum(physical IMFs)",
+  "residual_verification_nrmse": 1.2382610777168423e-16,
+  "residual_verified": true,
+  "seed_stability": {
+    "centre_frequency_instability": 0.07002966142737954,
+    "centre_frequency_log_ratio_mean": 0.07260258735139516,
+    "energy_distribution_l1": 0.010263100764187391,
+    "imf_count_mismatch_fraction": 0.0,
+    "imf_count_range": 0,
+    "imf_count_standard_deviation": 0.0,
+    "imf_counts": [
+      3,
+      3
+    ],
+    "instability_score": 0.06327861912197637,
+    "matched_imf_correlation_mean": 0.7925187789237061,
+    "matched_imf_correlation_minimum": 0.5924298735929224,
+    "n_seeds": 2,
+    "pairwise_comparisons": [
+      {
+        "centre_frequency_instability": 0.07002966142737954,
+        "centre_frequency_log_ratio_mean": 0.07260258735139516,
+        "energy_distribution_l1": 0.010263100764187391,
+        "first_imf_count": 3,
+        "first_seed": 42,
+        "imf_count_mismatch_fraction": 0.0,
+        "matched_imf_correlation_mean": 0.7925187789237061,
+        "matched_imf_correlation_minimum": 0.5924298735929224,
+        "matched_pairs": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        "second_imf_count": 3,
+        "second_seed": 43
+      }
+    ],
+    "per_seed": [
+      {
+        "centre_frequencies_hz": [
+          310.8789932577131,
+          35.53833729205541,
+          28.637446559681635
+        ],
+        "energy_percentages": [
+          27.85346324633172,
+          47.36746635028284,
+          24.779070403385433
+        ],
+        "number_of_imfs": 3,
+        "seed": 42,
+        "spectral_overlap": 0.2986188503372153
+      },
+      {
+        "centre_frequencies_hz": [
+          310.9904366233748,
+          39.7796141762471,
+          31.798591385979094
+        ],
+        "energy_percentages": [
+          28.879773322750463,
+          47.03221147950197,
+          24.088015197747566
+        ],
+        "number_of_imfs": 3,
+        "seed": 43,
+        "spectral_overlap": 0.24138062565317328
+      }
+    ],
+    "seeds": [
+      42,
+      43
+    ],
+    "spectral_overlap_mean": 0.2699997379951943,
+    "spectral_overlap_standard_deviation": 0.02861911234202101,
+    "structural_components": {
+      "centre_frequency": 0.07002966142737954,
+      "energy_distribution": 0.010263100764187391,
+      "imf_count_variation": 0.0,
+      "matched_imf_correlation": 0.20748122107629385,
+      "spectral_overlap_variation": 0.02861911234202101
+    }
+  },
+  "seed_stability_metric": "structural IMF stability (not reconstruction NRMSE variance)",
+  "selected_cutoff_objective": 0.1562194695246148,
+  "signed_orthogonality_index": -0.2451754475659596,
+  "single_physical_scale_factor": 1.1607437822809028,
+  "spectral_overlap": 0.17409428597913665
+}

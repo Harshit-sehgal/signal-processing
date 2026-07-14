@@ -1,6 +1,11 @@
 {
+  "through_stage": 4,
   "sampling_rate": 1000,
   "segment_points": 1000,
+  "use_physics_gating": false,
+  "preprocessing": {
+    "low_pass_cutoff_hz": null
+  },
   "ceemdan": {
     "trials": 2,
     "search_trials": 1,
@@ -8,5 +13,17 @@
     "noise_seed": 42,
     "sifting_iterations": 2,
     "search_cutoffs": [20]
+  },
+  "maiw": {
+    "chatter_band_center": 125.0,
+    "chatter_band_spread": 50.0
+  },
+  "features": {
+    "band_energy_ranges_hz": [
+      [0.0, 50.0],
+      [50.0, 150.0],
+      [150.0, 300.0],
+      [300.0, 490.0]
+    ]
   }
 }

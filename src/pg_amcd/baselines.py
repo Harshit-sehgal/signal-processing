@@ -42,7 +42,12 @@ METRIC_KEYS = [
 ]
 
 
-def _default_benchmark_config(fs: float, segment_points: int, ceemdan_cfg: Dict[str, Any]) -> Dict[str, Any]:
+def _default_benchmark_config(
+    fs: float,
+    segment_points: int,
+    ceemdan_cfg: Dict[str, Any],
+    wavelet_level: int = 4,
+) -> Dict[str, Any]:
     """Build a self-contained config (no filesystem dependency) for the pipeline."""
     return {
         "sampling_rate": fs,
@@ -56,7 +61,20 @@ def _default_benchmark_config(fs: float, segment_points: int, ceemdan_cfg: Dict[
             "chatter_band_center": 1250.0,
             "chatter_band_spread": 500.0,
         },
-        "wavelet": {"wavelet_name": "db8", "level": 4},
+        "physics_gating": {
+            "chatter_energy_weight": 4.0,
+            "correlation_weight": 2.0,
+            "kurtosis_weight": 1.0,
+            "frequency_proximity_weight": 1.0,
+            "harmonic_penalty": 5.0,
+            "offset": 1.5,
+            "harmonic_tolerance_hz": 15.0,
+            "harmonic_count": 5,
+            "kurtosis_scale": 10.0,
+            "selection_threshold": 0.5,
+            "include_residual": False,
+        },
+        "wavelet": {"wavelet_name": "db8", "level": wavelet_level},
         "use_physics_gating": True,
     }
 
@@ -140,6 +158,7 @@ def benchmark_denoising(
     seed: int = 0,
     snr_db: float = 20.0,
     ceemdan_cfg: Dict[str, Any] = None,
+    wavelet_level: int = 4,
 ) -> Dict[str, Dict[str, float]]:
     """Run all baselines on synthetic signals and aggregate denoising metrics.
 
@@ -156,7 +175,12 @@ def benchmark_denoising(
             "search_cutoffs": [100.0],
             "search_seeds": 1,
         }
-    config = _default_benchmark_config(fs, int(round(fs * duration)), ceemdan_cfg)
+    config = _default_benchmark_config(
+        fs,
+        int(round(fs * duration)),
+        ceemdan_cfg,
+        wavelet_level,
+    )
     chatter_center = config["maiw"]["chatter_band_center"]
     chatter_spread = config["maiw"]["chatter_band_spread"]
     low = 50.0
@@ -165,12 +189,14 @@ def benchmark_denoising(
     per_method: Dict[str, List[Dict[str, float]]] = {m: [] for m in METHODS}
 
     for i in range(n_signals):
+        synthetic_rpm = float(config["maiw"].get("rpm", 600.0))
+        synthetic_tooth_count = int(config["maiw"].get("tooth_count", 1))
         t, signal, comps = generate_synthetic_signal(
             fs=fs,
             duration=duration,
             seed=seed + i,
-            rpm=config["maiw"].get("rpm", 600.0),
-            tooth_count=config["maiw"].get("tooth_count", 1),
+            rpm=synthetic_rpm,
+            tooth_count=synthetic_tooth_count,
             chatter_freq=chatter_center,
             chatter_onset=0.5,
             snr_db=snr_db,
@@ -190,7 +216,17 @@ def benchmark_denoising(
         # Full proposed pipeline (canonical entrypoint). It denoises a
         # max-energy segment, so compare against the chatter component over the
         # same segment to keep lengths and conditions matched.
-        res = process_recording(t, signal, config, mode="exploratory")
+        res = process_recording(
+            t,
+            signal,
+            config,
+            metadata={
+                "rpm": synthetic_rpm,
+                "tooth_count": synthetic_tooth_count,
+                "recording_id": f"synthetic_{seed + i}",
+            },
+            mode="exploratory",
+        )
         wr = res.window_results[0]
         denoised["full_proposed"] = wr.denoised_clean
 

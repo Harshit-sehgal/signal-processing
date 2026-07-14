@@ -1,190 +1,155 @@
-"""Implementation of the ``pg-amcd validate`` command."""
+"""Implementation of ``pg-amcd validate``."""
 
-import glob
+from __future__ import annotations
+
+import argparse
 import json
-import os
-import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
 
 from pg_amcd.config import load_pipeline_config
 from pg_amcd.io import validate_and_load_signal
-from pg_amcd.cli.utils import get_case_insensitive, _load_metadata_index
+from pg_amcd.metadata import MachiningMetadata, build_metadata_index
+from pg_amcd.provenance import canonical_json_sha256, compute_file_sha256
 
 
-def run_validation_on_dataset(args):
-    """Validate a dataset's raw signals against the configured input contract."""
-    config = load_pipeline_config(args.config)
-    fs = config["sampling_rate"]
-    vcfg = config.get("validation", {})
-    tolerance = vcfg.get("tolerance", 0.05)
-    min_duration = vcfg.get("min_duration_seconds", 1.0)
+def _discover_mat_files(input_dir: Path) -> list[Path]:
+    return sorted(path for path in input_dir.rglob("*.mat") if path.is_file())
 
-    use_physics = config.get("use_physics_gating", True)
-    if use_physics and not getattr(args, "metadata", None):
-        print("Error: Physics gating is enabled in configuration, but no metadata file was provided.")
-        sys.exit(1)
 
-    meta_index = {}
-    duplicate_meta = 0
-    missing_meta = 0
-    missing_label = 0
-    invalid_rpm = 0
-    invalid_tooth = 0
-    metadata_row_no_file = 0
-    sampling_mismatch = 0
+def run_validation_on_dataset(args: argparse.Namespace) -> int:
+    """Validate signals and metadata, write a machine-readable report, and return status."""
 
-    if getattr(args, "metadata", None):
-        if not os.path.exists(args.metadata):
-            print(f"Error: Metadata file does not exist: {args.metadata}")
-            sys.exit(1)
-        meta_rows = _load_metadata_index(args.metadata)
-
-        def _meta_key(r):
-            return os.path.basename(str(r.get("file_path") or r.get("recording_id") or ""))
-
-        for _row in meta_rows:
-            _k = _meta_key(_row)
-            if not _k:
-                continue
-            if _k in meta_index:
-                duplicate_meta += 1
-            else:
-                meta_index[_k] = _row
-
-            lbl = get_case_insensitive(_row, ["label"])
-            if lbl is None or str(lbl).strip() == "":
-                missing_label += 1
-
-            rpm_val = get_case_insensitive(_row, ["rpm"])
-            if rpm_val is None or str(rpm_val).strip() == "":
-                invalid_rpm += 1
-            else:
-                try:
-                    if float(rpm_val) <= 0:
-                        invalid_rpm += 1
-                except ValueError:
-                    invalid_rpm += 1
-
-            tc_val = get_case_insensitive(_row, ["tooth_count", "toothcount", "ToothCount"])
-            if tc_val is None or str(tc_val).strip() == "":
-                invalid_tooth += 1
-            else:
-                try:
-                    if int(tc_val) < 1:
-                        invalid_tooth += 1
-                except ValueError:
-                    invalid_tooth += 1
-
-    if not os.path.exists(args.input_dir):
-        print(f"Error: Input directory does not exist: {args.input_dir}")
-        sys.exit(1)
-
-    mat_files = glob.glob(os.path.join(args.input_dir, "**/*.mat"), recursive=True)
-    mat_files = [f for f in mat_files if not f.endswith("combinations.xlsx") and "~lock" not in f]
-
-    if not mat_files:
-        print(f"No MAT files found in: {args.input_dir}")
-        sys.exit(0)
-
-    report = {
-        "sampling_rate": fs,
-        "tolerance": tolerance,
-        "min_duration_seconds": min_duration,
+    input_dir = Path(args.input_dir).expanduser().resolve()
+    output_path = Path(args.output).expanduser().resolve()
+    report: dict[str, Any] = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "input_dir": str(input_dir),
         "files": [],
+        "warnings": [],
+        "failures": [],
     }
 
-    n_valid = 0
-    discovered_files = set()
-    print("=" * 65)
+    try:
+        config = load_pipeline_config(args.config)
+        report["resolved_config_sha256"] = canonical_json_sha256(config)
+        if not input_dir.is_dir():
+            raise FileNotFoundError(f"Input directory does not exist: {input_dir}")
+        mat_files = _discover_mat_files(input_dir)
+        if not mat_files:
+            raise ValueError(f"No MAT files found in: {input_dir}")
+
+        use_physics = bool(config.get("use_physics_gating", True))
+        metadata_index: dict[str, MachiningMetadata] = {}
+        if args.metadata:
+            metadata_index, metadata_diagnostics = build_metadata_index(
+                input_dir, mat_files, args.metadata
+            )
+            report["metadata"] = metadata_diagnostics
+            report["metadata"]["path"] = str(Path(args.metadata).resolve())
+            report["metadata"]["sha256"] = compute_file_sha256(args.metadata)
+            if int(metadata_diagnostics.get("ambiguous_rows", 0)):
+                report["failures"].append(
+                    "Metadata contains ambiguous or duplicate rows; each recording must map once"
+                )
+            duplicate_ids = metadata_diagnostics.get("duplicate_recording_ids", [])
+            if duplicate_ids:
+                report["failures"].append(
+                    "Metadata recording_id values must be unique: "
+                    + ", ".join(str(value) for value in duplicate_ids)
+                )
+        elif use_physics:
+            raise ValueError(
+                "Physics-guided gating requires --metadata with positive RPM and tooth_count"
+            )
+        else:
+            report["warnings"].append(
+                "No metadata supplied; metadata-dependent Stage 4 features will be undefined"
+            )
+
+        fs = float(config["sampling_rate"])
+        validation_cfg = config.get("validation", {})
+        tolerance = float(
+            validation_cfg.get("sampling_rate_tolerance", validation_cfg.get("tolerance", 0.05))
+        )
+        minimum_duration = float(
+            validation_cfg.get(
+                "minimum_duration_seconds",
+                validation_cfg.get("min_duration_seconds", 1.0),
+            )
+        )
+        signal_column = int(validation_cfg.get("signal_column", 1))
+        jitter = float(validation_cfg.get("timestamp_jitter_tolerance", 0.05))
+
+        for mat_path in mat_files:
+            relative = mat_path.relative_to(input_dir).as_posix()
+            entry: dict[str, Any] = {
+                "path": relative,
+                "sha256": compute_file_sha256(mat_path),
+                "signal_valid": False,
+                "metadata_valid": not use_physics,
+                "valid": False,
+                "errors": [],
+            }
+            try:
+                _, signal, estimated_fs = validate_and_load_signal(
+                    str(mat_path),
+                    configured_fs=fs,
+                    tolerance=tolerance,
+                    min_duration_seconds=minimum_duration,
+                    signal_column=signal_column,
+                    max_timestamp_jitter=jitter,
+                )
+                entry.update(
+                    signal_valid=True,
+                    estimated_sampling_rate_hz=float(estimated_fs),
+                    sample_count=int(signal.size),
+                    duration_seconds=float(signal.size / estimated_fs),
+                )
+            except (FileNotFoundError, ValueError) as exc:
+                entry["errors"].append(str(exc))
+
+            metadata = metadata_index.get(relative)
+            if metadata is not None:
+                entry["metadata"] = metadata.to_dict()
+                if use_physics:
+                    if metadata.rpm is None or metadata.rpm <= 0:
+                        entry["errors"].append("Physics metadata is missing a positive RPM")
+                    if metadata.tooth_count is None or metadata.tooth_count < 1:
+                        entry["errors"].append("Physics metadata is missing a positive tooth_count")
+                    entry["metadata_valid"] = not any(
+                        message.startswith("Physics metadata") for message in entry["errors"]
+                    )
+                else:
+                    entry["metadata_valid"] = True
+            elif use_physics:
+                entry["errors"].append("No metadata row maps to this relative input path")
+
+            entry["valid"] = bool(entry["signal_valid"] and entry["metadata_valid"])
+            report["files"].append(entry)
+
+        report["n_files"] = len(report["files"])
+        report["n_signal_valid"] = sum(bool(item["signal_valid"]) for item in report["files"])
+        report["n_valid"] = sum(bool(item["valid"]) for item in report["files"])
+        report["n_invalid"] = report["n_files"] - report["n_valid"]
+        report["status"] = (
+            "valid" if report["n_invalid"] == 0 and not report["failures"] else "invalid"
+        )
+    except (FileNotFoundError, ValueError, TypeError) as exc:
+        report["status"] = "invalid"
+        report["failures"].append(str(exc))
+        report.setdefault("n_files", 0)
+        report.setdefault("n_signal_valid", 0)
+        report.setdefault("n_valid", 0)
+        report.setdefault("n_invalid", 0)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(report, indent=2, allow_nan=False), encoding="utf-8")
     print(
-        f"🔎 Validating {len(mat_files)} files (fs={fs} Hz, "
-        f"tol={tolerance * 100:.0f}%, min_dur={min_duration}s)"
+        f"Validation {report['status']}: {report.get('n_valid', 0)}/"
+        f"{report.get('n_files', 0)} recordings valid; report={output_path}"
     )
-    print("=" * 65)
-
-    for raw_path in mat_files:
-        rel_path = os.path.relpath(raw_path, args.input_dir)
-        entry = {"path": rel_path, "valid": False}
-        base = os.path.basename(raw_path)
-        discovered_files.add(base)
-
-        if getattr(args, "metadata", None) and base not in meta_index:
-            missing_meta += 1
-
-        try:
-            t_arr, sig_arr, fs_est = validate_and_load_signal(
-                raw_path,
-                configured_fs=fs,
-                tolerance=tolerance,
-                min_duration_seconds=min_duration,
-            )
-            entry["valid"] = True
-            entry["fs_estimated"] = float(fs_est)
-            entry["n_samples"] = int(len(sig_arr))
-            entry["duration_seconds"] = float(len(sig_arr) / fs_est)
-            n_valid += 1
-            print(
-                f"✅ {rel_path}  fs={fs_est:.1f}Hz  N={len(sig_arr)}  "
-                f"dur={entry['duration_seconds']:.3f}s"
-            )
-        except Exception as e:
-            emsg = str(e).lower()
-            if "sampling rate" in emsg or "deviates" in emsg:
-                sampling_mismatch += 1
-            entry["error"] = str(e)
-            print(f"❌ {rel_path}  {e}")
-        report["files"].append(entry)
-
-    if getattr(args, "metadata", None):
-        for _k in meta_index:
-            if _k not in discovered_files:
-                metadata_row_no_file += 1
-
-    report["n_files"] = len(mat_files)
-    report["n_valid"] = n_valid
-    report["n_invalid"] = len(mat_files) - n_valid
-
-    if getattr(args, "metadata", None):
-        report["metadata"] = {
-            "n_rows": len(meta_index) + duplicate_meta,
-            "missing_metadata": missing_meta,
-            "duplicate_metadata_entries": duplicate_meta,
-            "missing_chatter_label": missing_label,
-            "invalid_rpm_values": invalid_rpm,
-            "invalid_tooth_values": invalid_tooth,
-            "metadata_row_no_file": metadata_row_no_file,
-            "sampling_rate_mismatches": sampling_mismatch,
-        }
-        print("\n--- Metadata validation ---")
-        print(f"Files discovered:           {len(mat_files)}")
-        print(f"Valid signals:              {n_valid}")
-        print(f"Invalid signals:            {report['n_invalid']}")
-        print(f"Missing metadata:           {missing_meta}")
-        print(f"Duplicate metadata:         {duplicate_meta}")
-        print(f"Missing labels:             {missing_label}")
-        print(f"Invalid RPM values:         {invalid_rpm}")
-        print(f"Invalid tooth values:       {invalid_tooth}")
-        print(f"Metadata rows without files: {metadata_row_no_file}")
-        print(f"Sampling-rate mismatches:   {sampling_mismatch}")
-
-    if args.output:
-        out_dir = os.path.dirname(os.path.abspath(args.output))
-        os.makedirs(out_dir, exist_ok=True)
-        with open(args.output, "w") as f:
-            json.dump(report, f, indent=2)
-        print(f"\nValidation report written to: {args.output}")
-
-    print("\n" + "=" * 65)
-    print(f"🏁 VALIDATION: {n_valid}/{len(mat_files)} files passed")
-    print("=" * 65)
-
-    has_errors = (
-        (report["n_invalid"] > 0)
-        or (duplicate_meta > 0)
-        or (missing_label > 0)
-        or (invalid_rpm > 0)
-        or (invalid_tooth > 0)
-        or (missing_meta > 0)
-        or (metadata_row_no_file > 0)
-    )
-    if has_errors:
-        sys.exit(1)
+    for failure in report["failures"]:
+        print(f"Error: {failure}")
+    return 0 if report["status"] == "valid" else 1
