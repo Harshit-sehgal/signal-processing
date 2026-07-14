@@ -6,7 +6,7 @@ This folder is a self-contained evidence bundle for presenting the project throu
 
 Open [`START_HERE.html`](START_HERE.html) in a web browser. It links to the complete reports and displays the main figures in a recommended presentation order.
 
-## Recommended presentation flow
+## Presentation flow
 
 1. **Problem and framework** — show [`04_project_documentation/conceptual_framework.jpeg`](04_project_documentation/conceptual_framework.jpeg) and explain the Stage 1–4 signal-processing path.
 2. **Acceptance status** — show [`05_quick_showcase/01_acceptance_stage_scorecard.png`](05_quick_showcase/01_acceptance_stage_scorecard.png). The deterministic acceptance run scored 100/100 in every requested stage.
