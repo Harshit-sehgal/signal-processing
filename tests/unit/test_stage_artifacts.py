@@ -455,3 +455,63 @@ def test_aggregate_contract_names_and_figures_match_the_scorer(
     label_figure = aggregate / "aggregate_features_grouped_by_label.png"
     assert label_figure.stat().st_size > 1_000
     assert label_figure.with_suffix(".svg").stat().st_size > 1_000
+
+
+_SEED_STABILITY_FIGURE = "13b_seed_stability_per_imf.png"
+_ADJACENT_OVERLAP_FIGURE = "13c_adjacent_overlap_diagnostics.png"
+
+
+def test_stage_1_seed_stability_and_adjacent_overlap_figures_are_emitted(
+    tmp_path: Path,
+) -> None:
+    """Seed-stability and adjacent-overlap diagnostics render in Stage 1 artifacts."""
+
+    result = _pipeline_result("stability-sample")
+    # Inject per-IMF seed-stability diagnostics.
+    per_seed_stability = {
+        "imf_count_mismatch_fraction": 0.0,
+        "centre_frequency_instability": 0.01,
+        "energy_distribution_l1": 0.02,
+        "spectral_overlap_standard_deviation": 0.01,
+        "matched_imf_correlation_mean": 0.99,
+        "per_imf_centre_frequency": [
+            [125.0, 126.0],
+            [40.0, 41.0],
+            [260.0, 259.0],
+        ],
+        "per_imf_energy_percentage": [
+            [30.0, 31.0],
+            [20.0, 20.0],
+            [10.0, 10.0],
+        ],
+        "per_imf_matched_correlation": [0.99, 0.95, 0.88],
+    }
+    stage_1 = replace(result.stage_1, seed_stability=per_seed_stability)
+    # Inject adjacent-overlap values for the first (count - 1) IMFs.
+    imf_metrics = [dict(row) for row in stage_1.imf_metrics]
+    for index, row in enumerate(imf_metrics[:-1]):
+        row["adjacent_spectral_overlap"] = 0.05 + 0.01 * index
+    stage_1 = replace(stage_1, imf_metrics=imf_metrics)
+    result = replace(result, stage_1=stage_1)
+
+    run_dir = tmp_path / "stability-run"
+    write_recording_artifacts(
+        run_dir,
+        result,
+        {"output": {"write_svg": True, "png_dpi": 80}},
+    )
+
+    stage_1_dir = run_dir / "Stage_1" / result.recording_id
+    expected_figures = (_SEED_STABILITY_FIGURE, _ADJACENT_OVERLAP_FIGURE)
+    for filename in expected_figures:
+        png_path = stage_1_dir / filename
+        assert png_path.is_file(), png_path
+        assert png_path.stat().st_size > 1_000, png_path
+        svg_path = png_path.with_suffix(".svg")
+        assert svg_path.is_file(), svg_path
+        assert svg_path.stat().st_size > 1_000, svg_path
+
+    # The old direct-save filename should not exist; figures route through the standard list.
+    for old_suffix in (".png", ".svg"):
+        old_overlap_filename = f"13b_adjacent_overlap_diagnostics{old_suffix}"
+        assert not (stage_1_dir / old_overlap_filename).exists()
