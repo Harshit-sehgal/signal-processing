@@ -139,6 +139,7 @@ VISUAL_REQUIREMENTS: dict[str, tuple[tuple[str, tuple[str, ...]], ...]] = {
         ("residual_noise_waveform", ("residual_noise_waveform", "residual_noise")),
         ("residual_noise_psd", ("residual_noise_psd",)),
         ("time_frequency_energy", ("time_frequency_energy",)),
+        ("cumulative_retention", ("cumulative_retention", "stage_retention")),
     ),
     "Stage_4": (
         ("rms_timeline", ("rms_timeline",)),
@@ -1328,6 +1329,29 @@ def _score_stage(run_dir: Path, stage: str, manifest: Mapping[str, Any]) -> dict
 
     all_checks = [check for checks in categories.values() for check in checks]
     raw_score = sum(check.points for check in all_checks if check.passed)
+
+    # Engineering vs scientific sub-scores.
+    engineering_categories = {
+        "input_output_validation",
+        "automated_tests",
+        "required_artifacts",
+        "reproducibility_provenance",
+        "documentation_accuracy",
+    }
+    scientific_categories = {
+        "algorithmic_correctness",
+        "quantitative_metrics",
+        "visualisations",
+    }
+    engineering_score = sum(
+        sum(check.points for check in categories[cat] if check.passed)
+        for cat in engineering_categories
+    )
+    scientific_score = sum(
+        sum(check.points for check in categories[cat] if check.passed)
+        for cat in scientific_categories
+    )
+
     cap_reasons = _explicit_cap_flags(manifest, stage)
     artifact_checks = categories["required_artifacts"]
     visual_checks = categories["visualisations"]
@@ -1355,6 +1379,8 @@ def _score_stage(run_dir: Path, stage: str, manifest: Mapping[str, Any]) -> dict
     return {
         "score": round(score, 2),
         "raw_score": round(raw_score, 2),
+        "engineering_score": round(engineering_score, 2),
+        "scientific_score": round(scientific_score, 2),
         "passed": [check.check_id for check in all_checks if check.passed],
         "failed": failed,
         "warnings": warnings,
@@ -1381,19 +1407,26 @@ def calculate_stage_scorecard(run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _stage_score(payload: Mapping[str, Any], stage: str, key: str) -> float:
+    return float(payload[stage].get(key, payload[stage]["score"]))
+
+
 def _plot_scorecard(payload: Mapping[str, Any], output_path: Path) -> None:
     scores = [float(payload[stage]["score"]) for stage in STAGES]
+    engineering = [_stage_score(payload, stage, "engineering_score") for stage in STAGES]
+    scientific = [_stage_score(payload, stage, "scientific_score") for stage in STAGES]
     colors = [
         "#2e7d32" if score >= 90 else "#ef6c00" if score >= 70 else "#c62828" for score in scores
     ]
-    fig = plt.figure(figsize=(15, 7))
-    grid = fig.add_gridspec(1, 2, width_ratios=(1.05, 1.45))
+    fig = plt.figure(figsize=(18, 7))
+    grid = fig.add_gridspec(1, 3, width_ratios=(1.3, 1.3, 1.4))
+
     axis = fig.add_subplot(grid[0, 0])
     bars = axis.barh(STAGES, scores, color=colors)
     axis.set_xlim(0, 100)
     axis.axvline(90, color="#1565c0", linestyle="--", linewidth=1.5, label="90 target")
     axis.set_xlabel("Traceable score / 100")
-    axis.set_title("PG-AMCD Stage 1–4 scorecard")
+    axis.set_title("PG-AMCD Stage 1–4 scorecard\n(Pipeline Completeness Score)")
     axis.legend(loc="lower right")
     for bar, score in zip(bars, scores):
         axis.text(
@@ -1404,7 +1437,19 @@ def _plot_scorecard(payload: Mapping[str, Any], output_path: Path) -> None:
             fontweight="bold",
         )
 
-    text_axis = fig.add_subplot(grid[0, 1])
+    axis = fig.add_subplot(grid[0, 1])
+    y = np.arange(len(STAGES))
+    width = 0.35
+    axis.barh(y - width / 2, engineering, width, label="Engineering", color="#2878B5")
+    axis.barh(y + width / 2, scientific, width, label="Scientific", color="#E15759")
+    axis.set_yticks(y, STAGES)
+    axis.set_xlim(0, 100)
+    axis.axvline(90, color="#1565c0", linestyle="--", linewidth=1.5, label="90 target")
+    axis.set_xlabel("Score / 100")
+    axis.set_title("Engineering vs Scientific score")
+    axis.legend(loc="lower right")
+
+    text_axis = fig.add_subplot(grid[0, 2])
     text_axis.axis("off")
     lines = ["Failed criteria (first 8 per stage)", ""]
     for stage in STAGES:
@@ -1422,9 +1467,11 @@ def _plot_scorecard(payload: Mapping[str, Any], output_path: Path) -> None:
 
 def _plot_progress(payload: Mapping[str, Any], output_path: Path) -> None:
     scores = np.asarray([float(payload[stage]["score"]) for stage in STAGES])
+    engineering = np.asarray([_stage_score(payload, stage, "engineering_score") for stage in STAGES])
+    scientific = np.asarray([_stage_score(payload, stage, "scientific_score") for stage in STAGES])
     passed = np.asarray([len(payload[stage].get("passed", [])) for stage in STAGES])
     failed = np.asarray([len(payload[stage].get("failed", [])) for stage in STAGES])
-    fig, axes = plt.subplots(1, 2, figsize=(13, 5.5))
+    fig, axes = plt.subplots(1, 3, figsize=(16, 5.5))
     colors = [
         "#2e7d32" if score >= 90 else "#ef6c00" if score >= 70 else "#c62828" for score in scores
     ]
@@ -1432,13 +1479,24 @@ def _plot_progress(payload: Mapping[str, Any], output_path: Path) -> None:
     axes[0].axhline(90, color="#1565c0", linestyle="--", label="90 target")
     axes[0].set_ylim(0, 100)
     axes[0].set_ylabel("Score")
-    axes[0].set_title("Stage completion score")
+    axes[0].set_title("Pipeline Completeness Score")
     axes[0].legend()
-    axes[1].bar(STAGES, passed, color="#2e7d32", label="passed checks")
-    axes[1].bar(STAGES, failed, bottom=passed, color="#c62828", label="failed checks")
-    axes[1].set_ylabel("Traceable checks")
-    axes[1].set_title("Check progress")
+
+    x = np.arange(len(STAGES))
+    width = 0.35
+    axes[1].bar(x - width / 2, engineering, width, label="Engineering", color="#2878B5")
+    axes[1].bar(x + width / 2, scientific, width, label="Scientific", color="#E15759")
+    axes[1].set_xticks(x, STAGES)
+    axes[1].set_ylim(0, 100)
+    axes[1].set_ylabel("Score")
+    axes[1].set_title("Engineering vs Scientific score")
     axes[1].legend()
+
+    axes[2].bar(STAGES, passed, color="#2e7d32", label="passed checks")
+    axes[2].bar(STAGES, failed, bottom=passed, color="#c62828", label="failed checks")
+    axes[2].set_ylabel("Traceable checks")
+    axes[2].set_title("Check progress")
+    axes[2].legend()
     fig.tight_layout()
     fig.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close(fig)

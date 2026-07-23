@@ -78,11 +78,34 @@ def generate_html_dashboard(
     commit = scorecard_data.get("commit", "unknown")
     timestamp = scorecard_data.get("timestamp", "")
 
+    # Load stage scorecard if it exists to show engineering/scientific split.
+    stage_scorecard: Dict[str, Any] = {}
+    stage_scorecard_path = os.path.join(run_dir, "stage_scorecard.json")
+    if os.path.exists(stage_scorecard_path):
+        with open(stage_scorecard_path, "r", encoding="utf-8") as fh:
+            stage_scorecard = json.load(fh)
+
+    def _stage_score_html(stage: str) -> str:
+        data = stage_scorecard.get(stage, {})
+        if not data:
+            return ""
+        eng = data.get("engineering_score", 0.0)
+        sci = data.get("scientific_score", 0.0)
+        total = data.get("score", 0.0)
+        return (
+            f"<tr><td>{stage}</td>"
+            f"<td>{total:.1f}</td>"
+            f"<td>{eng:.1f}</td>"
+            f"<td>{sci:.1f}</td></tr>"
+        )
+
     def _img_tag(rel: str) -> str:
         path = os.path.join(run_dir, rel)
         if os.path.exists(path):
             return f'<img src="{rel}" alt="{rel}">'
         return f"<p><em>{rel} not yet generated</em></p>"
+
+    stage_score_rows = "".join(_stage_score_html(stage) for stage in ("Stage_1", "Stage_2", "Stage_3", "Stage_4"))
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -110,11 +133,21 @@ def generate_html_dashboard(
     <p><strong>Timestamp:</strong> {timestamp}</p>
 
     <div class="section">
-        <h2>Overall Score</h2>
+        <h2>Overall Score (Pipeline Completeness)</h2>
         <div class="metric">
             <div class="metric-value">{overall:.1f}</div>
             <div>Overall</div>
         </div>
+    </div>
+
+    <div class="section">
+        <h2>Engineering vs Scientific Scores (per stage)</h2>
+        <table>
+            <tr><th>Stage</th><th>Completeness</th><th>Engineering</th><th>Scientific</th></tr>
+            {stage_score_rows}
+        </table>
+        {_img_tag('stage_scorecard.png')}
+        {_img_tag('stage_progress.png')}
     </div>
 
     <div class="section">
