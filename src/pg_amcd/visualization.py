@@ -29,12 +29,12 @@ def _load_json(path: str) -> Optional[Dict[str, Any]]:
         return json.load(fh)
 
 
-def _save_or_return(fig, output_path: Optional[str] = None) -> Optional[str | plt.Figure]:
+def _save_or_return(fig, output_path: Optional[str] = None) -> Optional[plt.Figure]:
     if output_path:
         os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
         fig.savefig(output_path, dpi=120, bbox_inches="tight")
         plt.close(fig)
-        return output_path
+        return None
     return fig
 
 
@@ -45,7 +45,7 @@ def plot_project_scorecard(
     scorecard_path: str,
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 6),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Bar chart of the eight segment scores."""
     data = _load_json(scorecard_path)
     if data is None or "scorecard" not in data:
@@ -92,7 +92,7 @@ def plot_score_history(
     history_path: str,
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 6),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Line chart of each segment score over commits/time."""
     data = _load_json(history_path)
     if not data:
@@ -129,7 +129,7 @@ def plot_validation_summary(
     validation_report_path: str,
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (8, 5),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Bar chart of validation outcomes (valid, invalid, metadata issues)."""
     report = _load_json(validation_report_path)
     if report is None:
@@ -182,7 +182,7 @@ def plot_validation_error_distribution(
     validation_report_path: str,
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (6, 6),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Pie chart of validation-error categories."""
     report = _load_json(validation_report_path)
     if report is None:
@@ -223,7 +223,7 @@ def plot_decomposition_metrics(
     provenance_path: str,
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 5),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Grouped bar chart of per-file decomposition metrics."""
     data = _load_json(provenance_path)
     if data is None:
@@ -257,7 +257,7 @@ def plot_imf_gates(
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (8, 5),
     labels: Optional[Sequence[str]] = None,
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Bar chart of IMF gate values."""
     values = list(gate_values)
     if labels is None:
@@ -279,7 +279,7 @@ def plot_signal_stages(
     denoised: Sequence[float],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (12, 8),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Stacked plot of raw, preprocessed, gated, and denoised signals."""
     fig, axes = plt.subplots(4, 1, figsize=figsize, sharex=True)
     for ax, sig, title in zip(
@@ -301,7 +301,7 @@ def plot_psd_comparison(
     labels: Sequence[str],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 5),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Overlay PSDs for raw, preprocessed, gated, and denoised signals."""
     fig, ax = plt.subplots(figsize=figsize)
     for f, p, label in zip(freqs, psds, labels):
@@ -322,7 +322,7 @@ def plot_confusion_matrix(
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (5, 5),
     class_names: Sequence[str] = ("stable", "chatter"),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Plot a confusion matrix from a 2x2 array."""
     cm = np.asarray(cm)
     fig, ax = plt.subplots(figsize=figsize)
@@ -346,7 +346,7 @@ def plot_roc_curve(
     fpr_tpr_pairs: Sequence[Tuple[Sequence[float], Sequence[float], str]],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (6, 6),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Plot one or more ROC curves."""
     fig, ax = plt.subplots(figsize=figsize)
     for fpr, tpr, label in fpr_tpr_pairs:
@@ -364,7 +364,7 @@ def plot_precision_recall_curve(
     precision_recall_pairs: Sequence[Tuple[Sequence[float], Sequence[float], str]],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (6, 6),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Plot one or more precision-recall curves."""
     fig, ax = plt.subplots(figsize=figsize)
     for prec, rec, label in precision_recall_pairs:
@@ -381,7 +381,7 @@ def plot_calibration_curve(
     prob_true_pairs: Sequence[Tuple[Sequence[float], Sequence[float], str]],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (6, 6),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Plot calibration curves (predicted vs observed probability)."""
     fig, ax = plt.subplots(figsize=figsize)
     for prob, freq, label in prob_true_pairs:
@@ -402,7 +402,7 @@ def plot_detection_timeline(
     threshold: float = 0.5,
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (12, 4),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Plot signal, chatter probability, and decision threshold over time."""
     fig, ax = plt.subplots(figsize=figsize)
     ax.plot(time, signal, color="gray", alpha=0.6, label="signal")
@@ -424,7 +424,7 @@ def plot_ablation_results(
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 6),
     metric: str = "f1",
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Bar chart of ablation F1 scores relative to the full pipeline."""
     names = list(ablation_data.keys())
     values = [ablation_data[n].get(metric, 0.0) for n in names]
@@ -443,7 +443,7 @@ def plot_cross_condition_heatmap(
     col_labels: Sequence[str],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (8, 6),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Plot a cross-condition generalisation heatmap."""
     mat = np.asarray(matrix)
     fig, ax = plt.subplots(figsize=figsize)
@@ -469,7 +469,7 @@ def plot_cutoff_search(
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 5),
     selected_cutoff: Optional[float] = None,
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Plot cutoff search objective value with selected cutoff and second-best gap."""
     if not cutoff_metrics:
         return None
@@ -530,7 +530,7 @@ def plot_ceemdan_convergence(
     metrics_map: Dict[str, Sequence[float]],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (12, 8),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Plot CEEMDAN metrics versus trial count for convergence analysis.
 
     ``metrics_map`` keys are subplot titles (e.g. IMF count, spectral overlap,
@@ -566,7 +566,7 @@ def plot_seed_stability_per_imf(
     matched_correlations: Sequence[float],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (12, 8),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Plot per-IMF seed stability with confidence intervals.
 
     ``centre_frequencies`` and ``energy_percentages`` have shape
@@ -644,7 +644,7 @@ def plot_gate_stability_matched(
     matched_ids: Sequence[str],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 5),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Plot gate stability using matched-IMF identities rather than raw indices."""
     x = np.arange(len(labels))
     fig, ax = plt.subplots(figsize=figsize)
@@ -663,7 +663,7 @@ def plot_cumulative_retention(
     retention_values: Sequence[float],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (8, 5),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Bar chart of cumulative energy retention across pipeline stages."""
     if not stages or not retention_values:
         return None
@@ -694,7 +694,7 @@ def plot_engineering_scientific_scorecard(
     stage_labels: Sequence[str],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 5),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Side-by-side engineering vs scientific scores per stage."""
     x = np.arange(len(stage_labels))
     width = 0.35
@@ -719,7 +719,7 @@ def plot_adjacent_overlap_diagnostics(
     correlations: Sequence[float],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (12, 6),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Stage 1 diagnostic: adjacent IMF centre frequencies, bandwidths and overlap."""
     n = len(imf_labels)
     if n == 0:
@@ -784,7 +784,7 @@ def plot_harmonic_overlap_diagnostics(
     labels: Sequence[str],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 5),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Stage 2 diagnostic: spindle-only, tooth-only, overlap and union energy per IMF."""
     x = np.arange(len(labels))
     width = 0.2
@@ -809,7 +809,7 @@ def plot_wavelet_level_comparison(
     metric_name: str,
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (8, 6),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Stage 3 heatmap comparing wavelet families and decomposition levels."""
     mat = np.asarray(metric_matrix)
     fig, ax = plt.subplots(figsize=figsize)
@@ -832,7 +832,7 @@ def plot_thresholding_comparison(
     metric_values: Dict[str, Sequence[float]],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 5),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Stage 3 grouped bar chart of soft/hard/garrote/firm/SURE thresholding."""
     x = np.arange(len(modes))
     width = 0.8 / max(1, len(metric_values))
@@ -854,7 +854,7 @@ def plot_transient_preservation(
     labels: Sequence[str],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 5),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Stage 3 transient event timing error or energy retention."""
     x = np.arange(len(labels))
     fig, ax = plt.subplots(figsize=figsize)
@@ -875,7 +875,7 @@ def plot_ablation_matrix(
     matrix: Sequence[Sequence[float]],
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (8, 6),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Cross-stage ablation matrix heatmap."""
     mat = np.asarray(matrix)
     fig, ax = plt.subplots(figsize=figsize)
@@ -901,7 +901,7 @@ def plot_confidence_interval_bars(
     title: str,
     output_path: Optional[str] = None,
     figsize: Tuple[float, float] = (10, 5),
-) -> Optional[str | plt.Figure]:
+) -> Optional[plt.Figure]:
     """Generic dataset-level bar chart with error bars showing confidence intervals."""
     x = np.arange(len(labels))
     means_arr = np.asarray(means)

@@ -460,18 +460,15 @@ def _write_stage_1(
         float(row.get("adjacent_spectral_overlap", np.nan)) for row in stage.imf_metrics
     ][: count]
     if count > 1 and all(np.isfinite(adjacent_overlaps[: count - 1])):
-        try:
-            fig_overlap = plot_adjacent_overlap_diagnostics(
-                labels,
-                centres,
-                bandwidths,
-                adjacent_overlaps[: count - 1],
-                [corr[i, i + 1] for i in range(count - 1)],
-            )
-            if isinstance(fig_overlap, plt.Figure):
-                figures.append(("13c_adjacent_overlap_diagnostics.png", fig_overlap))
-        except (ValueError, TypeError):
-            pass
+        fig_overlap = plot_adjacent_overlap_diagnostics(
+            labels,
+            centres,
+            bandwidths,
+            adjacent_overlaps[: count - 1],
+            [corr[i, i + 1] for i in range(count - 1)],
+        )
+        if fig_overlap is not None:
+            figures.append(("13c_adjacent_overlap_diagnostics.png", fig_overlap))
 
     stability = stage.seed_stability
     stability_labels = [
@@ -522,20 +519,27 @@ def _write_stage_1(
         if value is not None:
             per_seed_data[alias] = value
 
-    if all(
-        k in per_seed_data and per_seed_data[k] is not None for k in per_seed_keys
-    ):
-        try:
+    per_seed_ok = (
+        "centre_frequencies" in per_seed_data
+        and "energy_percentages" in per_seed_data
+        and "matched_correlations" in per_seed_data
+        and len(per_seed_data["centre_frequencies"]) == count
+        and len(per_seed_data["energy_percentages"]) == count
+        and len(per_seed_data["matched_correlations"]) == count
+    )
+    if per_seed_ok:
+        cf = per_seed_data["centre_frequencies"]
+        ep = per_seed_data["energy_percentages"]
+        n_seed_values = {len(row) for row in cf} | {len(row) for row in ep}
+        if len(n_seed_values) == 1 and 0 not in n_seed_values:
             fig_seed = plot_seed_stability_per_imf(
                 labels,
-                per_seed_data["centre_frequencies"],
-                per_seed_data["energy_percentages"],
+                cf,
+                ep,
                 per_seed_data["matched_correlations"],
             )
-            if isinstance(fig_seed, plt.Figure):
+            if fig_seed is not None:
                 figures.append(("13b_seed_stability_per_imf.png", fig_seed))
-        except (ValueError, TypeError):
-            pass
 
     reconstruction = np.sum(stage.imfs_scaled, axis=0) + stage.residual_scaled
     error = stage.segment_scaled - reconstruction

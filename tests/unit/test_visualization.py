@@ -70,7 +70,7 @@ def test_plot_project_scorecard(tmp_path):
     scorecard_path = _write_scorecard(tmp_path)
     output_path = os.path.join(tmp_path, "scorecard.png")
     result = viz.plot_project_scorecard(scorecard_path, output_path)
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -78,7 +78,7 @@ def test_plot_validation_summary(tmp_path):
     report_path = _write_validation_report(tmp_path)
     output_path = os.path.join(tmp_path, "validation.png")
     result = viz.plot_validation_summary(report_path, output_path)
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -86,21 +86,21 @@ def test_plot_decomposition_metrics(tmp_path):
     prov_path = _write_provenance(tmp_path)
     output_path = os.path.join(tmp_path, "decomposition.png")
     result = viz.plot_decomposition_metrics(prov_path, output_path)
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
 def test_plot_imf_gates(tmp_path):
     output_path = os.path.join(tmp_path, "gates.png")
     result = viz.plot_imf_gates([0.1, 0.3, 0.8], output_path)
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
 def test_plot_confusion_matrix(tmp_path):
     output_path = os.path.join(tmp_path, "confusion.png")
     result = viz.plot_confusion_matrix([[9, 1], [2, 8]], output_path)
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -109,7 +109,7 @@ def test_plot_roc_curve(tmp_path):
     fpr = [0.0, 0.2, 0.5, 1.0]
     tpr = [0.0, 0.6, 0.8, 1.0]
     result = viz.plot_roc_curve([(fpr, tpr, "model")], output_path)
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -125,7 +125,7 @@ def test_plot_cutoff_search(tmp_path):
         {"cutoff_hz": 150.0, "final_score": 0.25, "spectral_overlap": 0.18},
     ]
     result = viz.plot_cutoff_search(metrics, output_path, selected_cutoff=100.0)
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -138,7 +138,7 @@ def test_plot_ceemdan_convergence(tmp_path):
         "Orthogonality": [0.05, 0.04, 0.03, 0.03],
     }
     result = viz.plot_ceemdan_convergence(trial_counts, metrics_map, output_path)
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -155,7 +155,7 @@ def test_plot_seed_stability_per_imf(tmp_path):
         matched_correlations,
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -172,6 +172,7 @@ def test_plot_seed_stability_per_imf_returns_figure_without_output_path():
     )
     assert result is not None
     assert isinstance(result, plt.Figure)
+    plt.close(result)
 
 
 def test_plot_seed_stability_per_imf_empty_labels_returns_none():
@@ -199,7 +200,7 @@ def test_plot_gate_stability_matched(tmp_path):
         ["IMF 1", "IMF 2", "IMF 3"],
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -210,7 +211,7 @@ def test_plot_cumulative_retention(tmp_path):
         [1.0, 0.85, 0.42, 0.38],
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -222,7 +223,7 @@ def test_plot_engineering_scientific_scorecard(tmp_path):
         ["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -236,7 +237,7 @@ def test_plot_adjacent_overlap_diagnostics(tmp_path):
         [0.1, -0.05],
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -250,6 +251,7 @@ def test_plot_adjacent_overlap_diagnostics_returns_figure_without_output_path():
     )
     assert result is not None
     assert isinstance(result, plt.Figure)
+    plt.close(result)
 
 
 def test_plot_adjacent_overlap_diagnostics_empty_labels_returns_none():
@@ -279,7 +281,7 @@ def test_plot_harmonic_overlap_diagnostics(tmp_path):
         ["IMF 1", "IMF 2", "IMF 3"],
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -292,7 +294,7 @@ def test_plot_wavelet_level_comparison(tmp_path):
         "SNR",
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -303,7 +305,7 @@ def test_plot_thresholding_comparison(tmp_path):
         {"SNR": [12.0, 10.0, 11.0], "Chatter retention": [0.8, 0.7, 0.75]},
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -315,7 +317,7 @@ def test_plot_transient_preservation(tmp_path):
         ["Event 1", "Event 2", "Event 3"],
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -327,7 +329,7 @@ def test_plot_ablation_matrix(tmp_path):
         [[0.6, 0.6, 0.6], [0.65, 0.55, 0.6], [0.8, 0.85, 0.9]],
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
@@ -342,7 +344,7 @@ def test_plot_confidence_interval_bars(tmp_path):
         "Dataset-level metric with 95% CI",
         output_path,
     )
-    assert result == output_path
+    assert result is None
     assert os.path.exists(output_path)
 
 
