@@ -70,6 +70,7 @@ PER_RECORDING_ARTIFACTS: dict[str, tuple[str, ...]] = {
         "wavelet_thresholds.csv",
         "denoised_scaled.npz",
         "denoised_physical.npz",
+        "cumulative_retention.json",
         "stage_3_metrics.json",
         "stage_3_summary.md",
         "stage_3_config.json",
@@ -124,6 +125,7 @@ VISUAL_REQUIREMENTS: dict[str, tuple[tuple[str, tuple[str, ...]], ...]] = {
         ("retained_suppressed_imfs", ("retained_suppressed", "retained_vs_suppressed")),
         ("gate_stability", ("gate_stability",)),
         ("harmonic_markers", ("harmonic_markers",)),
+        ("harmonic_overlap_diagnostics", ("harmonic_overlap_diagnostics",)),
         ("chatter_band_highlight", ("chatter_band_highlight", "chatter_band_psd")),
     ),
     "Stage_3": (
@@ -612,6 +614,66 @@ def _metric_keys(record: Path, stage: str) -> set[str]:
     return keys
 
 
+def _stage_3_scientific_outcomes(records: Sequence[Path]) -> list[tuple[str, str, bool, str]]:
+    """Scientific pass/fail checks for Stage 3 beyond artifact presence."""
+    if not records:
+        return []
+
+    def _get_metric(record: Path, key: str) -> Any:
+        metrics = _safe_json(record / "stage_3_metrics.json") or {}
+        return metrics.get(key)
+
+    retention_ok: list[bool] = []
+    attenuation_ok: list[bool] = []
+    snr_improved: list[bool] = []
+    for record in records:
+        retention = _get_metric(record, "chatter_band_retention")
+        attenuation = _get_metric(record, "out_of_band_attenuation")
+        synthetic = _get_metric(record, "synthetic_self_check") or {}
+        input_snr = synthetic.get("input_snr_db")
+        output_snr = synthetic.get("output_snr_db")
+        retention_ok.append(
+            isinstance(retention, (int, float)) and float(retention) > 0.0
+        )
+        attenuation_ok.append(
+            isinstance(attenuation, (int, float)) and float(attenuation) > 0.0
+        )
+        snr_improved.append(
+            isinstance(input_snr, (int, float))
+            and isinstance(output_snr, (int, float))
+            and math.isfinite(float(input_snr))
+            and math.isfinite(float(output_snr))
+            and float(output_snr) > float(input_snr)
+        )
+
+    return [
+        (
+            "metric_chatter_retention_positive",
+            "Stage 3 chatter-band retention is positive",
+            all(retention_ok),
+            "all recordings retain chatter energy"
+            if all(retention_ok)
+            else "some recordings have non-positive chatter retention",
+        ),
+        (
+            "metric_out_of_band_attenuation_positive",
+            "Stage 3 out-of-band attenuation is positive",
+            all(attenuation_ok),
+            "all recordings attenuate out-of-band energy"
+            if all(attenuation_ok)
+            else "some recordings do not attenuate out-of-band energy",
+        ),
+        (
+            "metric_synthetic_snr_improved",
+            "Stage 3 synthetic self-check SNR improves",
+            all(snr_improved),
+            "all synthetic self-checks improve SNR"
+            if all(snr_improved)
+            else "some synthetic self-checks do not improve SNR",
+        ),
+    ]
+
+
 def _metric_outcomes(stage: str, records: Sequence[Path]) -> list[tuple[str, str, bool, str]]:
     if stage != "Stage_4":
         outcomes = []
@@ -631,6 +693,10 @@ def _metric_outcomes(stage: str, records: Sequence[Path]) -> list[tuple[str, str
                     else f"missing for: {', '.join(missing)}",
                 )
             )
+        # Stage 3 scientific sanity: pipeline completeness is not enough; the
+        # denoising must actually improve/retain the signal.
+        if stage == "Stage_3":
+            outcomes.extend(_stage_3_scientific_outcomes(records))
         return outcomes
 
     available: set[str] = set()

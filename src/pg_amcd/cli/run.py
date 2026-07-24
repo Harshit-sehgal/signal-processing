@@ -406,6 +406,24 @@ def run_pipeline_on_dataset(args: argparse.Namespace) -> int:
                 {"stage": "Stage_4", "error": f"Aggregate feature generation failed: {exc}"}
             )
 
+    # Aggregate cutoff selection frequency across recordings (Stage 1 gap completion).
+    if results:
+        from collections import Counter
+
+        cutoff_candidates = config.get("ceemdan", {}).get("search_cutoffs", [])
+        selected_cutoffs = [
+            float(result.stage_1.selected_cutoff)
+            for result in results
+            if result.stage_1 is not None
+        ]
+        counts = Counter(selected_cutoffs)
+        # Ensure every configured candidate appears, including zero-count ones.
+        for cutoff in cutoff_candidates:
+            counts.setdefault(float(cutoff), 0)
+        manifest["cutoff_selection_frequency"] = {
+            str(cutoff): int(count) for cutoff, count in sorted(counts.items())
+        }
+
     integration_passed = bool(results) and not manifest["failures"]
     manifest["per_stage_runtime"] = {
         f"Stage_{number}": _stage_runtime(results, number) for number in range(1, 5)

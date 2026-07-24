@@ -18,6 +18,8 @@ from scipy import signal as scipy_signal
 from pg_amcd.models import PipelineResult, Stage1Output, Stage2Output, Stage3Output, Stage4Output
 from pg_amcd.visualization import (
     plot_adjacent_overlap_diagnostics,
+    plot_cutoff_search,
+    plot_harmonic_overlap_diagnostics,
     plot_seed_stability_per_imf,
 )
 
@@ -347,45 +349,9 @@ def _write_stage_1(
         )
     )
 
-    cutoff_values = [
-        float(row.get("cutoff", row.get("cutoff_hz", 0.0))) for row in stage.cutoff_search
-    ]
-    objective_values = [
-        float(row.get("final_score", row.get("objective", 0.0))) for row in stage.cutoff_search
-    ]
-    fig, ax = plt.subplots(figsize=(8, 4))
-    ax.plot(cutoff_values, objective_values, marker="o", color="#2878B5", label="Objective")
-    ax.axvline(stage.selected_cutoff, color="crimson", linestyle="--", label="Selected")
-    if len(stage.cutoff_search) >= 2:
-        sorted_objectives = sorted(objective_values)
-        gap = sorted_objectives[1] - sorted_objectives[0]
-        ax.annotate(
-            f"gap to 2nd = {gap:.4g}",
-            xy=(stage.selected_cutoff, sorted_objectives[0]),
-            xytext=(
-                stage.selected_cutoff,
-                sorted_objectives[0] + 0.05 * (max(objective_values) - min(objective_values) or 1.0),
-            ),
-            arrowprops=dict(arrowstyle="->", color="crimson"),
-            fontsize=8,
-        )
-    for key in ("spectral_overlap", "max_adjacent_correlation", "absolute_oi", "seed_instability"):
-        if key in stage.cutoff_search[0]:
-            ax.plot(
-                cutoff_values,
-                [row.get(key, np.nan) for row in stage.cutoff_search],
-                marker=".",
-                alpha=0.6,
-                label=key.replace("_", " "),
-            )
-    ax.set(
-        title="Controlled cutoff-objective search",
-        xlabel="High-pass cutoff (Hz)",
-        ylabel="Objective / component value",
-    )
-    ax.grid(alpha=0.25)
-    ax.legend(fontsize=7)
-    figures.append(("05_cutoff_search.png", fig))
+    cutoff_fig = plot_cutoff_search(stage.cutoff_search, selected_cutoff=stage.selected_cutoff)
+    if cutoff_fig is not None:
+        figures.append(("05_cutoff_search.png", cutoff_fig))
 
     count = stage.imfs_scaled.shape[0]
     fig, axes = plt.subplots(count + 2, 1, figsize=(11, max(6, 1.5 * (count + 2))), sharex=True)
@@ -791,14 +757,25 @@ def _write_stage_2(
         expected_size=gates.size,
     )
 
-    # Build matched-IMF labels from centre frequency rather than raw row index.
-    matched_labels: list[str] = []
-    for index in range(gates.size):
-        cf = _indicator_values([indicators[index]] if index < len(indicators) else [], "centre_frequency_hz")
-        if cf and cf[0] > 0:
-            matched_labels.append(f"M{index + 1}\n{cf[0]:.0f} Hz")
-        else:
-            matched_labels.append(f"M{index + 1}")
+    # Prefer structurally matched labels from gate stability; fall back to
+    # indicator-derived labels if unavailable.
+    if (
+        isinstance(stability, dict)
+        and "matched_labels" in stability
+        and len(stability["matched_labels"]) == gates.size
+    ):
+        matched_labels = list(stability["matched_labels"])
+    else:
+        matched_labels = []
+        for index in range(gates.size):
+            cf = _indicator_values(
+                [indicators[index]] if index < len(indicators) else [],
+                "centre_frequency_hz",
+            )
+            if cf and cf[0] > 0:
+                matched_labels.append(f"M{index + 1}\n{cf[0]:.0f} Hz")
+            else:
+                matched_labels.append(f"M{index + 1}")
 
     fig, ax = plt.subplots(figsize=(9, 4))
     ax.errorbar(
@@ -823,6 +800,22 @@ def _write_stage_2(
         ax.set_title("Unmatched-mode stability penalty")
         ax.grid(axis="y", alpha=0.25)
         figures.append(("10b_unmatched_mode_penalty.png", fig))
+
+    # Spindle/tooth harmonic overlap diagnostic when each ratio set contains
+    # at least one positive value. Overlap/union are visual approximations
+    # derived from the per-IMF ratios, not rigorous harmonic mask intersections.
+    spindle_ratios = _indicator_values(indicators, "spindle_harmonic_energy_ratio")
+    tooth_ratios = _indicator_values(indicators, "tooth_harmonic_energy_ratio")
+    if any(v > 0 for v in spindle_ratios) and any(v > 0 for v in tooth_ratios):
+        overlap = [min(s, t) for s, t in zip(spindle_ratios, tooth_ratios)]
+        spindle_only = [s - o for s, o in zip(spindle_ratios, overlap)]
+        tooth_only = [t - o for t, o in zip(tooth_ratios, overlap)]
+        union = [max(s, t) for s, t in zip(spindle_ratios, tooth_ratios)]
+        fig_harmonic = plot_harmonic_overlap_diagnostics(
+            spindle_only, tooth_only, overlap, union, labels
+        )
+        if fig_harmonic is not None:
+            figures.append(("11b_harmonic_overlap_diagnostics.png", fig_harmonic))
 
     frequencies, power = _psd(stage_1.segment_physical, stage_1.sampling_rate)
     fig, ax = plt.subplots(figsize=(9, 4))
@@ -1142,25 +1135,24 @@ def _write_stage_3(
             raise RuntimeError("NumPy does not provide trapezoid or trapz integration")
         return float(integrate(power[mask], frequencies[mask]))
 
+    retention_stages = ["Raw", "Stage 1", "Stage 2", "Stage 3"]
     if band is not None and band[0] < band[1]:
         raw_energy = _chatter_band_energy(stage_1.segment_raw, fs, band)
         prep_energy = _chatter_band_energy(stage_1.segment_physical, fs, band)
         weighted_energy_band = _chatter_band_energy(stage_2.weighted_physical, fs, band)
         denoised_energy_band = _chatter_band_energy(stage.denoised_physical, fs, band)
         reference = raw_energy if raw_energy > 0 else 1.0
-        retention_stages = ["Raw", "Stage 1", "Stage 2", "Stage 3"]
         retention_values = [
-            1.0,
             prep_energy / reference,
             weighted_energy_band / reference,
             denoised_energy_band / reference,
         ]
         fig, ax = plt.subplots(figsize=(8, 5))
         bar_colors = ["#2878B5", "#59A14F", "#F28E2B", "#E15759"]
-        bars = ax.bar(retention_stages, retention_values, color=bar_colors)
+        bars = ax.bar(retention_stages[1:], retention_values, color=bar_colors)
         ax.set_ylabel("Cumulative retention")
         ax.set_ylim(0, 1)
-        ax.set_title("Cumulative chatter-band retention (Raw → Stage 3)")
+        ax.set_title("Cumulative chatter-band retention (Stage 1 → Stage 3)")
         for bar, val in zip(bars, retention_values):
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
@@ -1173,6 +1165,26 @@ def _write_stage_3(
         ax.grid(axis="y", alpha=0.25)
         fig.tight_layout()
         figures.append(("13_cumulative_retention.png", fig))
+
+        # Persist cumulative retention as a metric and a small JSON record.
+        retention_record = {
+            "stages": retention_stages,
+            "retention_values": [1.0] + [float(value) for value in retention_values],
+            "chatter_band_hz": list(band),
+        }
+    else:
+        retention_record = {
+            "stages": retention_stages,
+            "retention_values": [],
+            "chatter_band_hz": [],
+            "reason": "chatter band not configured or invalid",
+        }
+
+    stage.metrics["cumulative_chatter_band_retention"] = retention_record
+    (directory / "cumulative_retention.json").write_text(
+        json.dumps(retention_record, indent=2, default=str),
+        encoding="utf-8",
+    )
 
     paths = []
     for name, figure in figures:

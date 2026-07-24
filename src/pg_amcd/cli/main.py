@@ -3,7 +3,16 @@
 from __future__ import annotations
 
 import argparse
+import multiprocessing
 from collections.abc import Sequence
+
+
+def _ensure_multiprocessing_spawn() -> None:
+    """Use ``spawn`` so PyEMD's Pool avoids the fork-in-thread DeprecationWarning."""
+    try:
+        multiprocessing.set_start_method("spawn")
+    except RuntimeError:
+        pass
 
 
 def _stage_number(value: str) -> int:
@@ -60,6 +69,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the selected command and return its process exit status."""
 
+    _ensure_multiprocessing_spawn()
     args = build_parser().parse_args(argv)
     if args.command == "run":
         from pg_amcd.cli.run import run_pipeline_on_dataset

@@ -44,9 +44,10 @@ def _fake_result() -> SimpleNamespace:
         input_path="",
         metadata={},
         selected_parameters={"cutoff_frequency": 20.0},
-        **{
-            f"stage_{stage}": SimpleNamespace(runtime_seconds=0.01 * stage) for stage in range(1, 5)
-        },
+        stage_1=SimpleNamespace(runtime_seconds=0.01, selected_cutoff=20.0),
+        stage_2=SimpleNamespace(runtime_seconds=0.02),
+        stage_3=SimpleNamespace(runtime_seconds=0.03),
+        stage_4=SimpleNamespace(runtime_seconds=0.04),
     )
 
 
@@ -60,6 +61,7 @@ def _patch_fast_run(monkeypatch: pytest.MonkeyPatch, *, self_checks_pass: bool =
             "validation": {},
             "pipeline_version": "4.0.0",
             "feature_schema_version": "1.0.0",
+            "ceemdan": {"search_cutoffs": [20.0, 50.0]},
         },
     )
     monkeypatch.setattr(
@@ -241,6 +243,66 @@ def test_continue_on_error_records_partial_failure_and_aggregate_failure(
     assert manifest["success_count"] == 1
     assert manifest["input_validation"] == {"n_files": 2, "n_valid": 1, "n_invalid": 1}
     assert any(item.get("stage") == "Stage_4" for item in manifest["failures"])
+
+
+def test_run_records_cutoff_selection_frequency(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _make_inputs(tmp_path)
+    _patch_fast_run(monkeypatch)
+    monkeypatch.setattr(
+        run_module,
+        "validate_and_load_signal",
+        lambda *_args, **_kwargs: (
+            np.arange(1000) / 1000.0,
+            np.sin(2 * np.pi * 20 * np.arange(1000) / 1000.0),
+            1000.0,
+        ),
+    )
+    monkeypatch.setattr(run_module, "process_recording", lambda *_args, **_kwargs: _fake_result())
+
+    assert run_module.run_pipeline_on_dataset(_arguments(tmp_path)) == 0
+    manifest = json.loads(
+        (tmp_path / "outputs" / ("b" * 64) / "run_manifest.json").read_text(encoding="utf-8")
+    )
+    assert manifest["cutoff_selection_frequency"] == {"20.0": 1, "50.0": 0}
+
+
+def test_run_records_cutoff_selection_frequency_for_multiple_recordings(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _make_inputs(tmp_path, ("first.mat", "second.mat"))
+    _patch_fast_run(monkeypatch)
+    monkeypatch.setattr(
+        run_module,
+        "validate_and_load_signal",
+        lambda *_args, **_kwargs: (
+            np.arange(1000) / 1000.0,
+            np.sin(2 * np.pi * 20 * np.arange(1000) / 1000.0),
+            1000.0,
+        ),
+    )
+
+    call_count = {"n": 0}
+
+    def _process(*_args, **_kwargs):
+        result = _fake_result()
+        # Alternate selected cutoff between the two recordings.
+        result.selected_parameters = {"cutoff_frequency": 50.0}
+        result.stage_1 = SimpleNamespace(runtime_seconds=0.01, selected_cutoff=50.0)
+        if call_count["n"] % 2 == 0:
+            result.selected_parameters = {"cutoff_frequency": 20.0}
+            result.stage_1 = SimpleNamespace(runtime_seconds=0.01, selected_cutoff=20.0)
+        call_count["n"] += 1
+        return result
+
+    monkeypatch.setattr(run_module, "process_recording", _process)
+
+    assert run_module.run_pipeline_on_dataset(_arguments(tmp_path)) == 0
+    manifest = json.loads(
+        (tmp_path / "outputs" / ("b" * 64) / "run_manifest.json").read_text(encoding="utf-8")
+    )
+    assert manifest["cutoff_selection_frequency"] == {"20.0": 1, "50.0": 1}
 
 
 def test_report_failure_changes_an_otherwise_complete_run_to_partial_failure(

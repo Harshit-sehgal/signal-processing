@@ -7,7 +7,7 @@ module.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
@@ -131,6 +131,10 @@ class CutoffOptimizationResult:
     selected_cutoff: float
     per_cutoff_metrics: List[Dict[str, Any]] = field(default_factory=list)
     best_score: float = 0.0
+    second_best_score: float = 0.0
+    gap_to_second_best: float = 0.0
+    seed_consistency: Optional[float] = None
+    per_seed_best: Dict[str, float] = field(default_factory=dict)
 
 
 @dataclass

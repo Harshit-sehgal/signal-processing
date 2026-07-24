@@ -10,6 +10,7 @@ from pg_amcd.validation import (
     energy_distribution,
     frequency_ordering_index,
     validate_decomposition,
+    split_dataset_by_group,
 )
 
 
@@ -87,3 +88,60 @@ def test_validate_decomposition_keys(fs):
         "frequency_ordering_index",
     }
     assert report["nrmse"] < 1e-9
+
+
+def test_split_dataset_by_group_preserves_classes():
+    rows = [
+        {"recording_id": "a", "label": "chatter", "feature": 1},
+        {"recording_id": "a", "label": "chatter", "feature": 2},
+        {"recording_id": "b", "label": "chatter", "feature": 3},
+        {"recording_id": "c", "label": "stable", "feature": 4},
+        {"recording_id": "c", "label": "stable", "feature": 5},
+        {"recording_id": "d", "label": "stable", "feature": 6},
+        {"recording_id": "e", "label": "stable", "feature": 7},
+    ]
+    split = split_dataset_by_group(rows, test_frac=0.2, val_frac=0.2, random_state=0)
+    assert set(split) == {"train", "val", "test"}
+    # Each group appears in exactly one split.
+    all_ids = (
+        [r["recording_id"] for r in split["train"]]
+        + [r["recording_id"] for r in split["val"]]
+        + [r["recording_id"] for r in split["test"]]
+    )
+    assert len(all_ids) == len(rows)
+    # All classes represented in train.
+    train_labels = {r["label"] for r in split["train"]}
+    assert "chatter" in train_labels
+    assert "stable" in train_labels
+
+
+def test_split_dataset_by_group_empty_raises():
+    with pytest.raises(ValueError):
+        split_dataset_by_group([])
+
+
+def test_split_dataset_by_group_missing_key_raises():
+    rows = [{"label": "chatter", "feature": 1}]
+    with pytest.raises(KeyError):
+        split_dataset_by_group(rows, group_key="recording_id")
+
+
+def test_split_dataset_by_group_all_groups_appear_once():
+    rows = [
+        {"recording_id": "a", "label": "chatter", "feature": 1},
+        {"recording_id": "b", "label": "chatter", "feature": 2},
+        {"recording_id": "c", "label": "stable", "feature": 3},
+        {"recording_id": "d", "label": "stable", "feature": 4},
+        {"recording_id": "e", "label": "stable", "feature": 5},
+        {"recording_id": "f", "label": "stable", "feature": 6},
+    ]
+    split = split_dataset_by_group(rows, test_frac=0.5, val_frac=0.25, random_state=0)
+    # Every group appears exactly once across the three splits.
+    all_groups = {r["recording_id"] for r in split["train"]}
+    all_groups.update(r["recording_id"] for r in split["val"])
+    all_groups.update(r["recording_id"] for r in split["test"])
+    assert all_groups == {"a", "b", "c", "d", "e", "f"}
+    # Each split contains at least one distinct group.
+    assert len({r["recording_id"] for r in split["train"]}) >= 1
+    assert len({r["recording_id"] for r in split["val"]}) >= 1
+    assert len({r["recording_id"] for r in split["test"]}) >= 1

@@ -316,6 +316,7 @@ def optimize_cutoff(
     }
 
     per_cutoff: List[Dict[str, Any]] = []
+    per_seed_objectives_per_cutoff: List[List[float]] = []
     for cutoff in candidates:
         # Preprocess this candidate once.  Every seed below consumes the exact
         # same scaled array, and every candidate derives from the same immutable
@@ -373,6 +374,24 @@ def optimize_cutoff(
             weights=weights,
         )
 
+        # The per-seed objective reuses the cutoff-level instability and
+        # chatter-band distortion because those quantities describe the candidate
+        # (across all seeds), not an individual seed decomposition.
+        per_seed_objectives_per_cutoff.append(
+            [
+                _objective_from_components(
+                    spectral_overlap=float(metric["spectral_overlap"]),
+                    maximum_adjacent_correlation=float(metric["maximum_adjacent_imf_correlation"]),
+                    absolute_orthogonality=float(metric["absolute_orthogonality_index"]),
+                    frequency_ordering_score=float(metric["frequency_ordering_score"]),
+                    seed_instability=stability["instability_score"],
+                    chatter_band_distortion=band_distortion,
+                    weights=weights,
+                )
+                for metric in seed_metrics
+            ]
+        )
+
         per_cutoff.append(
             {
                 # `cutoff` remains for backwards compatibility; the explicit
@@ -406,10 +425,41 @@ def optimize_cutoff(
         )
 
     best = min(per_cutoff, key=lambda row: row["final_score"])
+    sorted_scores = sorted(row["final_score"] for row in per_cutoff)
+    second_best_score = sorted_scores[1] if len(sorted_scores) > 1 else best["final_score"]
+
+    # Per-seed best cutoff and selection consistency.  ``per_seed_objectives`` is
+    # indexed by [cutoff_index][seed_index]; for each seed we pick the candidate
+    # with the lowest objective.  The per-seed objective uses the same shared
+    # ``seed_instability`` and ``chatter_band_distortion`` as the averaged
+    # objective, so consistency measures agreement between individually optimal
+    # cutoffs and the cutoff chosen from the averaged metrics.
+    per_seed_best: Dict[str, float] = {}
+    for seed_index, seed_value in enumerate(seed_values):
+        seed_objectives = [
+            per_seed_objectives_per_cutoff[cutoff_index][seed_index]
+            for cutoff_index in range(len(candidates))
+        ]
+        best_cutoff_index = int(np.argmin(seed_objectives))
+        per_seed_best[str(seed_value)] = float(candidates[best_cutoff_index])
+
+    if len(seed_values) > 1:
+        matching = sum(
+            1 for selected in per_seed_best.values() if selected == best["cutoff"]
+        )
+        seed_consistency: Optional[float] = float(matching / len(per_seed_best))
+    else:
+        # Consistency across seeds is undefined with a single seed.
+        seed_consistency = None
+
     return CutoffOptimizationResult(
         selected_cutoff=float(best["cutoff"]),
         per_cutoff_metrics=per_cutoff,
         best_score=float(best["final_score"]),
+        second_best_score=float(second_best_score),
+        gap_to_second_best=float(second_best_score - best["final_score"]),
+        seed_consistency=seed_consistency,
+        per_seed_best=per_seed_best,
     )
 
 

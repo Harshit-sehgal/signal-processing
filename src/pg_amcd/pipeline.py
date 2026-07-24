@@ -49,7 +49,7 @@ from pg_amcd.weighting import (
     calculate_maiw_weights,
     reconstruct_gated_signal,
     restore_physical_units,
-    summarize_gate_stability,
+    summarize_matched_gate_stability,
     validate_physics_metadata,
 )
 
@@ -361,8 +361,9 @@ def _gate_stability(
             ceemdan.get("search_sifting_iterations", ceemdan.get("sifting_iterations", 16)),
         )
     )
-    vectors = []
-    component_counts = []
+    vectors: list[np.ndarray] = []
+    decompositions: list[np.ndarray] = []
+    component_counts: list[int] = []
     for seed in seeds:
         decomposition = _decompose(
             source,
@@ -371,7 +372,8 @@ def _gate_stability(
             trials=trials,
             sifting_iterations=sifting,
         )
-        component_counts.append(decomposition.num_imfs)
+        component_counts.append(int(decomposition.num_imfs))
+        decompositions.append(np.asarray(decomposition.imfs, dtype=float))
         if use_physics:
             if physics_metadata is None:  # guarded before pipeline work
                 raise RuntimeError("Validated physics metadata is unavailable.")
@@ -391,28 +393,18 @@ def _gate_stability(
             )
             vectors.append(weights)
 
-    if len(set(component_counts)) != 1:
-        reason = (
-            "Gate vectors cannot be compared by row index because CEEMDAN returned "
-            f"different physical-IMF counts across seeds: {component_counts}."
-        )
-        return {
-            "available": False,
-            "reason": reason,
-            "n_seeds": len(seeds),
-            "seeds": seeds,
-            "physical_imf_counts": component_counts,
-            "selection_threshold": selection_threshold,
-        }, reason
-    summary = summarize_gate_stability(vectors, selection_threshold=selection_threshold)
+    summary = summarize_matched_gate_stability(
+        vectors,
+        decompositions,
+        fs,
+        selection_threshold=selection_threshold,
+        seed_values=seeds,
+    )
     summary.update(
         {
             "available": True,
             "seeds": seeds,
             "physical_imf_counts": component_counts,
-            # Artifact-compatible aliases retain the canonical names too.
-            "mean_gates": summary["mean_gate_by_imf"],
-            "standard_deviation": summary["std_gate_by_imf"],
         }
     )
     return summary, None
@@ -478,6 +470,15 @@ def _synthetic_wavelet_self_check(
         clean_reference=np.asarray(components["clean"], dtype=float),
     )
     metrics = result.metrics.to_dict()
+    clean_signal = np.asarray(components["clean"], dtype=float)
+    noise_signal = np.asarray(noisy - clean_signal, dtype=float)
+    signal_var = float(np.var(clean_signal))
+    noise_var = float(np.var(noise_signal))
+    input_snr_db = (
+        10.0 * np.log10(signal_var / noise_var) if noise_var > 0 else float("inf")
+    )
+    raw_output_snr = metrics.get("synthetic_reference_snr_db")
+    output_snr_db = float(raw_output_snr) if raw_output_snr is not None else float("nan")
     metrics.update(
         {
             "sample_count": int(noisy.size),
@@ -485,6 +486,9 @@ def _synthetic_wavelet_self_check(
             "seed": int(seed),
             "known_clean_reference_used": True,
             "applied_level": int(result.applied_level),
+            "input_snr_db": float(input_snr_db),
+            "output_snr_db": output_snr_db,
+            "delta_snr_db": float(output_snr_db - input_snr_db),
         }
     )
     signals = {
@@ -619,6 +623,14 @@ def process_recording(
                 100.0 * residual_energy / source_energy if source_energy > 0 else 0.0
             ),
             "selected_cutoff_objective": float(selected_search_row["final_score"]),
+            "gap_to_second_best": float(cutoff_result.gap_to_second_best),
+            "second_best_score": float(cutoff_result.second_best_score),
+            "seed_consistency": (
+                float(cutoff_result.seed_consistency)
+                if cutoff_result.seed_consistency is not None
+                else None
+            ),
+            "per_seed_best_cutoff": dict(cutoff_result.per_seed_best),
             "controlled_segment_start_index": int(start_index),
             "controlled_segment_end_index": int(end_index),
             "controlled_segment_samples": int(end_index - start_index),

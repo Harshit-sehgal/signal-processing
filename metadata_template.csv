@@ -1,0 +1,2 @@
+relative_path,recording_id,rpm,tooth_count,stickout,depth_of_cut,feed_rate,tool_identifier,label,repetition_id
+REPLACE_ME.mat,REPLACE_ME,0,0,0.0,0.0,0.0,T0,unknown,1

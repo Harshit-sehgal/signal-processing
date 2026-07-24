@@ -18,6 +18,7 @@ from pg_amcd.evaluation import (
     _exploratory_segment_config,
     evaluate_real_dataset,
     evaluate_real_dataset_temporal,
+    run_multiseed_experiment,
 )
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -208,5 +209,23 @@ def test_evaluate_real_dataset_temporal_smoothing():
             == item["segment_duration_seconds"]
             for item in adjustments
         )
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_run_multiseed_experiment_aggregates_across_seeds():
+    """The multi-seed runner processes the same corpus with different CEEMDAN seeds."""
+    tmp = tempfile.mkdtemp()
+    try:
+        sub = _build_subset(tmp)
+        cfg = load_pipeline_config(os.path.join(ROOT, "configs", "research_fast.json"))
+        res = run_multiseed_experiment(sub, cfg, seeds=[42, 43])
+        assert len(res["seeds"]) == 2
+        assert len(res["per_seed"]) == 2
+        assert "summary" in res
+        assert "roc_auc" in res["summary"]
+        assert "f1" in res["summary"]
+        assert "mean" in res["summary"]["roc_auc"]
+        assert "std" in res["summary"]["roc_auc"]
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

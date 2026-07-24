@@ -8,7 +8,7 @@
     "epsilon": 0.02,
     "noise_seed": 42,
     "sifting_iterations": 2,
-    "search_cutoffs": [100],
+    "search_cutoffs": [25.0, 50.0, 75.0, 100.0, 125.0, 150.0, 200.0, 250.0, 300.0],
     "parallel": false
   },
   "maiw": {

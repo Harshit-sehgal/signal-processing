@@ -3,7 +3,9 @@ import re
 import glob
 from copy import deepcopy
 import math
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Sequence
+
+import numpy as np
 # Goal 6.1 canonical metadata schema. A metadata workbook must provide these
 # columns (matched case-insensitively; a few accept the aliases the parser
 # already understands). Enforced by build_dataset_index.
@@ -576,6 +578,66 @@ def evaluate_real_dataset(
         },
         "feature_ablations": feature_ablations,
         "skipped_files": skips,
+    }
+
+
+def run_multiseed_experiment(
+    mat_dir: str,
+    config: Dict[str, Any],
+    seeds: Sequence[int] = (42, 43, 44),
+    label_filter: tuple = ("c", "i", "s"),
+) -> Dict[str, Any]:
+    """Run the real-data evaluation across multiple CEEMDAN seeds.
+
+    Each seed produces an independent run of :func:`evaluate_real_dataset`.
+    The best-model ROC-AUC and F1 are aggregated across seeds so that Stage
+    1 stochasticity is visible in the final report.
+
+    Raises:
+        ValueError: if ``seeds`` is empty.
+    """
+    if not seeds:
+        raise ValueError("At least one seed is required for a multi-seed experiment.")
+
+    per_seed: List[Dict[str, Any]] = []
+    for seed in seeds:
+        local_config = deepcopy(config)
+        local_config.setdefault("ceemdan", {})["noise_seed"] = seed
+        local_config["random_state"] = seed
+        res = evaluate_real_dataset(
+            mat_dir,
+            local_config,
+            label_filter=label_filter,
+            random_state=seed,
+        )
+        per_seed.append({"seed": seed, "result": res})
+
+    aucs: List[float] = []
+    f1s: List[float] = []
+    for entry in per_seed:
+        loo = entry["result"].get("leave_one_recording_out", {})
+        if not loo:
+            continue
+        best_name = max(loo, key=lambda n: (loo[n] or {}).get("roc_auc", -1.0))
+        best_metrics = loo.get(best_name, {})
+        if "roc_auc" in best_metrics and not math.isnan(best_metrics["roc_auc"]):
+            aucs.append(float(best_metrics["roc_auc"]))
+        if "f1" in best_metrics and not math.isnan(best_metrics["f1"]):
+            f1s.append(float(best_metrics["f1"]))
+
+    def _mean_std(values: List[float]) -> Dict[str, float]:
+        if not values:
+            return {"mean": float("nan"), "std": float("nan")}
+        arr = np.asarray(values, dtype=float)
+        return {"mean": float(np.mean(arr)), "std": float(np.std(arr, ddof=0))}
+
+    return {
+        "seeds": list(seeds),
+        "per_seed": per_seed,
+        "summary": {
+            "roc_auc": _mean_std(aucs),
+            "f1": _mean_std(f1s),
+        },
     }
 
 

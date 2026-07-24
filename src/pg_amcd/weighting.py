@@ -11,12 +11,16 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import math
 import time
+import warnings
 from typing import Any, Dict, Literal, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
 import scipy.signal
 import scipy.special
 import scipy.stats
+from scipy.optimize import linear_sum_assignment
+
+from pg_amcd.decomposition import calculate_imf_metrics
 
 
 ResidualPolicy = Literal["last_row", "none"]
@@ -550,6 +554,166 @@ def summarize_gate_stability(
         "selected_imf_consistency": float(consistency),
         "selected_count_by_seed": np.sum(selected, axis=1).astype(int).tolist(),
         "selection_threshold": threshold,
+    }
+
+
+def _best_match_indices(
+    reference: np.ndarray,
+    target: np.ndarray,
+    fs: float,
+    *,
+    min_correlation: float = 0.5,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Return matched pair indices (reference -> target) using structural matching.
+
+    The matching uses absolute waveform correlation with a frequency proximity
+    penalty, similar to :func:`pg_amcd.decomposition._match_seed_decompositions`.
+    Any pair whose correlation is below ``min_correlation`` is treated as
+    unmatched.
+    """
+    if reference.ndim != 2 or target.ndim != 2:
+        raise ValueError("Reference and target must be physical IMF matrices.")
+
+    ref_metrics = calculate_imf_metrics(reference, fs)
+    tgt_metrics = calculate_imf_metrics(target, fs)
+    ref_cf = np.asarray([m.centre_frequency_hz for m in ref_metrics], dtype=float)
+    tgt_cf = np.asarray([m.centre_frequency_hz for m in tgt_metrics], dtype=float)
+
+    correlation = np.empty((reference.shape[0], target.shape[0]), dtype=float)
+    frequency_cost = np.empty_like(correlation)
+    eps = max(float(fs) * 1e-12, np.finfo(float).eps)
+
+    for i in range(reference.shape[0]):
+        for j in range(target.shape[0]):
+            a = reference[i] - float(np.mean(reference[i]))
+            b = target[j] - float(np.mean(target[j]))
+            denom = float(np.sqrt(np.sum(a**2) * np.sum(b**2)))
+            correlation[i, j] = (
+                0.0 if denom <= np.finfo(float).tiny else abs(float(np.sum(a * b) / denom))
+            )
+            log_ratio = abs(float(np.log((ref_cf[i] + eps) / (tgt_cf[j] + eps))))
+            frequency_cost[i, j] = 1.0 - np.exp(-log_ratio)
+
+    cost = 0.65 * (1.0 - correlation) + 0.35 * frequency_cost
+    rows, cols = linear_sum_assignment(cost)
+    valid = correlation[rows, cols] >= min_correlation
+    return rows[valid], cols[valid]
+
+
+def summarize_matched_gate_stability(
+    gate_vectors: Sequence[np.ndarray],
+    decompositions: Sequence[np.ndarray],
+    fs: float,
+    *,
+    selection_threshold: float = 0.5,
+    seed_values: Optional[Sequence[int]] = None,
+    min_correlation: float = 0.5,
+) -> Dict[str, Any]:
+    """Summarise gate stability across seeds after structurally matching IMFs.
+
+    Unlike :func:`summarize_gate_stability`, this function tolerates different
+    physical-IMF counts across seeds because it matches modes by waveform
+    correlation and centre-frequency proximity before comparing gates.
+    """
+    if not gate_vectors or not decompositions:
+        raise ValueError("At least one gate vector and decomposition is required.")
+    if len(gate_vectors) != len(decompositions):
+        raise ValueError("gate_vectors and decompositions must have the same length.")
+
+    n_seeds = len(gate_vectors)
+    seeds = list(seed_values) if seed_values is not None else list(range(n_seeds))
+    reference = np.asarray(decompositions[0], dtype=float)
+    n_ref = reference.shape[0]
+    reference_gates = np.asarray(gate_vectors[0], dtype=float)
+    if reference_gates.size != n_ref:
+        raise ValueError("First gate vector length must match the reference decomposition.")
+
+    for seed_index, (gates_i, decomp_i) in enumerate(zip(gate_vectors, decompositions)):
+        gates_i = np.asarray(gates_i, dtype=float)
+        if gates_i.size != decomp_i.shape[0]:
+            raise ValueError(
+                f"Seed {seed_index}: gate vector length ({gates_i.size}) does not match "
+                f"decomposition IMF count ({decomp_i.shape[0]})."
+            )
+        if not np.all(np.isfinite(gates_i)):
+            raise ValueError("Gate vectors must contain only finite values.")
+        if np.any((gates_i < 0.0) | (gates_i > 1.0)):
+            raise ValueError("Independent gates must be bounded in [0, 1].")
+
+    reference_metrics = calculate_imf_metrics(reference, fs)
+    reference_cf = [m.centre_frequency_hz for m in reference_metrics]
+    matched_labels = [
+        f"M{i + 1}\n{cf:.0f} Hz" if cf > 0 else f"M{i + 1}" for i, cf in enumerate(reference_cf)
+    ]
+
+    # Build an (n_seeds, n_ref) matrix.  Unmatched modes are represented by NaN
+    # so they do not contribute to mean/std calculations.
+    aligned = np.full((n_seeds, n_ref), np.nan, dtype=float)
+    aligned[0, :] = reference_gates
+    matched_counts = [n_ref]
+    for seed_index in range(1, n_seeds):
+        target = np.asarray(decompositions[seed_index], dtype=float)
+        if target.shape[1] != reference.shape[1]:
+            raise ValueError(
+                "All seed decompositions must have the same sample count; "
+                f"reference has {reference.shape[1]}, seed {seed_index} has {target.shape[1]}."
+            )
+        rows, cols = _best_match_indices(
+            reference, target, fs, min_correlation=min_correlation
+        )
+        if rows.size:
+            aligned[seed_index, rows] = np.asarray(gate_vectors[seed_index], dtype=float)[cols]
+            matched_counts.append(int(rows.size))
+        else:
+            matched_counts.append(0)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        mean_gates = np.nanmean(aligned, axis=0)
+        std_gates = np.nanstd(aligned, axis=0, ddof=0)
+    mean_gates = np.nan_to_num(mean_gates, nan=0.0)
+    std_gates = np.nan_to_num(std_gates, nan=0.0)
+
+    selected = (aligned >= selection_threshold).astype(float)
+    # For each reference mode, fraction of *available* seeds that selected it.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        fraction_selected = np.nanmean(selected, axis=0)
+        selected_count_by_seed = np.nansum(selected, axis=1)
+    fraction_selected = np.nan_to_num(fraction_selected, nan=0.0)
+    selected_count_by_seed = np.nan_to_num(selected_count_by_seed, nan=0.0)
+
+    # Consistency: fraction of reference modes where all available seeds agree.
+    def _all_agree(col: np.ndarray) -> bool:
+        available = col[~np.isnan(col)]
+        if available.size == 0:
+            return True
+        return bool(np.all(available == available[0]))
+
+    selected_consistency = float(np.mean([_all_agree(selected[:, i]) for i in range(n_ref)]))
+
+    unmatched_proportions = [(n_ref - count) / n_ref for count in matched_counts]
+    unmatched_mode_penalty = float(np.mean(unmatched_proportions))
+
+    return {
+        "available": True,
+        "n_seeds": n_seeds,
+        "seeds": seeds,
+        "physical_imf_count": n_ref,
+        "physical_imf_counts": [decomp.shape[0] for decomp in decompositions],
+        "mean_gate_by_imf": mean_gates.tolist(),
+        "std_gate_by_imf": std_gates.tolist(),
+        "mean_gates": mean_gates.tolist(),
+        "standard_deviation": std_gates.tolist(),
+        "selected_fraction_by_imf": fraction_selected.tolist(),
+        "selected_imf_consistency": selected_consistency,
+        "selected_count_by_seed": selected_count_by_seed.astype(int).tolist(),
+        "unmatched_mode_penalty": unmatched_mode_penalty,
+        "matched_labels": matched_labels,
+        "reference_centre_frequencies_hz": reference_cf,
+        "matched_counts": matched_counts,
+        "min_correlation": min_correlation,
+        "selection_threshold": selection_threshold,
     }
 
 

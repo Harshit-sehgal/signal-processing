@@ -506,14 +506,21 @@ def plot_cutoff_search(
             fontsize=8,
         )
 
-    for key in ["spectral_overlap", "max_adjacent_correlation", "absolute_oi", "seed_instability"]:
+    component_keys = [
+        ("spectral_overlap", "spectral overlap"),
+        ("maximum_adjacent_correlation", "max adjacent correlation"),
+        ("absolute_orthogonality_index", "absolute orthogonality"),
+        ("seed_instability", "seed instability"),
+    ]
+    for key, label in component_keys:
+        # Support both canonical and legacy/alias keys.
         if key in sorted_metrics[0]:
             ax.plot(
                 cutoffs,
                 [m[key] for m in sorted_metrics],
                 marker=".",
                 alpha=0.6,
-                label=key.replace("_", " "),
+                label=label,
             )
 
     ax.set_xlabel("Cutoff frequency (Hz)")

@@ -381,6 +381,18 @@ def test_required_stage_2_to_4_artifacts_and_visuals_are_nonempty(
         assert all(path.with_suffix(".svg").stat().st_size > 1_000 for path in pngs)
 
 
+def test_harmonic_overlap_diagnostics_visual_is_written(
+    artifact_run: tuple[Path, PipelineResult],
+) -> None:
+    run_dir, result = artifact_run
+    stage_2_dir = run_dir / "Stage_2" / result.recording_id
+    assert _visual_present(stage_2_dir, ("harmonic_overlap_diagnostics",))
+    png = stage_2_dir / "11b_harmonic_overlap_diagnostics.png"
+    svg = stage_2_dir / "11b_harmonic_overlap_diagnostics.svg"
+    assert png.is_file() and png.stat().st_size > 1_000
+    assert svg.is_file() and svg.stat().st_size > 1_000
+
+
 def test_typed_indicator_gate_and_wavelet_diagnostics_are_mapped_losslessly(
     artifact_run: tuple[Path, PipelineResult],
 ) -> None:

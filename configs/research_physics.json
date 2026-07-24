@@ -1,0 +1,44 @@
+{
+  "sampling_rate": 10000.0,
+  "segment_points": 10000,
+  "use_physics_gating": true,
+  "ceemdan": {
+    "trials": 2,
+    "search_trials": 1,
+    "epsilon": 0.02,
+    "noise_seed": 42,
+    "sifting_iterations": 2,
+    "search_cutoffs": [25.0, 50.0, 75.0, 100.0, 125.0, 150.0, 200.0, 250.0, 300.0],
+    "parallel": false
+  },
+  "maiw": {
+    "alpha": 0.25,
+    "beta": 0.25,
+    "gamma": 0.25,
+    "delta": 0.25,
+    "chatter_band_center": 1250.0,
+    "chatter_band_spread": 500.0
+  },
+  "physics_gating": {
+    "chatter_energy_weight": 4.0,
+    "correlation_weight": 2.0,
+    "kurtosis_weight": 1.0,
+    "frequency_proximity_weight": 1.0,
+    "harmonic_penalty": 5.0,
+    "offset": 1.5,
+    "harmonic_tolerance_hz": 15.0,
+    "harmonic_count": 5,
+    "kurtosis_scale": 10.0,
+    "selection_threshold": 0.5,
+    "include_residual": false
+  },
+  "wavelet": {
+    "wavelet_name": "db8",
+    "level": 4,
+    "threshold_mode": "soft",
+    "band_aware": true,
+    "chatter_threshold_scale": 0.5,
+    "noise_threshold_scale": 1.4,
+    "minimum_noise_sigma": 1e-12
+  }
+}

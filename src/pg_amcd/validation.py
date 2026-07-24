@@ -7,7 +7,7 @@ functions are pure (numpy only) and operate on the IMF matrix ``imfs`` of
 shape ``(n_imfs, n_samples)``.
 """
 
-from typing import Dict
+from typing import Any, Dict, List
 
 import numpy as np
 
@@ -111,4 +111,84 @@ def validate_decomposition(original: np.ndarray, imfs: np.ndarray, fs: float) ->
         "orthogonality_index": orthogonality_index(imfs),
         "mode_mixing_index": mode_mixing_index(imfs),
         "frequency_ordering_index": frequency_ordering_index(imfs, fs),
+    }
+
+
+def split_dataset_by_group(
+    index_table: List[Dict[str, Any]],
+    group_key: str = "recording_id",
+    test_frac: float = 0.2,
+    val_frac: float = 0.1,
+    random_state: int = 42,
+) -> Dict[str, List[Dict[str, Any]]]:
+    """Split a dataset index into train/val/test groups without leakage.
+
+    Splits are performed at the group level (e.g., ``recording_id``) so that
+    all windows belonging to one recording stay in one split.  Class labels are
+    read from each group's first row and used to balance the split.
+
+    Parameters
+    ----------
+    index_table: list of row dictionaries. Must contain ``group_key`` and a
+        ``label`` field on every row.
+    group_key: column used to define a recording/group.
+    test_frac: fraction of groups to reserve for testing.
+    val_frac: fraction of groups to reserve for validation.
+    random_state: seed for the random permutation.
+
+    Returns
+    -------
+    dict with keys ``train``, ``val``, ``test``; each maps to a list of rows.
+    Note that ``val`` or ``test`` may be empty when a class has too few
+    groups to satisfy the requested fractions while preserving at least one
+    group in ``train``.
+    """
+    if not index_table:
+        raise ValueError("index_table must contain at least one row.")
+    if test_frac < 0 or val_frac < 0 or (test_frac + val_frac) >= 1.0:
+        raise ValueError("test_frac and val_frac must be non-negative and sum to less than 1.")
+
+    rows_by_group: Dict[str, List[Dict[str, Any]]] = {}
+    for row in index_table:
+        group = str(row[group_key])
+        rows_by_group.setdefault(group, []).append(row)
+
+    group_ids = list(rows_by_group.keys())
+    labels = {gid: rows_by_group[gid][0].get("label", "unknown") for gid in group_ids}
+
+    rng = np.random.default_rng(random_state)
+    perm = rng.permutation(len(group_ids))
+    shuffled = [group_ids[int(i)] for i in perm]
+
+    class_to_groups: Dict[str, List[str]] = {}
+    for gid in shuffled:
+        class_to_groups.setdefault(labels[gid], []).append(gid)
+
+    train_ids: List[str] = []
+    val_ids: List[str] = []
+    test_ids: List[str] = []
+    for gids in class_to_groups.values():
+        n = len(gids)
+        n_test = max(0, int(round(n * test_frac)))
+        n_val = max(0, int(round(n * val_frac)))
+        # Ensure at least one group remains in train.
+        while n_test + n_val >= n and (n_test > 0 or n_val > 0):
+            if n_val > 0:
+                n_val -= 1
+            elif n_test > 0:
+                n_test -= 1
+        test_ids.extend(gids[:n_test])
+        val_ids.extend(gids[n_test : n_test + n_val])
+        train_ids.extend(gids[n_test + n_val :])
+
+    def _collect(gids: List[str]) -> List[Dict[str, Any]]:
+        result: List[Dict[str, Any]] = []
+        for gid in gids:
+            result.extend(rows_by_group[gid])
+        return result
+
+    return {
+        "train": _collect(train_ids),
+        "val": _collect(val_ids),
+        "test": _collect(test_ids),
     }

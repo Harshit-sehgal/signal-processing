@@ -139,6 +139,13 @@ def test_optimize_cutoff_returns_valid_candidate():
     assert isinstance(res, CutoffOptimizationResult)
     assert res.selected_cutoff in cutoffs
     assert len(res.per_cutoff_metrics) == len(cutoffs)
+    assert np.isfinite(res.second_best_score)
+    assert res.gap_to_second_best >= 0.0
+    if len(res.per_seed_best) > 1:
+        assert 0.0 <= res.seed_consistency <= 1.0
+    else:
+        assert res.seed_consistency is None
+    assert all(value in cutoffs for value in res.per_seed_best.values())
     for d in res.per_cutoff_metrics:
         for key in (
             "cutoff",
@@ -229,6 +236,13 @@ def test_pipeline_populates_cutoff_search():
     assert res.stage_1.selected_cutoff in cutoffs
     assert len(res.stage_1.cutoff_search) == len(cutoffs)
     assert res.selected_parameters["cutoff_frequency"] in cutoffs
+    assert "gap_to_second_best" in res.stage_1.metrics
+    assert "second_best_score" in res.stage_1.metrics
+    assert "seed_consistency" in res.stage_1.metrics
+    assert "per_seed_best_cutoff" in res.stage_1.metrics
+    assert np.isfinite(res.stage_1.metrics["gap_to_second_best"])
+    if res.stage_1.metrics["seed_consistency"] is not None:
+        assert 0.0 <= res.stage_1.metrics["seed_consistency"] <= 1.0
     search = res.selected_parameters["cutoff_search"]
     assert isinstance(search, list) and len(search) == len(cutoffs)
 

@@ -122,3 +122,59 @@ def evaluate_denoising_performance(
         "noise_band_attenuation": noise_band_attenuation,
         "onset_detection_error": onset_detection_error,
     }
+
+
+def generate_semisynthetic_chatter(
+    stable_signal: np.ndarray,
+    fs: float,
+    chatter_freq: float = 1250.0,
+    chatter_onset: float = 0.5,
+    snr_db: float = 20.0,
+    seed: int = 0,
+) -> tuple:
+    """Inject a controlled chatter component into a real stable recording.
+
+    The stable signal is treated as the ground-truth background (forced,
+    drift and noise). A synthetic chatter sinusoid with a logistic onset is
+    scaled so that the chatter-to-background power ratio equals ``snr_db``.
+
+    Parameters
+    ----------
+    stable_signal:
+        Background signal into which chatter is injected.
+    fs:
+        Sampling rate in Hz.
+    chatter_freq:
+        Frequency of the injected chatter sinusoid.
+    chatter_onset:
+        Onset time (seconds) controlling the logistic envelope.
+    snr_db:
+        Desired chatter-to-background power ratio in dB.
+    seed:
+        Reserved for reproducible jitter; currently unused so the exact SNR
+        contract is preserved.
+
+    Returns ``(t, combined_signal, components)`` where ``components`` holds
+    the ``stable`` background, the injected ``chatter``, and the ``clean``
+    reference (identical to the stable background).
+    """
+    _ = seed  # reserved for future deterministic jitter; currently unused
+    stable = np.asarray(stable_signal, dtype=float)
+    n = stable.size
+    t = np.arange(n) / fs
+
+    envelope = 1.0 / (1.0 + np.exp(-15.0 * (t - chatter_onset)))
+    x_chatter = envelope * np.sin(2 * np.pi * chatter_freq * t)
+
+    stable_power = float(np.var(stable))
+    chatter_power = stable_power / (10.0 ** (snr_db / 10.0))
+    if chatter_power > 0 and np.var(x_chatter) > 0:
+        x_chatter = x_chatter * np.sqrt(chatter_power / np.var(x_chatter))
+
+    combined = stable + x_chatter
+    components = {
+        "stable": stable,
+        "chatter": x_chatter,
+        "clean": stable,
+    }
+    return t, combined, components
